@@ -67,7 +67,7 @@ int CHudTimer::Draw(float time)
 	int r, g, b;
 	UnpackRGB(r, g, b, RGB_YELLOWISH);
 
-	gHUD.DrawHudStringCentered(ScreenWidth / 2, 20, str, r, g, b);
+	gHUD.DrawHudStringCentered(ScreenWidth / 2, gHUD.m_scrinfo.iCharHeight, str, r, g, b);
 
 	return 0;
 }
