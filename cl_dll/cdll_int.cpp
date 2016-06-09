@@ -271,6 +271,13 @@ void CL_DLLEXPORT HUD_Frame( double time )
 	ServersThink( time );
 
 	GetClientVoiceMgr()->Frame(time);
+
+	// I don't like this being in HUD_Frame but I couldn't find a better place.
+	static bool printed_watermark = false;
+	if (!printed_watermark) {
+		printed_watermark = true;
+		gEngfuncs.Con_Printf("AG-Compat DLL by Ivan \"YaLTeR\" Molodetskikh built at " __DATE__ " " __TIME__ ".\n");
+	}
 }
 
 
