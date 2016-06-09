@@ -367,6 +367,7 @@ void CHud :: Init( void )
 	m_TextMessage.Init();
 	m_StatusIcons.Init();
 	m_Timer.Init();
+	m_Vote.Init();
 	GetClientVoiceMgr()->Init(&g_VoiceStatusHelper, (vgui::Panel**)&gViewPort);
 
 	m_Menu.Init();
@@ -517,6 +518,7 @@ void CHud :: VidInit( void )
 	m_TextMessage.VidInit();
 	m_StatusIcons.VidInit();
 	m_Timer.VidInit();
+	m_Vote.VidInit();
 	GetClientVoiceMgr()->VidInit();
 }
 

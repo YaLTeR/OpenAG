@@ -93,6 +93,7 @@ struct HUDLIST {
 #include "hud_spectator.h"
 
 #include "hud_timer.h"
+#include "hud_vote.h"
 
 
 //
@@ -617,6 +618,7 @@ public:
 	CHudBenchmark	m_Benchmark;
 
 	CHudTimer		m_Timer;
+	CHudVote		m_Vote;
 
 	void Init( void );
 	void VidInit( void );
