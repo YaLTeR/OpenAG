@@ -349,3 +349,142 @@ int CHud::DrawHudStringCentered(int x, int y, char* string, int r, int g, int b)
 	return x + gEngfuncs.pfnDrawString(x - width / 2, y, string, r, g, b);
 }
 
+// R, G, B.
+static const constexpr int colors[][3] = {
+	{ 255, 0,   0   },
+	{ 0,   255, 0   },
+	{ 255, 255, 0   },
+	{ 0,   0,   255 },
+	{ 0,   255, 255 },
+	{ 255, 0,   255 },
+	{ 136, 136, 136 },
+	{ 255, 255, 255 }
+};
+
+int CHud::DrawHudStringWithColorTags(int x, int y, char* string, int r, int g, int b)
+{
+	int r_ = r, g_ = g, b_ = b;
+	char *temp = string;
+
+	while ((temp = strchr(temp, '^'))) {
+		char color_index = temp[1];
+
+		if (color_index >= '0' && color_index <= '9') {
+			if (temp != string) {
+				*temp = '\0';
+
+				x += gEngfuncs.pfnDrawString(x, y, string, r_, g_, b_);
+
+				*temp = '^';
+			}
+
+			string = temp + 2;
+			temp = temp + 2;
+
+			if (color_index == '0' || color_index == '9') {
+				r_ = r;
+				g_ = g;
+				b_ = b;
+			} else {
+				r_ = colors[color_index - '1'][0];
+				g_ = colors[color_index - '1'][1];
+				b_ = colors[color_index - '1'][2];
+			}
+		} else {
+			++temp;
+		}
+	}
+
+	if (string[0] != '\0')
+		x += gEngfuncs.pfnDrawString(x, y, string, r_, g_, b_);
+
+	return x;
+}
+
+int CHud::DrawConsoleStringWithColorTags(int x, int y, char* string, bool use_default_color, float default_r, float default_g, float default_b)
+{
+	int r_, g_, b_;
+	bool custom_color = false;
+	char *temp = string;
+
+	while ((temp = strchr(temp, '^'))) {
+		char color_index = temp[1];
+
+		if (color_index >= '0' && color_index <= '9') {
+			if (temp != string) {
+				*temp = '\0';
+
+				if (custom_color)
+					gEngfuncs.pfnDrawSetTextColor(r_ / 255.0f, g_ / 255.0f, b_ / 255.0f);
+				else if (use_default_color)
+					gEngfuncs.pfnDrawSetTextColor(default_r, default_g, default_b);
+
+				x = gEngfuncs.pfnDrawConsoleString(x, y, string);
+
+				*temp = '^';
+			}
+
+			string = temp + 2;
+			temp = temp + 2;
+
+			if (color_index == '0' || color_index == '9') {
+				custom_color = false;
+			} else {
+				custom_color = true;
+				r_ = colors[color_index - '1'][0];
+				g_ = colors[color_index - '1'][1];
+				b_ = colors[color_index - '1'][2];
+			}
+		} else {
+			++temp;
+		}
+	}
+
+	if (string[0] != '\0') {
+		if (custom_color)
+			gEngfuncs.pfnDrawSetTextColor(r_ / 255.0f, g_ / 255.0f, b_ / 255.0f);
+		else if (use_default_color)
+			gEngfuncs.pfnDrawSetTextColor(default_r, default_g, default_b);
+
+		x = gEngfuncs.pfnDrawConsoleString(x, y, string);
+	}
+
+	return x;
+}
+
+void CHud::GetConsoleStringSizeWithColorTags(char* string, int& width, int& height)
+{
+	width = 0;
+	height = 0;
+
+	int w, h;
+	char *temp = string;
+
+	while ((temp = strchr(temp, '^'))) {
+		char color_index = temp[1];
+
+		if (color_index >= '0' && color_index <= '9') {
+			if (temp != string) {
+				*temp = '\0';
+
+				gEngfuncs.pfnDrawConsoleStringLen(string, &w, &h);
+				width += w;
+				height = max(height, h);
+
+				*temp = '^';
+			}
+
+			string = temp + 2;
+			temp = temp + 2;
+		} else {
+			++temp;
+		}
+	}
+
+	if (string[0] != '\0') {
+		gEngfuncs.pfnDrawConsoleStringLen(string, &w, &h);
+		width += w;
+		height = max(height, h);
+	}
+}
+

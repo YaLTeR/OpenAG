@@ -578,6 +578,17 @@ public:
 	int GetNumWidth(int iNumber, int iFlags);
 
 	int DrawHudStringCentered(int x, int y, char* string, int r, int g, int b);
+	int DrawHudStringWithColorTags(int x, int y, char* string, int r, int g, int b);
+	int DrawConsoleStringWithColorTags(
+		int x,
+		int y,
+		char* string,
+		bool use_default_color = false,
+		float default_r = 0.0f,
+		float default_g = 0.0f,
+		float default_b = 0.0f
+	);
+	void GetConsoleStringSizeWithColorTags(char* string, int& width, int& height);
 
 private:
 	// the memory for these arrays are allocated in the first call to CHud::VidInit(), when the hud.txt and associated sprites are loaded.

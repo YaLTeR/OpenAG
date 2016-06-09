@@ -138,8 +138,15 @@ int CHudSayText :: Draw( float flTime )
 					// draw the first x characters in the player color
 					strncpy( buf, g_szLineBuffer[i], min(g_iNameLengths[i], MAX_PLAYER_NAME_LENGTH+32) );
 					buf[ min(g_iNameLengths[i], MAX_PLAYER_NAME_LENGTH+31) ] = 0;
-					gEngfuncs.pfnDrawSetTextColor( g_pflNameColors[i][0], g_pflNameColors[i][1], g_pflNameColors[i][2] );
-					int x = DrawConsoleString( LINE_START, y, buf + 1 ); // don't draw the control code at the start
+					int x = gHUD.DrawConsoleStringWithColorTags(
+						LINE_START,
+						y,
+						buf + 1,
+						true,
+						g_pflNameColors[i][0],
+						g_pflNameColors[i][1],
+						g_pflNameColors[i][2]
+					); // don't draw the control code at the start
 					strncpy( buf, g_szLineBuffer[i] + g_iNameLengths[i], strlen( g_szLineBuffer[i] ));
 					buf[ strlen( g_szLineBuffer[i] + g_iNameLengths[i] ) - 1 ] = '\0';
 					// color is reset after each string draw
@@ -261,6 +268,9 @@ void CHudSayText :: EnsureTextFitsInOneLineAndWrapIfHaveTo( int line )
 				if ( *x == 0 )
 					break;
 			}
+
+			if (x[0] == '^' && x[1] >= '0' && x[1] <= '9')
+				x += 2;
 
 			char buf[2];
 			buf[1] = 0;

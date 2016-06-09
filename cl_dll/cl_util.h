@@ -97,17 +97,17 @@ inline 	int						TextMessageDrawChar( int x, int y, int number, int r, int g, in
 	return gEngfuncs.pfnDrawCharacter( x, y, number, r, g, b ); 
 }
 
-inline int DrawConsoleString( int x, int y, const char *string )
+inline int DrawConsoleString( int x, int y, char *string )
 {
-	return gEngfuncs.pfnDrawConsoleString( x, y, (char*) string );
+	return gHUD.DrawConsoleStringWithColorTags(x, y, string);
 }
 
-inline void GetConsoleStringSize( const char *string, int *width, int *height )
+inline void GetConsoleStringSize( char *string, int *width, int *height )
 {
-	gEngfuncs.pfnDrawConsoleStringLen( string, width, height );
+	gHUD.GetConsoleStringSizeWithColorTags(string, *width, *height);
 }
 
-inline int ConsoleStringLen( const char *string )
+inline int ConsoleStringLen( char *string )
 {
 	int _width, _height;
 	GetConsoleStringSize( string, &_width, &_height );

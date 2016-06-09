@@ -207,9 +207,17 @@ int CHudStatusBar :: Draw( float fTime )
 		}
 
 		if ( m_pflNameColors[i] )
-			gEngfuncs.pfnDrawSetTextColor( m_pflNameColors[i][0], m_pflNameColors[i][1], m_pflNameColors[i][2] );
-
-		DrawConsoleString( x, y, m_szStatusBar[i] );
+			gHUD.DrawConsoleStringWithColorTags(
+				x,
+				y,
+				m_szStatusBar[i],
+				true,
+				m_pflNameColors[i][0],
+				m_pflNameColors[i][1],
+				m_pflNameColors[i][2]
+			);
+		else
+			DrawConsoleString(x, y, m_szStatusBar[i]);
 	}
 
 	return 1;

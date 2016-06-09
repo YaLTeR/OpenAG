@@ -40,7 +40,7 @@ int CHudVote::Draw(float time)
 	y += gHUD.m_scrinfo.iCharHeight;
 
 	sprintf(str, "Called by: %s", called_by);
-	gEngfuncs.pfnDrawString(x, y, str, r, g, b);
+	gHUD.DrawHudStringWithColorTags(x, y, str, r, g, b);
 	y += gHUD.m_scrinfo.iCharHeight * 3 / 2;
 
 	switch (status) {
