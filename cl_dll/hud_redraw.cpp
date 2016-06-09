@@ -343,4 +343,9 @@ int CHud::GetNumWidth( int iNumber, int iFlags )
 
 }	
 
+int CHud::DrawHudStringCentered(int x, int y, char* string, int r, int g, int b)
+{
+	auto width = gEngfuncs.pfnDrawString(0, 0, string, 0, 0, 0);
+	return x + gEngfuncs.pfnDrawString(x - width / 2, y, string, r, g, b);
+}
 

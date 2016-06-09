@@ -92,6 +92,8 @@ struct HUDLIST {
 #include "voice_status.h" // base voice handling class
 #include "hud_spectator.h"
 
+#include "hud_timer.h"
+
 
 //
 //-----------------------------------------------------
@@ -573,6 +575,8 @@ public:
 	int DrawHudNumberString( int xpos, int ypos, int iMinX, int iNumber, int r, int g, int b );
 	int GetNumWidth(int iNumber, int iFlags);
 
+	int DrawHudStringCentered(int x, int y, char* string, int r, int g, int b);
+
 private:
 	// the memory for these arrays are allocated in the first call to CHud::VidInit(), when the hud.txt and associated sprites are loaded.
 	// freed in ~CHud()
@@ -611,6 +615,8 @@ public:
 	CHudTextMessage m_TextMessage;
 	CHudStatusIcons m_StatusIcons;
 	CHudBenchmark	m_Benchmark;
+
+	CHudTimer		m_Timer;
 
 	void Init( void );
 	void VidInit( void );

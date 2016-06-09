@@ -133,6 +133,7 @@
     <ClCompile Include="..\..\cl_dll\hud_redraw.cpp" />
     <ClCompile Include="..\..\cl_dll\hud_servers.cpp" />
     <ClCompile Include="..\..\cl_dll\hud_spectator.cpp" />
+    <ClCompile Include="..\..\cl_dll\hud_timer.cpp" />
     <ClCompile Include="..\..\cl_dll\hud_update.cpp" />
     <ClCompile Include="..\..\cl_dll\input.cpp" />
     <ClCompile Include="..\..\cl_dll\inputw32.cpp" />
@@ -206,6 +207,7 @@
     <ClInclude Include="..\..\cl_dll\hud_servers.h" />
     <ClInclude Include="..\..\cl_dll\hud_servers_priv.h" />
     <ClInclude Include="..\..\cl_dll\hud_spectator.h" />
+    <ClInclude Include="..\..\cl_dll\hud_timer.h" />
     <ClInclude Include="..\..\cl_dll\interpolation.h" />
     <ClInclude Include="..\..\cl_dll\in_defs.h" />
     <ClInclude Include="..\..\cl_dll\kbutton.h" />

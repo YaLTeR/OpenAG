@@ -332,6 +332,8 @@ void CHud :: Init( void )
 	m_pCvarDraw = CVAR_CREATE( "hud_draw", "1", FCVAR_ARCHIVE );
 	cl_lw = gEngfuncs.pfnGetCvarPointer( "cl_lw" );
 
+	m_Timer.hud_timer = CVAR_CREATE("hud_timer", "1", FCVAR_ARCHIVE);
+
 	m_pSpriteList = NULL;
 
 	// Clear any old HUD list
@@ -364,6 +366,7 @@ void CHud :: Init( void )
 	m_AmmoSecondary.Init();
 	m_TextMessage.Init();
 	m_StatusIcons.Init();
+	m_Timer.Init();
 	GetClientVoiceMgr()->Init(&g_VoiceStatusHelper, (vgui::Panel**)&gViewPort);
 
 	m_Menu.Init();
@@ -513,10 +516,11 @@ void CHud :: VidInit( void )
 	m_AmmoSecondary.VidInit();
 	m_TextMessage.VidInit();
 	m_StatusIcons.VidInit();
+	m_Timer.VidInit();
 	GetClientVoiceMgr()->VidInit();
 }
 
-int CHud::MsgFunc_Logo(const char *pszName,  int iSize, void *pbuf)
+int CHud::MsgFunc_Logo(const char *pszName, int iSize, void *pbuf)
 {
 	BEGIN_READ( pbuf, iSize );
 
