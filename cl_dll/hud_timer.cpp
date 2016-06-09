@@ -41,7 +41,7 @@ int CHudTimer::VidInit()
 
 int CHudTimer::Draw(float time)
 {
-	if (hud_timer->value == 0.0f)
+	if (hud_timer->value == 0.0f || gHUD.m_flTime >= draw_until)
 		return 0;
 
 	char str[32];
@@ -78,6 +78,8 @@ int CHudTimer::MsgFunc_Timer(const char* name, int size, void* buf)
 
 	seconds_total = READ_LONG();
 	seconds_passed = READ_LONG();
+
+	draw_until = gHUD.m_flTime + 5.0f;
 
 	if (seconds_passed >= 0
 		&& seconds_total >= 0

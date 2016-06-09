@@ -2,6 +2,7 @@
 
 class CHudTimer : public CHudBase
 {
+	float draw_until;
 	int seconds_total;
 	int seconds_passed;
 
