@@ -366,6 +366,7 @@ void CHud :: Init( void )
 	m_AmmoSecondary.Init();
 	m_TextMessage.Init();
 	m_StatusIcons.Init();
+	m_Countdown.Init();
 	m_Timer.Init();
 	m_Vote.Init();
 	m_Watermark.Init();
@@ -518,6 +519,7 @@ void CHud :: VidInit( void )
 	m_AmmoSecondary.VidInit();
 	m_TextMessage.VidInit();
 	m_StatusIcons.VidInit();
+	m_Countdown.VidInit();
 	m_Timer.VidInit();
 	m_Vote.VidInit();
 	m_Watermark.VidInit();

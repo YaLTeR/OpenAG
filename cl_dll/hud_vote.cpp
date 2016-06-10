@@ -83,9 +83,9 @@ int CHudVote::MsgFunc_Vote(const char* name, int size, void* buf)
 	count_against = READ_BYTE();
 	count_undecided = READ_BYTE();
 
-	strncpy(str1, READ_STRING(), 32);
-	strncpy(str2, READ_STRING(), 32);
-	strncpy(called_by, READ_STRING(), 32);
+	strncpy(str1, READ_STRING(), sizeof(str1));
+	strncpy(str2, READ_STRING(), sizeof(str2));
+	strncpy(called_by, READ_STRING(), sizeof(called_by));
 
 	draw_until = gHUD.m_flTime + 4.0f;
 

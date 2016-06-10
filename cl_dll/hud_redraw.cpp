@@ -316,6 +316,57 @@ int CHud :: DrawHudNumber( int x, int y, int iFlags, int iNumber, int r, int g, 
 	return x;
 }
 
+static size_t count_digits(int n)
+{
+	size_t result = 0;
+
+	do {
+		++result;
+	} while ((n /= 10) != 0);
+
+	return result;
+}
+
+static constexpr const int ten_powers[] = {
+	1,
+	10,
+	100,
+	1000,
+	10000,
+	100000,
+	1000000,
+	10000000,
+	100000000,
+	1000000000
+};
+
+int CHud::DrawHudNumber(int x, int y, int number, int r, int g, int b)
+{
+	auto digit_width = GetSpriteRect(m_HUD_number_0).right - GetSpriteRect(m_HUD_number_0).left;
+	auto digit_count = count_digits(number);
+
+	for (int i = digit_count; i > 0; --i) {
+		int digit = number / ten_powers[i - 1];
+
+		SPR_Set(GetSprite(m_HUD_number_0 + digit), r, g, b);
+		SPR_DrawAdditive(0, x, y, &GetSpriteRect(m_HUD_number_0 + digit));
+		x += digit_width;
+
+		number -= digit * ten_powers[i - 1];
+	}
+
+	return x;
+}
+
+int CHud::DrawHudNumberCentered(int x, int y, int number, int r, int g, int b)
+{
+	auto digit_width = GetSpriteRect(m_HUD_number_0).right - GetSpriteRect(m_HUD_number_0).left;
+	auto digit_count = count_digits(number);
+
+	return DrawHudNumber(x - (digit_width * digit_count) / 2, y, number, r, g, b);
+}
+
+
 
 int CHud::GetNumWidth( int iNumber, int iFlags )
 {
@@ -399,6 +450,12 @@ int CHud::DrawHudStringWithColorTags(int x, int y, char* string, int r, int g, i
 		x += gEngfuncs.pfnDrawString(x, y, string, r_, g_, b_);
 
 	return x;
+}
+
+int CHud::DrawHudStringCenteredWithColorTags(int x, int y, char* string, int r, int g, int b)
+{
+	auto width = gEngfuncs.pfnDrawString(0, 0, strip_color_tags_thread_unsafe(string), 0, 0, 0);
+	return DrawHudStringWithColorTags(x - width / 2, y, string, r, g, b);
 }
 
 int CHud::DrawConsoleStringWithColorTags(int x, int y, char* string, bool use_default_color, float default_r, float default_g, float default_b)
