@@ -91,6 +91,30 @@ inline struct cvar_s *CVAR_CREATE( const char *cv, const char *val, const int fl
 inline int SPR_Height( HSPRITE x, int f )	{ return gEngfuncs.pfnSPR_Height(x, f); }
 inline int SPR_Width( HSPRITE x, int f )	{ return gEngfuncs.pfnSPR_Width(x, f); }
 
+static char* strip_color_tags_thread_unsafe(const char* string)
+{
+	static char buf[2048];
+	buf[0] = '\0';
+
+	if (!string)
+		return nullptr;
+
+	size_t idx = 0;
+
+	for (; *string != '\0' && idx + 1 < sizeof(buf); ++string) {
+		if (string[0] == '^' && string[1] >= '0' && string[1] <= '9') {
+			++string;
+			continue;
+		} else {
+			buf[idx++] = *string;
+		}
+	}
+
+	buf[idx] = '\0';
+
+	return buf;
+}
+
 inline 	client_textmessage_t	*TextMessageGet( const char *pName ) { return gEngfuncs.pfnTextMessageGet( pName ); }
 inline 	int						TextMessageDrawChar( int x, int y, int number, int r, int g, int b ) 
 { 
@@ -116,12 +140,12 @@ inline int ConsoleStringLen( char *string )
 
 inline void ConsolePrint( const char *string )
 {
-	gEngfuncs.pfnConsolePrint( string );
+	gEngfuncs.pfnConsolePrint( strip_color_tags_thread_unsafe(string) );
 }
 
 inline void CenterPrint( const char *string )
 {
-	gEngfuncs.pfnCenterPrint( string );
+	gEngfuncs.pfnCenterPrint( strip_color_tags_thread_unsafe(string) );
 }
 
 
