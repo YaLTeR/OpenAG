@@ -27,6 +27,7 @@ int CHudTimer::Init()
 	HOOK_MESSAGE(Timer);
 
 	m_iFlags = 0;
+	hud_timer = CVAR_CREATE("hud_timer", "1", FCVAR_ARCHIVE);
 
 	gHUD.AddHudElem(this);
 	return 0;
@@ -41,7 +42,12 @@ int CHudTimer::VidInit()
 
 int CHudTimer::Draw(float time)
 {
-	if (hud_timer->value == 0.0f || gHUD.m_flTime >= draw_until)
+	if (gHUD.m_flTime >= draw_until) {
+		m_iFlags &= ~HUD_ACTIVE;
+		return 0;
+	}
+
+	if (hud_timer->value == 0.0f)
 		return 0;
 
 	char str[32];

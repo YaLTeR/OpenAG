@@ -332,8 +332,6 @@ void CHud :: Init( void )
 	m_pCvarDraw = CVAR_CREATE( "hud_draw", "1", FCVAR_ARCHIVE );
 	cl_lw = gEngfuncs.pfnGetCvarPointer( "cl_lw" );
 
-	m_Timer.hud_timer = CVAR_CREATE("hud_timer", "1", FCVAR_ARCHIVE);
-
 	m_pSpriteList = NULL;
 
 	// Clear any old HUD list
