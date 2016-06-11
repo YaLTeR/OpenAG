@@ -814,7 +814,7 @@ void CHudSpectator::DirectorMessage( int iSize, void *pbuf )
 
 		case DRC_CMD_BANNER:
 							// gEngfuncs.Con_DPrintf("GUI: Banner %s\n",READ_STRING() ); // name of banner tga eg gfx/temp/7454562234563475.tga
-							gViewPort->m_pSpectatorPanel->m_TopBanner->LoadImage( READ_STRING() );
+							//gViewPort->m_pSpectatorPanel->m_TopBanner->LoadImage( READ_STRING() );
 							gViewPort->UpdateSpectatorPanel();
 							break;
 

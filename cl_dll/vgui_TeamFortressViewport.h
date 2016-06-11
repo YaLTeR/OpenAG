@@ -1562,6 +1562,11 @@ public:
 			drawFilledRect(0,0,_size[0],_size[1]);
 		}
 	}
+
+	inline void setTransparency(int transparency)
+	{
+		m_iTransparency = transparency;
+	}
 };
 
 //================================================================

@@ -66,21 +66,22 @@ public:
 	CImageButton	  *	m_NextPlayerButton;
 	DropDownButton     *	m_CamButton;	
 
-	CTransparentPanel *			m_TopBorder;
+	//CTransparentPanel *			m_TopBorder;
 	CTransparentPanel *			m_BottomBorder;
 
 	ColorButton		*m_InsetViewButton;
 	
 	DropDownButton	*m_BottomMainButton;
-	CImageLabel		*m_TimerImage;
+	//CImageLabel		*m_TimerImage;
 	Label			*m_BottomMainLabel;
-	Label			*m_CurrentTime;
-	Label			*m_ExtraInfo;
-	Panel			*m_Separator;
+	CTransparentPanel *m_BottomMainLabelBackground;
+	//Label			*m_CurrentTime;
+	//Label			*m_ExtraInfo;
+	//Panel			*m_Separator;
 
-	Label			*m_TeamScores[TEAM_NUMBER];
+	//Label			*m_TeamScores[TEAM_NUMBER];
 	
-	CImageLabel		*m_TopBanner;
+	//CImageLabel		*m_TopBanner;
 
 	bool			m_menuVisible;
 	bool			m_insetVisible;

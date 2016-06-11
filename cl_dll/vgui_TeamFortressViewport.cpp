@@ -1510,7 +1510,7 @@ void TeamFortressViewport::UpdatePlayerMenu(int menuIndex)
 		//if ( g_PlayerExtraInfo[i].teamname[0] == 0 )
 		//	continue; // skip over players who are not in a team
 	
-		SpectButton *pButton = new SpectButton(1 , g_PlayerInfoList[pEnt->index].name ,
+		SpectButton *pButton = new SpectButton(1 , strip_color_tags_thread_unsafe(g_PlayerInfoList[pEnt->index].name),
 							 XRES( ( 15 + OPTIONS_BUTTON_X + 15 ) + 31 ),PANEL_HEIGHT+(i-1)*CMENU_SIZE_X, flLabelSize, BUTTON_SIZE_Y /2 );
 
 		pButton->setBoundKey( (char)255  );
@@ -1521,7 +1521,7 @@ void TeamFortressViewport::UpdatePlayerMenu(int menuIndex)
 		// Override font in CommandMenu
 		pButton->setFont( Scheme::sf_primary3 );
 
-		pButton->addActionSignal(new CMenuHandler_SpectateFollow( g_PlayerInfoList[pEnt->index].name));
+		pButton->addActionSignal(new CMenuHandler_SpectateFollow(g_PlayerInfoList[pEnt->index].name));
 		// Create an input signal that'll popup the current menu
 		pButton->addInputSignal( new CMenuHandler_PopupSubMenuInput(pButton, m_pCommandMenus[menuIndex]) );
 	
@@ -1644,7 +1644,7 @@ void TeamFortressViewport::UpdateSpectatorPanel()
 
 		szText[63] = 0;
 
-		m_pSpectatorPanel->m_ExtraInfo->setText ( szText );
+		//m_pSpectatorPanel->m_ExtraInfo->setText ( szText );
 		
 		/*
 		int timer = (int)( gHUD.m_roundTimer.m_flTimeEnd - gHUD.m_flTime );
