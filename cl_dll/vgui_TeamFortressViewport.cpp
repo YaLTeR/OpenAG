@@ -611,16 +611,14 @@ TeamFortressViewport::TeamFortressViewport(int x,int y,int wide,int tall) : Pane
 	m_iCurrentTeamNumber = m_iUser1 = m_iUser2 = m_iUser3 = 0;
 
 	m_StandardMenu = CreateCommandMenu("commandmenu.txt", 0, CMENU_TOP, false, CMENU_SIZE_X, BUTTON_SIZE_Y, 0 );
-	m_SpectatorOptionsMenu = CreateCommandMenu("spectatormenu.txt", 1, PANEL_HEIGHT, true, CMENU_SIZE_X, BUTTON_SIZE_Y / 2, 0 );	// above bottom bar, flat design
-	m_SpectatorCameraMenu = CreateCommandMenu("spectcammenu.txt", 1, PANEL_HEIGHT, true, XRES( 200 ), BUTTON_SIZE_Y / 2, ScreenWidth - ( XRES ( 200 ) + 15 ) );	// above bottom bar, flat design
+	m_SpectatorOptionsMenu = CreateCommandMenu("spectatormenu.txt", 1, PANEL_HEIGHT, true, XRES(OPTIONS_BUTTON_WIDTH), BUTTON_SIZE_Y / 2, XRES(OPTIONS_BUTTON_X) );	// above bottom bar, flat design
+	m_SpectatorCameraMenu = CreateCommandMenu("spectcammenu.txt", 1, PANEL_HEIGHT, true, XRES(OPTIONS_BUTTON_WIDTH), BUTTON_SIZE_Y / 2, XRES(640 - OPTIONS_BUTTON_X - OPTIONS_BUTTON_WIDTH) );	// above bottom bar, flat design
 
 	m_PlayerMenu =  m_iNumMenus;
 	m_iNumMenus++;
 
-	float flLabelSize = ( (ScreenWidth - (XRES ( CAMOPTIONS_BUTTON_X ) + 15)) - XRES ( 24 + 15 ) ) - XRES( (15 + OPTIONS_BUTTON_X + 15) + 38 );
-
 	m_pCommandMenus[m_PlayerMenu] = new CCommandMenu(NULL, 1, 
-									XRES( ( 15 + OPTIONS_BUTTON_X + 15 ) + 31 ),PANEL_HEIGHT, flLabelSize,300);	
+									XRES(MAIN_LABEL_X), PANEL_HEIGHT, XRES(MAIN_LABEL_WIDTH), 300);	
 	m_pCommandMenus[m_PlayerMenu]->setParent(this);
 	m_pCommandMenus[m_PlayerMenu]->setVisible(false);
 	m_pCommandMenus[m_PlayerMenu]->m_flButtonSizeY = BUTTON_SIZE_Y /2;
@@ -895,7 +893,7 @@ try
 				else
 				{
 					// Create the menu
-					m_pCommandMenus[m_iNumMenus] = CreateSubMenu(pButton, m_pCurrentCommandMenu, iButtonY );
+					m_pCommandMenus[m_iNumMenus] = CreateSubMenu(pButton, m_pCurrentCommandMenu, iButtonY, XRES(OPTIONS_BUTTON_WIDTH) - (CMENU_SIZE_X - 1));
 					m_pCurrentCommandMenu = m_pCommandMenus[m_iNumMenus];
 					m_iNumMenus++;
 				}
@@ -1493,7 +1491,6 @@ void TeamFortressViewport::UpdatePlayerMenu(int menuIndex)
 {
 
 	cl_entity_t * pEnt = NULL;
-	float flLabelSize = ( (ScreenWidth - (XRES ( CAMOPTIONS_BUTTON_X ) + 15)) - XRES ( 24 + 15 ) ) - XRES( (15 + OPTIONS_BUTTON_X + 15) + 38 );
 	gViewPort->GetAllPlayersInfo();
 
 
@@ -1509,9 +1506,9 @@ void TeamFortressViewport::UpdatePlayerMenu(int menuIndex)
 
 		//if ( g_PlayerExtraInfo[i].teamname[0] == 0 )
 		//	continue; // skip over players who are not in a team
-	
+
 		SpectButton *pButton = new SpectButton(1 , strip_color_tags_thread_unsafe(g_PlayerInfoList[pEnt->index].name),
-							 XRES( ( 15 + OPTIONS_BUTTON_X + 15 ) + 31 ),PANEL_HEIGHT+(i-1)*CMENU_SIZE_X, flLabelSize, BUTTON_SIZE_Y /2 );
+							 XRES(MAIN_LABEL_X), PANEL_HEIGHT+(i-1)*CMENU_SIZE_X, XRES(MAIN_LABEL_WIDTH), BUTTON_SIZE_Y /2 );
 
 		pButton->setBoundKey( (char)255  );
 		pButton->setContentAlignment( vgui::Label::a_center );

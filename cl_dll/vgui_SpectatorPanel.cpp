@@ -144,10 +144,9 @@ void SpectatorPanel::Initialize()
 	//	m_TeamScores[j]->setVisible ( false );
 	//}
 	
-	
 	// Initialize command buttons.
 //	m_OptionButton = new ColorButton( CHudTextMessage::BufferedLocaliseTextString( "#SPECT_OPTIONS" ), XRES(15), YRES(6), XRES(OPTIONS_BUTTON_X), YRES(20), false, false );
-	m_OptionButton = new DropDownButton( CHudTextMessage::BufferedLocaliseTextString( "#SPECT_OPTIONS" ), XRES(15), YRES(6), XRES(OPTIONS_BUTTON_X), YRES(20), false, false );
+	m_OptionButton = new DropDownButton( CHudTextMessage::BufferedLocaliseTextString( "#SPECT_OPTIONS" ), XRES(OPTIONS_BUTTON_X), YRES(6), XRES(OPTIONS_BUTTON_WIDTH), YRES(20), false, false );
 	m_OptionButton->setParent( m_BottomBorder );
 	m_OptionButton->setContentAlignment( vgui::Label::a_center );
 	m_OptionButton->setBoundKey( (char)255 );	// special no bound to avoid leading spaces in name 
@@ -157,7 +156,7 @@ void SpectatorPanel::Initialize()
 	m_OptionButton->setUnArmedColor ( 143, 143, 54, 0 );
 	m_OptionButton->setArmedColor ( 194, 202, 54, 0 );
 
-	m_CamButton = new DropDownButton( CHudTextMessage::BufferedLocaliseTextString( "#CAM_OPTIONS" ),  ScreenWidth - ( XRES ( CAMOPTIONS_BUTTON_X ) + 15 ), YRES(6), XRES ( CAMOPTIONS_BUTTON_X ), YRES(20), false, false );
+	m_CamButton = new DropDownButton( CHudTextMessage::BufferedLocaliseTextString( "#CAM_OPTIONS" ),  XRES(640 - OPTIONS_BUTTON_X - OPTIONS_BUTTON_WIDTH), YRES(6), XRES (OPTIONS_BUTTON_WIDTH), YRES(20), false, false );
 	m_CamButton->setParent( m_BottomBorder );
 	m_CamButton->setContentAlignment( vgui::Label::a_center );
 	m_CamButton->setBoundKey( (char)255 );	// special no bound to avoid leading spaces in name 
@@ -168,7 +167,7 @@ void SpectatorPanel::Initialize()
 	m_CamButton->setArmedColor ( 194, 202, 54, 0 );
 
 //	m_PrevPlayerButton= new ColorButton("<", XRES( 15 + OPTIONS_BUTTON_X + 15 ), YRES(6), XRES(24), YRES(20), false, false );
-	m_PrevPlayerButton= new CImageButton("arrowleft", XRES( 15 + OPTIONS_BUTTON_X + 15 ), YRES(6), XRES(24), YRES(20), false, false );
+	m_PrevPlayerButton= new CImageButton("arrowleft", XRES(PREV_BUTTON_X), YRES(6), XRES(PREVNEXT_BUTTON_WIDTH), YRES(20), false, false );
 	m_PrevPlayerButton->setParent( m_BottomBorder );
 	m_PrevPlayerButton->setContentAlignment( vgui::Label::a_center );
 	m_PrevPlayerButton->setBoundKey( (char)255 );	// special no bound to avoid leading spaces in name 
@@ -179,7 +178,7 @@ void SpectatorPanel::Initialize()
 	m_PrevPlayerButton->setArmedColor ( 194, 202, 54, 0 );
 
 //	m_NextPlayerButton= new ColorButton(">", (ScreenWidth - (XRES ( CAMOPTIONS_BUTTON_X ) + 15)) - XRES ( 24 + 15 ), YRES(6), XRES(24), YRES(20),false, false );
-	m_NextPlayerButton= new CImageButton("arrowright", (ScreenWidth - (XRES ( CAMOPTIONS_BUTTON_X ) + 15)) - XRES ( 24 + 15 ), YRES(6), XRES(24), YRES(20),false, false );
+	m_NextPlayerButton= new CImageButton("arrowright", XRES(NEXT_BUTTON_X), YRES(6), XRES(PREVNEXT_BUTTON_WIDTH), YRES(20),false, false );
 	m_NextPlayerButton->setParent( m_BottomBorder );
 	m_NextPlayerButton->setContentAlignment( vgui::Label::a_center );
 	m_NextPlayerButton->setBoundKey( (char)255 );	// special no bound to avoid leading spaces in name 
@@ -190,11 +189,8 @@ void SpectatorPanel::Initialize()
 	m_NextPlayerButton->setArmedColor ( 194, 202, 54, 0 );
 	
 	// Initialize the bottom title.
-
-	float flLabelSize = ( (ScreenWidth - (XRES ( CAMOPTIONS_BUTTON_X ) + 15)) - XRES ( 24 + 15 ) ) - XRES( (15 + OPTIONS_BUTTON_X + 15) + 38 );
-
 	m_BottomMainButton = new DropDownButton("Spectator Bottom", 
-		 XRES( ( 15 + OPTIONS_BUTTON_X + 15 ) + 31 ), YRES(6), flLabelSize, YRES(20), 
+		XRES(MAIN_LABEL_X), YRES(6), XRES(MAIN_LABEL_WIDTH), YRES(20), 
 		false, false );
 
 	m_BottomMainButton->setParent(m_BottomBorder);
@@ -210,11 +206,11 @@ void SpectatorPanel::Initialize()
 	m_BottomMainButton->setArmedColor ( 194, 202, 54, 0 );
 
 
-	m_BottomMainLabelBackground = new CTransparentPanel(128, XRES(213), YRES(6), ScreenWidth - XRES(213 * 2), YRES(20));
+	m_BottomMainLabelBackground = new CTransparentPanel(128, XRES(MAIN_LABEL_X), YRES(6), XRES(MAIN_LABEL_WIDTH), YRES(20));
 	m_BottomMainLabelBackground->setParent(m_BottomBorder);
 
 	m_BottomMainLabel = new Label("Spectator Bottom", 
-		 XRES(213), YRES(6), ScreenWidth - XRES(213 * 2), YRES(20));
+		XRES(MAIN_LABEL_X), YRES(6), XRES(MAIN_LABEL_WIDTH), YRES(20));
 
 	m_BottomMainLabel->setParent(m_BottomBorder);
 	m_BottomMainLabel->setPaintBackgroundEnabled(false);
@@ -257,19 +253,19 @@ void SpectatorPanel::ShowMenu(bool isVisible)
 
 	if ( !isVisible )
 	{
-		int iLabelSizeX, iLabelSizeY;
+		//int iLabelSizeX, iLabelSizeY;
 		m_BottomMainLabel->setVisible(true);
 		m_BottomMainLabelBackground->setVisible(true);
 		m_BottomMainButton->setVisible(false);
 
-		m_BottomMainLabel->getSize( iLabelSizeX, iLabelSizeY );
-		m_BottomMainLabel->setPos( ( ScreenWidth / 2 ) - (iLabelSizeX/2), YRES(6) );
+		//m_BottomMainLabel->getSize( iLabelSizeX, iLabelSizeY );
+		//m_BottomMainLabel->setPos( ( ScreenWidth / 2 ) - (iLabelSizeX/2), YRES(6) );
 
 		m_BottomBorder->setTransparency(255);
 	}
 	else
 	{
-		m_BottomMainButton->setPos( XRES( ( 15 + OPTIONS_BUTTON_X + 15 ) + 31 ), YRES(6) );
+		//m_BottomMainButton->setPos( XRES( ( 15 + OPTIONS_BUTTON_X + 15 ) + 31 ), YRES(6) );
 		m_BottomMainLabel->setVisible(false);
 		m_BottomMainLabelBackground->setVisible(false);
 		m_BottomMainButton->setVisible(true);

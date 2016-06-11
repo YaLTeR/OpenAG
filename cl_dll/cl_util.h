@@ -77,8 +77,15 @@ inline struct cvar_s *CVAR_CREATE( const char *cv, const char *val, const int fl
 #define XPROJECT(x)	( (1.0f+(x))*ScreenWidth*0.5f )
 #define YPROJECT(y) ( (1.0f-(y))*ScreenHeight*0.5f )
 
-#define XRES(x)					(x  * ((float)ScreenWidth / 640))
-#define YRES(y)					(y  * ((float)ScreenHeight / 480))
+static constexpr float XRES(float x)
+{
+	return x * ScreenWidth / 640;
+}
+
+static constexpr float YRES(float y)
+{
+	return y * ScreenHeight / 480;
+}
 
 #define GetScreenInfo (*gEngfuncs.pfnGetScreenInfo)
 #define ServerCmd (*gEngfuncs.pfnServerCmd)
