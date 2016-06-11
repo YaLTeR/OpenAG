@@ -91,26 +91,38 @@ inline struct cvar_s *CVAR_CREATE( const char *cv, const char *val, const int fl
 inline int SPR_Height( HSPRITE x, int f )	{ return gEngfuncs.pfnSPR_Height(x, f); }
 inline int SPR_Width( HSPRITE x, int f )	{ return gEngfuncs.pfnSPR_Width(x, f); }
 
-static char* strip_color_tags_thread_unsafe(const char* string)
+template<typename T, size_t N>
+char (&ArraySizeHelper(T (&)[N]))[N];
+#define ARRAYSIZE(x) sizeof(ArraySizeHelper(x))
+
+/*
+ * Copies at most count characters (including the terminating null character)
+ * from src to dest, omitting the color tags. The resulting array is always
+ * null-terminated.
+ */
+static void strip_color_tags(char* dest, const char* src, size_t count)
 {
-	static char buf[2048];
-	buf[0] = '\0';
+	if (count == 0)
+		return;
 
-	if (!string)
-		return nullptr;
-
-	size_t idx = 0;
-
-	for (; *string != '\0' && idx + 1 < sizeof(buf); ++string) {
-		if (string[0] == '^' && string[1] >= '0' && string[1] <= '9') {
-			++string;
+	for (; *src != '\0' && count > 1; ++src) {
+		if (src[0] == '^' && src[1] >= '0' && src[1] <= '9') {
+			++src;
 			continue;
 		} else {
-			buf[idx++] = *string;
+			*dest++ = *src;
+			--count;
 		}
 	}
 
-	buf[idx] = '\0';
+	*dest = '\0';
+}
+
+static char* strip_color_tags_thread_unsafe(const char* string)
+{
+	static char buf[2048];
+
+	strip_color_tags(buf, string, ARRAYSIZE(buf));
 
 	return buf;
 }

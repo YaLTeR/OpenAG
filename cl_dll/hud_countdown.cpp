@@ -10,6 +10,9 @@ int CHudCountdown::Init()
 
 	m_iFlags = 0;
 
+	name1[ARRAYSIZE(name1) - 1] = '\0';
+	name2[ARRAYSIZE(name2) - 1] = '\0';
+
 	gHUD.AddHudElem(this);
 	return 0;
 }
@@ -68,8 +71,8 @@ int CHudCountdown::MsgFunc_Countdown(const char* name, int size, void* buf)
 	seconds_left = READ_BYTE();
 	bool play_sound = (READ_BYTE() != 0);
 
-	strncpy(name1, READ_STRING(), sizeof(name1));
-	strncpy(name2, READ_STRING(), sizeof(name2));
+	strncpy(name1, READ_STRING(), ARRAYSIZE(name1) - 1);
+	strncpy(name2, READ_STRING(), ARRAYSIZE(name2) - 1);
 
 	if (seconds_left >= 0) {
 		m_iFlags |= HUD_ACTIVE;

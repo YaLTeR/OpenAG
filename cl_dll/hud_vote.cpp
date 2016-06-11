@@ -10,6 +10,10 @@ int CHudVote::Init()
 
 	m_iFlags = 0;
 
+	str1[ARRAYSIZE(str1) - 1] = '\0';
+	str2[ARRAYSIZE(str2) - 1] = '\0';
+	called_by[ARRAYSIZE(called_by) - 1] = '\0';
+
 	gHUD.AddHudElem(this);
 	return 0;
 }
@@ -83,9 +87,9 @@ int CHudVote::MsgFunc_Vote(const char* name, int size, void* buf)
 	count_against = READ_BYTE();
 	count_undecided = READ_BYTE();
 
-	strncpy(str1, READ_STRING(), sizeof(str1));
-	strncpy(str2, READ_STRING(), sizeof(str2));
-	strncpy(called_by, READ_STRING(), sizeof(called_by));
+	strncpy(str1, READ_STRING(), ARRAYSIZE(str1) - 1);
+	strncpy(str2, READ_STRING(), ARRAYSIZE(str2) - 1);
+	strncpy(called_by, READ_STRING(), ARRAYSIZE(called_by) - 1);
 
 	draw_until = gHUD.m_flTime + 4.0f;
 

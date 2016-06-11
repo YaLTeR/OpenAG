@@ -1586,9 +1586,8 @@ void TeamFortressViewport::UpdateSpectatorPanel()
 		// create player & health string
 		if ( player && name )
 		{
-			char *temp = strip_color_tags_thread_unsafe(name);
-			strncpy( bottomText, temp, sizeof(bottomText) );
-			bottomText[ sizeof(bottomText) - 1 ] = 0;
+			strip_color_tags(bottomText, name, ARRAYSIZE(bottomText));
+			//bottomText[ sizeof(bottomText) - 1 ] = 0; // Not needed because strip_color_tags does it.
 			pBottomText = bottomText;
 		}
 		else
