@@ -20,6 +20,7 @@
 
 #include "hud.h"
 #include "cl_util.h"
+#include <ctime>
 #include <string.h>
 #include <stdio.h>
 #include "parsemsg.h"
@@ -167,6 +168,36 @@ void __CmdFunc_ToggleServerBrowser( void )
 	}
 }
 
+static void GetMapName(char* dest, size_t count)
+{
+	auto map_path = gEngfuncs.pfnGetLevelName();
+
+	auto slash = strrchr(map_path, '/');
+	if (!slash)
+		slash = map_path - 1;
+
+	strncpy(dest, slash + 1, count - 1);
+	dest[count - 1] = '\0';
+}
+
+void __CmdFunc_Agrecord(void)
+{
+	char cmd[128];
+
+	std::time_t curtime = std::time(nullptr);
+
+	auto written = std::strftime(cmd, sizeof(cmd) - 1, "record %Y%m%d_%H%M%S_", std::localtime(&curtime));
+	if (written > 0) {
+		char mapname[128];
+		GetMapName(mapname, ARRAYSIZE(mapname));
+
+		strncat(cmd, mapname, ARRAYSIZE(cmd) - written - 1);
+		strcat(cmd, "\n");
+
+		gEngfuncs.pfnClientCmd(cmd);
+	}
+}
+
 // TFFree Command Menu Message Handlers
 int __MsgFunc_ValClass(const char *pszName, int iSize, void *pbuf)
 {
@@ -297,6 +328,8 @@ void CHud :: Init( void )
 	HOOK_COMMAND( "ForceCloseCommandMenu", ForceCloseCommandMenu );
 	HOOK_COMMAND( "special", InputPlayerSpecial );
 	HOOK_COMMAND( "togglebrowser", ToggleServerBrowser );
+
+	HOOK_COMMAND( "agrecord", Agrecord );
 
 	HOOK_MESSAGE( ValClass );
 	HOOK_MESSAGE( TeamNames );
