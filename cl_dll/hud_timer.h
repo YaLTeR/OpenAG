@@ -9,9 +9,9 @@ class CHudTimer : public CHudBase
 	cvar_t* hud_timer;
 
 public:
-	virtual int Init() override;
-	virtual int VidInit() override;
-	virtual int Draw(float time) override;
+	virtual int Init();
+	virtual int VidInit();
+	virtual int Draw(float time);
 
 	int MsgFunc_Timer(const char* name, int size, void* buf);
 };

@@ -6,9 +6,9 @@ DECLARE_MESSAGE(m_Timer, Timer);
 
 static void unpack_seconds(int seconds_total, int& days, int& hours, int& minutes, int& seconds)
 {
-	constexpr const int SECONDS_PER_MINUTE = 60;
-	constexpr const int SECONDS_PER_HOUR = SECONDS_PER_MINUTE * 60;
-	constexpr const int SECONDS_PER_DAY = SECONDS_PER_HOUR * 24;
+	constexpr int SECONDS_PER_MINUTE = 60;
+	constexpr int SECONDS_PER_HOUR = SECONDS_PER_MINUTE * 60;
+	constexpr int SECONDS_PER_DAY = SECONDS_PER_HOUR * 24;
 
 	days = seconds_total / SECONDS_PER_DAY;
 	seconds_total %= SECONDS_PER_DAY;

@@ -326,7 +326,7 @@ static size_t count_digits(int n)
 	return result;
 }
 
-static constexpr const int ten_powers[] = {
+static constexpr int ten_powers[] = {
 	1,
 	10,
 	100,
@@ -400,7 +400,7 @@ int CHud::DrawHudStringCentered(int x, int y, char* string, int r, int g, int b)
 }
 
 // R, G, B.
-static const constexpr int colors[][3] = {
+static constexpr int colors[][3] = {
 	{ 255, 0,   0   },
 	{ 0,   255, 0   },
 	{ 255, 255, 0   },

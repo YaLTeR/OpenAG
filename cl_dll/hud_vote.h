@@ -24,9 +24,9 @@ class CHudVote : public CHudBase
 	char called_by[32];
 
 public:
-	virtual int Init() override;
-	virtual int VidInit() override;
-	virtual int Draw(float time) override;
+	virtual int Init();
+	virtual int VidInit();
+	virtual int Draw(float time);
 
 	int MsgFunc_Vote(const char* name, int size, void* buf);
 };

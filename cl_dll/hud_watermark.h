@@ -6,7 +6,7 @@ class CHudWatermark : public CHudBase
 	bool refresh_draw_until;
 
 public:
-	virtual int Init() override;
-	virtual int VidInit() override;
-	virtual int Draw(float time) override;
+	virtual int Init();
+	virtual int VidInit();
+	virtual int Draw(float time);
 };

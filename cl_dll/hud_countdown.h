@@ -8,9 +8,9 @@ class CHudCountdown : public CHudBase
 	char name2[32];
 
 public:
-	virtual int Init() override;
-	virtual int VidInit() override;
-	virtual int Draw(float time) override;
+	virtual int Init();
+	virtual int VidInit();
+	virtual int Draw(float time);
 
 	int MsgFunc_Countdown(const char* name, int size, void* buf);
 };

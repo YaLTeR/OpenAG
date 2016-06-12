@@ -59,9 +59,13 @@ HL1_OBJS = \
 	$(HL1_OBJ_DIR)/health.o \
 	$(HL1_OBJ_DIR)/hud_bench.o \
 	$(HL1_OBJ_DIR)/hud_benchtrace.o \
+	$(HL1_OBJ_DIR)/hud_countdown.o \
 	$(HL1_OBJ_DIR)/hud_msg.o \
 	$(HL1_OBJ_DIR)/hud_redraw.o \
+	$(HL1_OBJ_DIR)/hud_timer.o \
 	$(HL1_OBJ_DIR)/hud_update.o \
+	$(HL1_OBJ_DIR)/hud_vote.o \
+	$(HL1_OBJ_DIR)/hud_watermark.o \
 	$(HL1_OBJ_DIR)/in_camera.o \
 	$(HL1_OBJ_DIR)/input.o \
 	$(HL1_OBJ_DIR)/interpolation.o \
@@ -137,9 +141,9 @@ all: client.$(SHLIBEXT)
 
 client.$(SHLIBEXT): $(HL1_OBJS) $(PUBLIC_OBJS) $(COMMON_OBJS) $(GAME_SHARED_OBJS) $(DLL_OBJS) $(PM_SHARED_OBJS)
 	$(CLINK) -o $(BUILD_DIR)/$@ $(HL1_OBJS) $(PUBLIC_OBJS) $(COMMON_OBJS) $(GAME_SHARED_OBJS) $(DLL_OBJS) $(PM_SHARED_OBJS) $(LDFLAGS) $(CPP_LIB)
-	p4 edit ../../game/mod/cl_dlls/$@
-	cp $(BUILD_DIR)/$@  ../../game/mod/cl_dlls
-	./gendbg.sh ../../game/mod/cl_dlls/client.$(SHLIBEXT)
+	# p4 edit ../../game/mod/cl_dlls/$@
+	# cp $(BUILD_DIR)/$@  ../../game/mod/cl_dlls
+	# ./gendbg.sh ../../game/mod/cl_dlls/client.$(SHLIBEXT)
 
 $(HL1_OBJ_DIR):
 	mkdir -p $(HL1_OBJ_DIR)
