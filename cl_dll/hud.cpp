@@ -205,11 +205,13 @@ void __CmdFunc_Agrecord()
 		char mapname[256];
 		auto mapname_len = GetMapName(mapname, ARRAYSIZE(mapname));
 
-		// We want to leave at least one more byte for '\0'.
-		// written does not include the '\0'.
-		// written is strictly less than sizeof(cmd).
-		// The maximal value for written is sizeof(cmd) - 1.
-		// So if we wrote ARRAYSIZE(cmd) - 1 bytes, we have no extra bytes left.
+		/*
+		 * We want to leave at least one more byte for '\0'.
+		 * written does not include the '\0'.
+		 * written is strictly less than sizeof(cmd).
+		 * The maximal value for written is sizeof(cmd) - 1.
+		 * So if we wrote ARRAYSIZE(cmd) - 1 bytes, we have no extra bytes left.
+		 */
 		mapname_len = min(mapname_len, ARRAYSIZE(cmd) - written - 1);
 		strncpy(cmd + written, mapname, mapname_len);
 
