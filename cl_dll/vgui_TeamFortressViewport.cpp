@@ -672,9 +672,10 @@ void TeamFortressViewport::Initialize( void )
 
 	strcpy(m_sMapName, "");
 	strcpy(m_szServerName, "");
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < ARRAYSIZE(m_sTeamNames); i++)
 	{
-		m_iValidClasses[i] = 0;
+		if (i < ARRAYSIZE(m_iValidClasses))
+			m_iValidClasses[i] = 0;
 		strcpy(m_sTeamNames[i], "");
 	}
 
@@ -2309,14 +2310,15 @@ int TeamFortressViewport::MsgFunc_TeamNames(const char *pszName, int iSize, void
 	{
 		int teamNum = i + 1;
 
-		gHUD.m_TextMessage.LocaliseTextString( READ_STRING(), m_sTeamNames[teamNum], MAX_TEAMNAME_SIZE );
+		if (teamNum < ARRAYSIZE(m_sTeamNames))
+			gHUD.m_TextMessage.LocaliseTextString( READ_STRING(), m_sTeamNames[teamNum], MAX_TEAMNAME_SIZE );
 
 		// Set the team name buttons
-		if (m_pTeamButtons[i])
+		if (i < ARRAYSIZE(m_pTeamButtons) && m_pTeamButtons[i])
 			m_pTeamButtons[i]->setText( m_sTeamNames[teamNum] );
 
 		// range check this value...m_pDisguiseButtons[5];
-		if ( teamNum < 5 )
+		if ( teamNum < ARRAYSIZE(m_pDisguiseButtons) )
 		{
 			// Set the disguise buttons
 			if ( m_pDisguiseButtons[teamNum] )
