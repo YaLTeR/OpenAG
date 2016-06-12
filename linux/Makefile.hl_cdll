@@ -62,6 +62,7 @@ HL1_OBJS = \
 	$(HL1_OBJ_DIR)/hud_countdown.o \
 	$(HL1_OBJ_DIR)/hud_msg.o \
 	$(HL1_OBJ_DIR)/hud_redraw.o \
+	$(HL1_OBJ_DIR)/hud_settings.o \
 	$(HL1_OBJ_DIR)/hud_timer.o \
 	$(HL1_OBJ_DIR)/hud_update.o \
 	$(HL1_OBJ_DIR)/hud_vote.o \
