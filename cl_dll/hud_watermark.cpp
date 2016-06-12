@@ -36,7 +36,7 @@ int CHudWatermark::Draw(float time)
 	gEngfuncs.pfnDrawString(
 		ScreenWidth / 20,
 		gHUD.m_scrinfo.iCharHeight,
-		"AG-Compat DLL built at " __DATE__ " " __TIME__,
+		"AG-Compat client built at " __DATE__ " " __TIME__,
 		r,
 		g,
 		b
