@@ -178,7 +178,7 @@ static size_t GetMapName(char* dest, size_t count)
 
 	auto dot = strrchr(map_path, '.');
 	if (!dot)
-		dot = strlen(map_path);
+		dot = map_path + strlen(map_path);
 
 	size_t bytes_to_copy = min(count - 1, dot - slash - 1);
 
