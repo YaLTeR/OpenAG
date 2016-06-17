@@ -1,6 +1,7 @@
 #include "hud.h"
 #include "cl_util.h"
 #include "parsemsg.h"
+#include "update_checker.h"
 
 int CHudWatermark::Init()
 {
@@ -14,6 +15,7 @@ int CHudWatermark::VidInit()
 {
 	m_iFlags |= HUD_ACTIVE;
 	refresh_draw_until = true;
+	update_is_available = update_checker::is_update_available();
 
 	return 1;
 }
@@ -50,6 +52,26 @@ int CHudWatermark::Draw(float time)
 		g,
 		b
 	);
+
+	if (update_is_available) {
+		gEngfuncs.pfnDrawString(
+			ScreenWidth / 20,
+			gHUD.m_scrinfo.iCharHeight / 2 * 7,
+			"An update is available.",
+			r,
+			g,
+			b
+		);
+
+		gEngfuncs.pfnDrawString(
+			ScreenWidth / 20,
+			gHUD.m_scrinfo.iCharHeight / 2 * 9,
+			"bit.ly/ag-compat",
+			r,
+			g,
+			b
+		);
+	}
 
 	return 0;
 }

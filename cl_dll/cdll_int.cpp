@@ -55,6 +55,8 @@ TeamFortressViewport *gViewPort = NULL;
 CSysModule *g_hParticleManModule = NULL;
 IParticleMan *g_pParticleMan = NULL;
 
+#include "update_checker.h"
+
 void CL_LoadParticleMan( void );
 void CL_UnloadParticleMan( void );
 
@@ -152,6 +154,8 @@ int CL_DLLEXPORT Initialize( cl_enginefunc_t *pEnginefuncs, int iVersion )
 		return 0;
 
 	memcpy(&gEngfuncs, pEnginefuncs, sizeof(cl_enginefunc_t));
+
+	update_checker::check_for_updates();
 
 	EV_HookEvents();
 	CL_LoadParticleMan();
