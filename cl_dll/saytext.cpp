@@ -180,6 +180,47 @@ int CHudSayText :: MsgFunc_SayText( const char *pszName, int iSize, void *pbuf )
 	return 1;
 }
 
+/*
+ * Copies at most count characters (including the terminating null character)
+ * from src to dest, replacing the location tags with the location names.
+ * The resulting array is always null-terminated except when count == 0.
+ */
+static void convert_locations(char* dest, const char* src, size_t count, int player_id)
+{
+	if (count == 0)
+		return;
+
+	if (count == 1) {
+		dest[0] = '\0';
+		return;
+	}
+
+	size_t i = 0;
+
+	for (; *src != '\0'; ++src) {
+		if (src[0] == '%' && (src[1] == 'l' || src[1] == 'L' || src[1] == 'd' || src[1] == 'D')) {
+			auto loc = gHUD.m_Location.get_player_location(player_id).c_str();
+			auto loc_len = strlen(loc);
+			auto bytes_to_copy = min(loc_len, count - i - 1);
+
+			strncpy(&dest[i], loc, bytes_to_copy);
+			i += bytes_to_copy;
+
+			if (i + 1 == count)
+				break;
+
+			++src;
+		} else {
+			dest[i++] = *src;
+
+			if (i + 1 == count)
+				break;
+		}
+	}
+
+	dest[i] = '\0';
+}
+
 void CHudSayText :: SayTextPrint( const char *pszBuf, int iBufSize, int clientIndex )
 {
 	if ( gViewPort && gViewPort->AllowedToPrintText() == FALSE )
@@ -224,7 +265,7 @@ void CHudSayText :: SayTextPrint( const char *pszBuf, int iBufSize, int clientIn
 		}
 	}
 
-	strncpy( g_szLineBuffer[i], pszBuf, max(iBufSize , MAX_CHARS_PER_LINE) );
+	convert_locations( g_szLineBuffer[i], pszBuf, max(iBufSize , MAX_CHARS_PER_LINE), clientIndex );
 
 	// make sure the text fits in one line
 	EnsureTextFitsInOneLineAndWrapIfHaveTo( i );
