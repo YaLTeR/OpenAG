@@ -129,33 +129,23 @@ int CHudSayText :: Draw( float flTime )
 		{
 			if ( *g_szLineBuffer[i] == 2 && g_pflNameColors[i] )
 			{
-				// it's a saytext string
-				char *buf = static_cast<char *>( _alloca( strlen( g_szLineBuffer[i] ) ) );
-				if ( buf )
-				{
-					//char buf[MAX_PLAYER_NAME_LENGTH+32];
+				char buf[MAX_PLAYER_NAME_LENGTH + 32];
 
-					// draw the first x characters in the player color
-					strncpy( buf, g_szLineBuffer[i], min(g_iNameLengths[i], MAX_PLAYER_NAME_LENGTH+32) );
-					buf[ min(g_iNameLengths[i], MAX_PLAYER_NAME_LENGTH+31) ] = 0;
-					int x = gHUD.DrawConsoleStringWithColorTags(
-						LINE_START,
-						y,
-						buf + 1,
-						true,
-						g_pflNameColors[i][0],
-						g_pflNameColors[i][1],
-						g_pflNameColors[i][2]
-					); // don't draw the control code at the start
-					strncpy( buf, g_szLineBuffer[i] + g_iNameLengths[i], strlen( g_szLineBuffer[i] ));
-					buf[ strlen( g_szLineBuffer[i] + g_iNameLengths[i] ) - 1 ] = '\0';
-					// color is reset after each string draw
-					DrawConsoleString( x, y, buf ); 
-				}
-				else
-				{
-					assert( "Not able to alloca chat buffer!\n");
-				}
+				// draw the first x characters in the player color
+				strncpy( buf, g_szLineBuffer[i], min(g_iNameLengths[i], MAX_PLAYER_NAME_LENGTH + 31) );
+				buf[ min(g_iNameLengths[i], MAX_PLAYER_NAME_LENGTH + 31) ] = 0;
+				int x = gHUD.DrawConsoleStringWithColorTags(
+					LINE_START,
+					y,
+					buf + 1, // don't draw the control code at the start
+					true,
+					g_pflNameColors[i][0],
+					g_pflNameColors[i][1],
+					g_pflNameColors[i][2]
+				);
+
+				// color is reset after each string draw
+				DrawConsoleString( x, y, g_szLineBuffer[i] + g_iNameLengths[i] );
 			}
 			else
 			{
@@ -265,7 +255,7 @@ void CHudSayText :: SayTextPrint( const char *pszBuf, int iBufSize, int clientIn
 		}
 	}
 
-	convert_locations( g_szLineBuffer[i], pszBuf, max(iBufSize , MAX_CHARS_PER_LINE), clientIndex );
+	convert_locations( g_szLineBuffer[i], pszBuf, MAX_CHARS_PER_LINE, clientIndex );
 
 	// make sure the text fits in one line
 	EnsureTextFitsInOneLineAndWrapIfHaveTo( i );
@@ -310,8 +300,12 @@ void CHudSayText :: EnsureTextFitsInOneLineAndWrapIfHaveTo( int line )
 					break;
 			}
 
-			if (x[0] == '^' && x[1] >= '0' && x[1] <= '9')
+			if (x[0] == '^' && x[1] >= '0' && x[1] <= '9') {
 				x += 2;
+
+				if (*x == 0)
+					break;
+			}
 
 			char buf[2];
 			buf[1] = 0;

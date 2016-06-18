@@ -510,37 +510,6 @@ int CHud::DrawConsoleStringWithColorTags(int x, int y, char* string, bool use_de
 
 void CHud::GetConsoleStringSizeWithColorTags(char* string, int& width, int& height)
 {
-	width = 0;
-	height = 0;
-
-	int w, h;
-	char *temp = string;
-
-	while ((temp = strchr(temp, '^'))) {
-		char color_index = temp[1];
-
-		if (color_index >= '0' && color_index <= '9') {
-			if (temp != string) {
-				*temp = '\0';
-
-				gEngfuncs.pfnDrawConsoleStringLen(string, &w, &h);
-				width += w;
-				height = max(height, h);
-
-				*temp = '^';
-			}
-
-			string = temp + 2;
-			temp = temp + 2;
-		} else {
-			++temp;
-		}
-	}
-
-	if (string[0] != '\0') {
-		gEngfuncs.pfnDrawConsoleStringLen(string, &w, &h);
-		width += w;
-		height = max(height, h);
-	}
+	gEngfuncs.pfnDrawConsoleStringLen(strip_color_tags_thread_unsafe(string), &width, &height);
 }
 
