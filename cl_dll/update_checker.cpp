@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <atomic>
 #include <cstdint>
+#include <cstring>
 #include <thread>
 
 #define CURL_STATICLIB
@@ -17,7 +18,7 @@ namespace update_checker
 
 	// Replace this with the latest commit timestamp.
 	// git show -s --format=%ct
-	//#define CURRENT_VERSION 0ull
+	// #define CURRENT_VERSION 0ull
 	#define CURRENT_VERSION UINT64_MAX
 
 	namespace
