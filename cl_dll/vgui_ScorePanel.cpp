@@ -767,7 +767,7 @@ void ScorePanel::FillGrid()
 						}
 					}
 					*/
-					sprintf(sz, "%s  ", pl_info->name);
+					sprintf(sz, "%s  ", strip_color_tags_thread_unsafe(pl_info->name));
 					break;
 				case COLUMN_VOICE:
 					sz[0] = 0;

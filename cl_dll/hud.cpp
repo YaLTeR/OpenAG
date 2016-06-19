@@ -20,6 +20,7 @@
 
 #include "hud.h"
 #include "cl_util.h"
+#include <ctime>
 #include <string.h>
 #include <stdio.h>
 #include "parsemsg.h"
@@ -167,6 +168,73 @@ void __CmdFunc_ToggleServerBrowser( void )
 	}
 }
 
+static size_t GetMapName(char* dest, size_t count)
+{
+	auto map_path = gEngfuncs.pfnGetLevelName();
+
+	auto slash = strrchr(map_path, '/');
+	if (!slash)
+		slash = map_path - 1;
+
+	auto dot = strrchr(map_path, '.');
+	if (!dot)
+		dot = map_path + strlen(map_path);
+
+	size_t bytes_to_copy = min(count - 1, dot - slash - 1);
+
+	strncpy(dest, slash + 1, bytes_to_copy);
+	dest[count - 1] = '\0';
+
+	return bytes_to_copy;
+}
+
+void __CmdFunc_Agrecord()
+{
+	/*
+	 * Yay overcomplicating stuff.
+	 * All this code makes sure we can fit as much as possible into cmd.
+	 */
+
+	char cmd[256];
+	cmd[ARRAYSIZE(cmd) - 1] = '\0';
+
+	std::time_t curtime = std::time(nullptr);
+
+	auto written = std::strftime(cmd, sizeof(cmd), "record %Y%m%d_%H%M%S_", std::localtime(&curtime));
+	if (written > 0) {
+		char mapname[256];
+		auto mapname_len = GetMapName(mapname, ARRAYSIZE(mapname));
+
+		/*
+		 * We want to leave at least one more byte for '\0'.
+		 * written does not include the '\0'.
+		 * written is strictly less than sizeof(cmd).
+		 * The maximal value for written is sizeof(cmd) - 1.
+		 * So if we wrote ARRAYSIZE(cmd) - 1 bytes, we have no extra bytes left.
+		 */
+		mapname_len = min(mapname_len, ARRAYSIZE(cmd) - written - 1);
+		strncpy(cmd + written, mapname, mapname_len);
+
+		cmd[written + mapname_len] = '\0';
+
+		if (gEngfuncs.Cmd_Argc() >= 2) {
+			size_t bytes_left = ARRAYSIZE(cmd) - written - 1 - mapname_len;
+			if (bytes_left >= 2) {
+				cmd[written + mapname_len] = '_';
+
+				auto arg_len = strlen(gEngfuncs.Cmd_Argv(1));
+				auto bytes_to_write = min(arg_len, bytes_left - 1);
+
+				strncpy(cmd + written + mapname_len + 1, gEngfuncs.Cmd_Argv(1), bytes_to_write);
+
+				cmd[written + mapname_len + 1 + bytes_to_write] = '\0';
+			}
+		}
+
+		gEngfuncs.pfnClientCmd(cmd);
+	}
+}
+
 // TFFree Command Menu Message Handlers
 int __MsgFunc_ValClass(const char *pszName, int iSize, void *pbuf)
 {
@@ -298,6 +366,8 @@ void CHud :: Init( void )
 	HOOK_COMMAND( "special", InputPlayerSpecial );
 	HOOK_COMMAND( "togglebrowser", ToggleServerBrowser );
 
+	HOOK_COMMAND( "agrecord", Agrecord );
+
 	HOOK_MESSAGE( ValClass );
 	HOOK_MESSAGE( TeamNames );
 	HOOK_MESSAGE( Feign );
@@ -364,6 +434,12 @@ void CHud :: Init( void )
 	m_AmmoSecondary.Init();
 	m_TextMessage.Init();
 	m_StatusIcons.Init();
+	m_Countdown.Init();
+	m_Location.Init();
+	m_Settings.Init();
+	m_Timer.Init();
+	m_Vote.Init();
+	m_Watermark.Init();
 	GetClientVoiceMgr()->Init(&g_VoiceStatusHelper, (vgui::Panel**)&gViewPort);
 
 	m_Menu.Init();
@@ -513,10 +589,16 @@ void CHud :: VidInit( void )
 	m_AmmoSecondary.VidInit();
 	m_TextMessage.VidInit();
 	m_StatusIcons.VidInit();
+	m_Countdown.VidInit();
+	m_Location.VidInit();
+	m_Settings.VidInit();
+	m_Timer.VidInit();
+	m_Vote.VidInit();
+	m_Watermark.VidInit();
 	GetClientVoiceMgr()->VidInit();
 }
 
-int CHud::MsgFunc_Logo(const char *pszName,  int iSize, void *pbuf)
+int CHud::MsgFunc_Logo(const char *pszName, int iSize, void *pbuf)
 {
 	BEGIN_READ( pbuf, iSize );
 

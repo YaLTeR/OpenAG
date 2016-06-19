@@ -58,7 +58,7 @@
 #include "shake.h"
 #include "screenfade.h"
 
-extern int g_iVisibleMouse;
+void IN_SetVisibleMouse(bool visible);
 class CCommandMenu;
 int g_iPlayerClass;
 int g_iTeamNumber;
@@ -611,16 +611,14 @@ TeamFortressViewport::TeamFortressViewport(int x,int y,int wide,int tall) : Pane
 	m_iCurrentTeamNumber = m_iUser1 = m_iUser2 = m_iUser3 = 0;
 
 	m_StandardMenu = CreateCommandMenu("commandmenu.txt", 0, CMENU_TOP, false, CMENU_SIZE_X, BUTTON_SIZE_Y, 0 );
-	m_SpectatorOptionsMenu = CreateCommandMenu("spectatormenu.txt", 1, PANEL_HEIGHT, true, CMENU_SIZE_X, BUTTON_SIZE_Y / 2, 0 );	// above bottom bar, flat design
-	m_SpectatorCameraMenu = CreateCommandMenu("spectcammenu.txt", 1, PANEL_HEIGHT, true, XRES( 200 ), BUTTON_SIZE_Y / 2, ScreenWidth - ( XRES ( 200 ) + 15 ) );	// above bottom bar, flat design
+	m_SpectatorOptionsMenu = CreateCommandMenu("spectatormenu.txt", 1, PANEL_HEIGHT, true, XRES(OPTIONS_BUTTON_WIDTH), BUTTON_SIZE_Y / 2, XRES(OPTIONS_BUTTON_X) );	// above bottom bar, flat design
+	m_SpectatorCameraMenu = CreateCommandMenu("spectcammenu.txt", 1, PANEL_HEIGHT, true, XRES(OPTIONS_BUTTON_WIDTH), BUTTON_SIZE_Y / 2, XRES(640 - OPTIONS_BUTTON_X - OPTIONS_BUTTON_WIDTH) );	// above bottom bar, flat design
 
 	m_PlayerMenu =  m_iNumMenus;
 	m_iNumMenus++;
 
-	float flLabelSize = ( (ScreenWidth - (XRES ( CAMOPTIONS_BUTTON_X ) + 15)) - XRES ( 24 + 15 ) ) - XRES( (15 + OPTIONS_BUTTON_X + 15) + 38 );
-
 	m_pCommandMenus[m_PlayerMenu] = new CCommandMenu(NULL, 1, 
-									XRES( ( 15 + OPTIONS_BUTTON_X + 15 ) + 31 ),PANEL_HEIGHT, flLabelSize,300);	
+									XRES(MAIN_LABEL_X), PANEL_HEIGHT, XRES(MAIN_LABEL_WIDTH), 300);	
 	m_pCommandMenus[m_PlayerMenu]->setParent(this);
 	m_pCommandMenus[m_PlayerMenu]->setVisible(false);
 	m_pCommandMenus[m_PlayerMenu]->m_flButtonSizeY = BUTTON_SIZE_Y /2;
@@ -674,9 +672,10 @@ void TeamFortressViewport::Initialize( void )
 
 	strcpy(m_sMapName, "");
 	strcpy(m_szServerName, "");
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < ARRAYSIZE(m_sTeamNames); i++)
 	{
-		m_iValidClasses[i] = 0;
+		if (i < ARRAYSIZE(m_iValidClasses))
+			m_iValidClasses[i] = 0;
 		strcpy(m_sTeamNames[i], "");
 	}
 
@@ -895,7 +894,7 @@ try
 				else
 				{
 					// Create the menu
-					m_pCommandMenus[m_iNumMenus] = CreateSubMenu(pButton, m_pCurrentCommandMenu, iButtonY );
+					m_pCommandMenus[m_iNumMenus] = CreateSubMenu(pButton, m_pCurrentCommandMenu, iButtonY, XRES(OPTIONS_BUTTON_WIDTH) - (CMENU_SIZE_X - 1));
 					m_pCurrentCommandMenu = m_pCommandMenus[m_iNumMenus];
 					m_iNumMenus++;
 				}
@@ -1493,7 +1492,6 @@ void TeamFortressViewport::UpdatePlayerMenu(int menuIndex)
 {
 
 	cl_entity_t * pEnt = NULL;
-	float flLabelSize = ( (ScreenWidth - (XRES ( CAMOPTIONS_BUTTON_X ) + 15)) - XRES ( 24 + 15 ) ) - XRES( (15 + OPTIONS_BUTTON_X + 15) + 38 );
 	gViewPort->GetAllPlayersInfo();
 
 
@@ -1509,9 +1507,9 @@ void TeamFortressViewport::UpdatePlayerMenu(int menuIndex)
 
 		//if ( g_PlayerExtraInfo[i].teamname[0] == 0 )
 		//	continue; // skip over players who are not in a team
-	
-		SpectButton *pButton = new SpectButton(1 , g_PlayerInfoList[pEnt->index].name ,
-							 XRES( ( 15 + OPTIONS_BUTTON_X + 15 ) + 31 ),PANEL_HEIGHT+(i-1)*CMENU_SIZE_X, flLabelSize, BUTTON_SIZE_Y /2 );
+
+		SpectButton *pButton = new SpectButton(1 , strip_color_tags_thread_unsafe(g_PlayerInfoList[pEnt->index].name),
+							 XRES(MAIN_LABEL_X), PANEL_HEIGHT+(i-1)*CMENU_SIZE_X, XRES(MAIN_LABEL_WIDTH), BUTTON_SIZE_Y /2 );
 
 		pButton->setBoundKey( (char)255  );
 		pButton->setContentAlignment( vgui::Label::a_center );
@@ -1521,7 +1519,7 @@ void TeamFortressViewport::UpdatePlayerMenu(int menuIndex)
 		// Override font in CommandMenu
 		pButton->setFont( Scheme::sf_primary3 );
 
-		pButton->addActionSignal(new CMenuHandler_SpectateFollow( g_PlayerInfoList[pEnt->index].name));
+		pButton->addActionSignal(new CMenuHandler_SpectateFollow(g_PlayerInfoList[pEnt->index].name));
 		// Create an input signal that'll popup the current menu
 		pButton->addInputSignal( new CMenuHandler_PopupSubMenuInput(pButton, m_pCommandMenus[menuIndex]) );
 	
@@ -1586,8 +1584,8 @@ void TeamFortressViewport::UpdateSpectatorPanel()
 		// create player & health string
 		if ( player && name )
 		{
-			strncpy( bottomText, name, sizeof(bottomText) );
-			bottomText[ sizeof(bottomText) - 1 ] = 0;
+			strip_color_tags(bottomText, name, ARRAYSIZE(bottomText));
+			//bottomText[ sizeof(bottomText) - 1 ] = 0; // Not needed because strip_color_tags does it.
 			pBottomText = bottomText;
 		}
 		else
@@ -1644,7 +1642,7 @@ void TeamFortressViewport::UpdateSpectatorPanel()
 
 		szText[63] = 0;
 
-		m_pSpectatorPanel->m_ExtraInfo->setText ( szText );
+		//m_pSpectatorPanel->m_ExtraInfo->setText ( szText );
 		
 		/*
 		int timer = (int)( gHUD.m_roundTimer.m_flTimeEnd - gHUD.m_flTime );
@@ -2060,7 +2058,7 @@ void TeamFortressViewport::UpdateCursorState()
 	// Need cursor if any VGUI window is up
 	if ( m_pSpectatorPanel->m_menuVisible || m_pCurrentMenu || m_pTeamMenu->isVisible() || m_pServerBrowser->isVisible() || GetClientVoiceMgr()->IsInSquelchMode() )
 	{
-		g_iVisibleMouse = true;
+		IN_SetVisibleMouse(true);
 		App::getInstance()->setCursorOveride( App::getInstance()->getScheme()->getCursor(Scheme::scu_arrow) );
 		return;
 	}
@@ -2069,20 +2067,20 @@ void TeamFortressViewport::UpdateCursorState()
 		// commandmenu doesn't have cursor if hud_capturemouse is turned off
 		if ( gHUD.m_pCvarStealMouse->value != 0.0f )
 		{
-			g_iVisibleMouse = true;
+			IN_SetVisibleMouse(true);
 			App::getInstance()->setCursorOveride( App::getInstance()->getScheme()->getCursor(Scheme::scu_arrow) );
 			return;
 		}
 	}
+
+	App::getInstance()->setCursorOveride( App::getInstance()->getScheme()->getCursor(Scheme::scu_none) );
+	IN_SetVisibleMouse(false);
 
 	// Don't reset mouse in demo playback
 	if ( !gEngfuncs.pDemoAPI->IsPlayingback() )
 	{
 		IN_ResetMouse();
 	}
-
-	g_iVisibleMouse = false;
-	App::getInstance()->setCursorOveride( App::getInstance()->getScheme()->getCursor(Scheme::scu_none) );
 }
 
 void TeamFortressViewport::UpdateHighlights()
@@ -2312,14 +2310,15 @@ int TeamFortressViewport::MsgFunc_TeamNames(const char *pszName, int iSize, void
 	{
 		int teamNum = i + 1;
 
-		gHUD.m_TextMessage.LocaliseTextString( READ_STRING(), m_sTeamNames[teamNum], MAX_TEAMNAME_SIZE );
+		if (teamNum < ARRAYSIZE(m_sTeamNames))
+			gHUD.m_TextMessage.LocaliseTextString( READ_STRING(), m_sTeamNames[teamNum], MAX_TEAMNAME_SIZE );
 
 		// Set the team name buttons
-		if (m_pTeamButtons[i])
+		if (i < ARRAYSIZE(m_pTeamButtons) && m_pTeamButtons[i])
 			m_pTeamButtons[i]->setText( m_sTeamNames[teamNum] );
 
 		// range check this value...m_pDisguiseButtons[5];
-		if ( teamNum < 5 )
+		if ( teamNum < ARRAYSIZE(m_pDisguiseButtons) )
 		{
 			// Set the disguise buttons
 			if ( m_pDisguiseButtons[teamNum] )

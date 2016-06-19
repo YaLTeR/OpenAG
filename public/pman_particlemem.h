@@ -5,7 +5,18 @@
 #pragma once
 #endif
 
+#ifndef _WIN32
+// Ugly hax
+#pragma push_macro("min")
+#pragma push_macro("max")
+#undef min
+#undef max
 #include <vector>
+#pragma pop_macro("min")
+#pragma pop_macro("max")
+#else
+#include <vector>
+#endif
 
 class CCoreTriangleEffect;
 

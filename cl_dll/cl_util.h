@@ -77,8 +77,15 @@ inline struct cvar_s *CVAR_CREATE( const char *cv, const char *val, const int fl
 #define XPROJECT(x)	( (1.0f+(x))*ScreenWidth*0.5f )
 #define YPROJECT(y) ( (1.0f-(y))*ScreenHeight*0.5f )
 
-#define XRES(x)					(x  * ((float)ScreenWidth / 640))
-#define YRES(y)					(y  * ((float)ScreenHeight / 480))
+static inline float XRES(float x)
+{
+	return x * ScreenWidth / 640;
+}
+
+static inline float YRES(float y)
+{
+	return y * ScreenHeight / 480;
+}
 
 #define GetScreenInfo (*gEngfuncs.pfnGetScreenInfo)
 #define ServerCmd (*gEngfuncs.pfnServerCmd)
@@ -91,23 +98,59 @@ inline struct cvar_s *CVAR_CREATE( const char *cv, const char *val, const int fl
 inline int SPR_Height( HSPRITE x, int f )	{ return gEngfuncs.pfnSPR_Height(x, f); }
 inline int SPR_Width( HSPRITE x, int f )	{ return gEngfuncs.pfnSPR_Width(x, f); }
 
+template<typename T, size_t N>
+char (&ArraySizeHelper(T (&)[N]))[N];
+#define ARRAYSIZE(x) sizeof(ArraySizeHelper(x))
+
+/*
+ * Copies at most count characters (including the terminating null character)
+ * from src to dest, omitting the color tags. The resulting array is always
+ * null-terminated.
+ */
+static void strip_color_tags(char* dest, const char* src, size_t count)
+{
+	if (count == 0)
+		return;
+
+	for (; *src != '\0' && count > 1; ++src) {
+		if (src[0] == '^' && src[1] >= '0' && src[1] <= '9') {
+			++src;
+			continue;
+		} else {
+			*dest++ = *src;
+			--count;
+		}
+	}
+
+	*dest = '\0';
+}
+
+static char* strip_color_tags_thread_unsafe(const char* string)
+{
+	static char buf[2048];
+
+	strip_color_tags(buf, string, ARRAYSIZE(buf));
+
+	return buf;
+}
+
 inline 	client_textmessage_t	*TextMessageGet( const char *pName ) { return gEngfuncs.pfnTextMessageGet( pName ); }
 inline 	int						TextMessageDrawChar( int x, int y, int number, int r, int g, int b ) 
 { 
 	return gEngfuncs.pfnDrawCharacter( x, y, number, r, g, b ); 
 }
 
-inline int DrawConsoleString( int x, int y, const char *string )
+inline int DrawConsoleString( int x, int y, char *string )
 {
-	return gEngfuncs.pfnDrawConsoleString( x, y, (char*) string );
+	return gHUD.DrawConsoleStringWithColorTags(x, y, string);
 }
 
-inline void GetConsoleStringSize( const char *string, int *width, int *height )
+inline void GetConsoleStringSize( char *string, int *width, int *height )
 {
-	gEngfuncs.pfnDrawConsoleStringLen( string, width, height );
+	gHUD.GetConsoleStringSizeWithColorTags(string, *width, *height);
 }
 
-inline int ConsoleStringLen( const char *string )
+inline int ConsoleStringLen( char *string )
 {
 	int _width, _height;
 	GetConsoleStringSize( string, &_width, &_height );
@@ -116,12 +159,12 @@ inline int ConsoleStringLen( const char *string )
 
 inline void ConsolePrint( const char *string )
 {
-	gEngfuncs.pfnConsolePrint( string );
+	gEngfuncs.pfnConsolePrint( strip_color_tags_thread_unsafe(string) );
 }
 
 inline void CenterPrint( const char *string )
 {
-	gEngfuncs.pfnCenterPrint( string );
+	gEngfuncs.pfnCenterPrint( strip_color_tags_thread_unsafe(string) );
 }
 
 
@@ -164,7 +207,7 @@ inline void PlaySound( int iSound, float vol ) { gEngfuncs.pfnPlaySoundByIndex( 
 
 #define max(a, b)  (((a) > (b)) ? (a) : (b))
 #define min(a, b)  (((a) < (b)) ? (a) : (b))
-#define fabs(x)	   ((x) > 0 ? (x) : 0 - (x))
+//#define fabs(x)	   ((x) > 0 ? (x) : 0 - (x))
 
 void ScaleColors( int &r, int &g, int &b, int a );
 

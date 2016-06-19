@@ -92,6 +92,13 @@ struct HUDLIST {
 #include "voice_status.h" // base voice handling class
 #include "hud_spectator.h"
 
+#include "hud_countdown.h"
+#include "hud_location.h"
+#include "hud_settings.h"
+#include "hud_timer.h"
+#include "hud_vote.h"
+#include "hud_watermark.h"
+
 
 //
 //-----------------------------------------------------
@@ -567,11 +574,27 @@ public:
 	cvar_t	*m_pCvarDraw;
 
 	int m_iFontHeight;
-	int DrawHudNumber(int x, int y, int iFlags, int iNumber, int r, int g, int b );
+	int DrawHudNumber(int x, int y, int iFlags, int iNumber, int r, int g, int b);
+	int DrawHudNumber(int x, int y, int number, int r, int g, int b);
+	int DrawHudNumberCentered(int x, int y, int number, int r, int g, int b);
 	int DrawHudString(int x, int y, int iMaxX, char *szString, int r, int g, int b );
 	int DrawHudStringReverse( int xpos, int ypos, int iMinX, char *szString, int r, int g, int b );
 	int DrawHudNumberString( int xpos, int ypos, int iMinX, int iNumber, int r, int g, int b );
 	int GetNumWidth(int iNumber, int iFlags);
+
+	int DrawHudStringCentered(int x, int y, char* string, int r, int g, int b);
+	int DrawHudStringWithColorTags(int x, int y, char* string, int r, int g, int b);
+	int DrawHudStringCenteredWithColorTags(int x, int y, char* string, int r, int g, int b);
+	int DrawConsoleStringWithColorTags(
+		int x,
+		int y,
+		char* string,
+		bool use_default_color = false,
+		float default_r = 0.0f,
+		float default_g = 0.0f,
+		float default_b = 0.0f
+	);
+	void GetConsoleStringSizeWithColorTags(char* string, int& width, int& height);
 
 private:
 	// the memory for these arrays are allocated in the first call to CHud::VidInit(), when the hud.txt and associated sprites are loaded.
@@ -611,6 +634,13 @@ public:
 	CHudTextMessage m_TextMessage;
 	CHudStatusIcons m_StatusIcons;
 	CHudBenchmark	m_Benchmark;
+
+	CHudCountdown	m_Countdown;
+	CHudLocation	m_Location;
+	CHudSettings	m_Settings;
+	CHudTimer		m_Timer;
+	CHudVote		m_Vote;
+	CHudWatermark	m_Watermark;
 
 	void Init( void );
 	void VidInit( void );

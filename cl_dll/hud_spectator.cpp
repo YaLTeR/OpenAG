@@ -669,8 +669,15 @@ int CHudSpectator::Draw(float flTime)
 		
 		lx = strlen(string)*3; // 3 is avg. character length :)
 
-		gEngfuncs.pfnDrawSetTextColor( color[0], color[1], color[2] );
-		DrawConsoleString( m_vPlayerPos[i][0]-lx,m_vPlayerPos[i][1], string);
+		gHUD.DrawConsoleStringWithColorTags(
+			m_vPlayerPos[i][0] - lx,
+			m_vPlayerPos[i][1],
+			string,
+			true,
+			color[0],
+			color[1],
+			color[2]
+		);
 		
 	}
 
@@ -807,7 +814,7 @@ void CHudSpectator::DirectorMessage( int iSize, void *pbuf )
 
 		case DRC_CMD_BANNER:
 							// gEngfuncs.Con_DPrintf("GUI: Banner %s\n",READ_STRING() ); // name of banner tga eg gfx/temp/7454562234563475.tga
-							gViewPort->m_pSpectatorPanel->m_TopBanner->LoadImage( READ_STRING() );
+							//gViewPort->m_pSpectatorPanel->m_TopBanner->LoadImage( READ_STRING() );
 							gViewPort->UpdateSpectatorPanel();
 							break;
 

@@ -129,26 +129,23 @@ int CHudSayText :: Draw( float flTime )
 		{
 			if ( *g_szLineBuffer[i] == 2 && g_pflNameColors[i] )
 			{
-				// it's a saytext string
-				char *buf = static_cast<char *>( _alloca( strlen( g_szLineBuffer[i] ) ) );
-				if ( buf )
-				{
-					//char buf[MAX_PLAYER_NAME_LENGTH+32];
+				char buf[MAX_PLAYER_NAME_LENGTH + 32];
 
-					// draw the first x characters in the player color
-					strncpy( buf, g_szLineBuffer[i], min(g_iNameLengths[i], MAX_PLAYER_NAME_LENGTH+32) );
-					buf[ min(g_iNameLengths[i], MAX_PLAYER_NAME_LENGTH+31) ] = 0;
-					gEngfuncs.pfnDrawSetTextColor( g_pflNameColors[i][0], g_pflNameColors[i][1], g_pflNameColors[i][2] );
-					int x = DrawConsoleString( LINE_START, y, buf + 1 ); // don't draw the control code at the start
-					strncpy( buf, g_szLineBuffer[i] + g_iNameLengths[i], strlen( g_szLineBuffer[i] ));
-					buf[ strlen( g_szLineBuffer[i] + g_iNameLengths[i] ) - 1 ] = '\0';
-					// color is reset after each string draw
-					DrawConsoleString( x, y, buf ); 
-				}
-				else
-				{
-					assert( "Not able to alloca chat buffer!\n");
-				}
+				// draw the first x characters in the player color
+				strncpy( buf, g_szLineBuffer[i], min(g_iNameLengths[i], MAX_PLAYER_NAME_LENGTH + 31) );
+				buf[ min(g_iNameLengths[i], MAX_PLAYER_NAME_LENGTH + 31) ] = 0;
+				int x = gHUD.DrawConsoleStringWithColorTags(
+					LINE_START,
+					y,
+					buf + 1, // don't draw the control code at the start
+					true,
+					g_pflNameColors[i][0],
+					g_pflNameColors[i][1],
+					g_pflNameColors[i][2]
+				);
+
+				// color is reset after each string draw
+				DrawConsoleString( x, y, g_szLineBuffer[i] + g_iNameLengths[i] );
 			}
 			else
 			{
@@ -171,6 +168,47 @@ int CHudSayText :: MsgFunc_SayText( const char *pszName, int iSize, void *pbuf )
 	SayTextPrint( READ_STRING(), iSize - 1,  client_index );
 	
 	return 1;
+}
+
+/*
+ * Copies at most count characters (including the terminating null character)
+ * from src to dest, replacing the location tags with the location names.
+ * The resulting array is always null-terminated except when count == 0.
+ */
+static void convert_locations(char* dest, const char* src, size_t count, int player_id)
+{
+	if (count == 0)
+		return;
+
+	if (count == 1) {
+		dest[0] = '\0';
+		return;
+	}
+
+	size_t i = 0;
+
+	for (; *src != '\0'; ++src) {
+		if (src[0] == '%' && (src[1] == 'l' || src[1] == 'L' || src[1] == 'd' || src[1] == 'D')) {
+			auto loc = gHUD.m_Location.get_player_location(player_id).c_str();
+			auto loc_len = strlen(loc);
+			auto bytes_to_copy = min(loc_len, count - i - 1);
+
+			strncpy(&dest[i], loc, bytes_to_copy);
+			i += bytes_to_copy;
+
+			if (i + 1 == count)
+				break;
+
+			++src;
+		} else {
+			dest[i++] = *src;
+
+			if (i + 1 == count)
+				break;
+		}
+	}
+
+	dest[i] = '\0';
 }
 
 void CHudSayText :: SayTextPrint( const char *pszBuf, int iBufSize, int clientIndex )
@@ -217,7 +255,7 @@ void CHudSayText :: SayTextPrint( const char *pszBuf, int iBufSize, int clientIn
 		}
 	}
 
-	strncpy( g_szLineBuffer[i], pszBuf, max(iBufSize , MAX_CHARS_PER_LINE) );
+	convert_locations( g_szLineBuffer[i], pszBuf, MAX_CHARS_PER_LINE, clientIndex );
 
 	// make sure the text fits in one line
 	EnsureTextFitsInOneLineAndWrapIfHaveTo( i );
@@ -245,6 +283,9 @@ void CHudSayText :: EnsureTextFitsInOneLineAndWrapIfHaveTo( int line )
 		int length = LINE_START;
 		int tmp_len = 0;
 		char *last_break = NULL;
+
+		int current_color = 0;
+		int color_before_last_break = 0;
 		for ( char *x = g_szLineBuffer[line]; *x != 0; x++ )
 		{
 			// check for a color change, if so skip past it
@@ -262,11 +303,35 @@ void CHudSayText :: EnsureTextFitsInOneLineAndWrapIfHaveTo( int line )
 					break;
 			}
 
+			// Skip past the color tags.
+			if (x[0] == '^' && x[1] >= '0' && x[1] <= '9') {
+				if (g_szLineBuffer[line][0] != 2 || g_szLineBuffer[line] + g_iNameLengths[line] < x) {
+					current_color = x[1] - '0';
+					if (current_color == 9)
+						current_color = 0;
+				}
+
+				x += 2;
+
+				if (*x == 0)
+					break;
+			}
+
+			// Skip past the control character at the start.
+			if (x[0] == 2) {
+				++x;
+
+				if (*x == 0)
+					break;
+			}
+
 			char buf[2];
 			buf[1] = 0;
 
-			if ( *x == ' ' && x != g_szLineBuffer[line] )  // store each line break,  except for the very first character
+			if (*x == ' ' && x != g_szLineBuffer[line]) {  // store each line break,  except for the very first character
 				last_break = x;
+				color_before_last_break = current_color;
+			}
 
 			buf[0] = *x;  // get the length of the current character
 			GetConsoleStringSize( buf, &tmp_len, &line_height );
@@ -274,8 +339,10 @@ void CHudSayText :: EnsureTextFitsInOneLineAndWrapIfHaveTo( int line )
 
 			if ( length > MAX_LINE_WIDTH )
 			{  // needs to be broken up
-				if ( !last_break )
-					last_break = x-1;
+				if (!last_break) {
+					last_break = x - 1;
+					color_before_last_break = current_color;
+				}
 
 				x = last_break;
 
@@ -299,21 +366,20 @@ void CHudSayText :: EnsureTextFitsInOneLineAndWrapIfHaveTo( int line )
 				while ( j == MAX_LINES );
 
 				// copy remaining string into next buffer,  making sure it starts with a space character
-				if ( (char)*last_break == (char)' ' )
-				{
-					int linelen = strlen(g_szLineBuffer[j]);
-					int remaininglen = strlen(last_break);
+				g_szLineBuffer[j][0] = ' ';
 
-					if ( (linelen - remaininglen) <= MAX_CHARS_PER_LINE )
-						strcat( g_szLineBuffer[j], last_break );
+				if (color_before_last_break)
+					sprintf(g_szLineBuffer[j] + 1, "^%d", color_before_last_break);
+				else
+					g_szLineBuffer[j][1] = '\0';
+
+				if ( *last_break == ' ' )
+				{
+					strcat(g_szLineBuffer[j], last_break + 1);
 				}
 				else
 				{
-					if ( (strlen(g_szLineBuffer[j]) - strlen(last_break) - 2) < MAX_CHARS_PER_LINE )
-					{
-						strcat( g_szLineBuffer[j], " " );
-						strcat( g_szLineBuffer[j], last_break );
-					}
+					strcat(g_szLineBuffer[j], last_break);
 				}
 
 				*last_break = 0; // cut off the last string
