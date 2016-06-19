@@ -53,7 +53,7 @@ int CHudSettings::Draw(float time)
 	gEngfuncs.pfnDrawString(x, (y += gHUD.m_scrinfo.iCharHeight), gamemode, r, g, b);
 
 	sprintf(str, "Time limit: %hhd", time_limit);
-	gEngfuncs.pfnDrawString(x, (y += gHUD.m_scrinfo.iCharHeight), str, r, g, b);
+	gEngfuncs.pfnDrawString(x, (y += gHUD.m_scrinfo.iCharHeight / 2 * 3), str, r, g, b);
 
 	sprintf(str, "Frag limit: %hhd", frag_limit);
 	gEngfuncs.pfnDrawString(x, (y += gHUD.m_scrinfo.iCharHeight), str, r, g, b);

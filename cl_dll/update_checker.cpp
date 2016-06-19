@@ -14,7 +14,7 @@ using namespace std;
 
 namespace update_checker
 {
-	#define UPDATE_URL "http://play.sourceruns.org/yalter/AG-Compat/latest_version"
+	#define UPDATE_URL "http://play.sourceruns.org/yalter/OpenAG/latest_version"
 
 	// Replace this with the latest commit timestamp.
 	// git show -s --format=%ct

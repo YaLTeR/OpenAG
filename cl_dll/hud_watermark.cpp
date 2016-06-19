@@ -35,43 +35,11 @@ int CHudWatermark::Draw(float time)
 	int r, g, b;
 	UnpackRGB(r, g, b, RGB_YELLOWISH);
 
-	gEngfuncs.pfnDrawString(
-		ScreenWidth / 20,
-		gHUD.m_scrinfo.iCharHeight,
-		"AG-Compat client built at " __DATE__ " " __TIME__,
-		r,
-		g,
-		b
-	);
+	gEngfuncs.pfnDrawString(ScreenWidth / 20, gHUD.m_scrinfo.iCharHeight, "OpenAG client build " __DATE__, r, g, b);
+	gEngfuncs.pfnDrawString(ScreenWidth / 20, gHUD.m_scrinfo.iCharHeight * 2, "j.mp/OpenAG", r, g, b);
 
-	gEngfuncs.pfnDrawString(
-		ScreenWidth / 20,
-		gHUD.m_scrinfo.iCharHeight * 2,
-		"by Ivan \"YaLTeR\" Molodetskikh",
-		r,
-		g,
-		b
-	);
-
-	if (update_is_available) {
-		gEngfuncs.pfnDrawString(
-			ScreenWidth / 20,
-			gHUD.m_scrinfo.iCharHeight / 2 * 7,
-			"An update is available.",
-			r,
-			g,
-			b
-		);
-
-		gEngfuncs.pfnDrawString(
-			ScreenWidth / 20,
-			gHUD.m_scrinfo.iCharHeight / 2 * 9,
-			"bit.ly/ag-compat",
-			r,
-			g,
-			b
-		);
-	}
+	if (update_is_available)
+		gEngfuncs.pfnDrawString(ScreenWidth / 20, gHUD.m_scrinfo.iCharHeight / 2 * 7, "An update is available.", r, g, b);
 
 	return 0;
 }
