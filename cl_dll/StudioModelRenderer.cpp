@@ -22,6 +22,8 @@
 #include "StudioModelRenderer.h"
 #include "GameStudioModelRenderer.h"
 
+#include "forcemodel.h"
+
 extern cvar_t *tfc_newmodels;
 
 extern extra_player_info_t  g_PlayerExtraInfo[MAX_PLAYERS+1];
@@ -1646,6 +1648,15 @@ float g_flSpinUpTime[ 33 ];
 float g_flSpinDownTime[ 33 ];
 #endif
 
+model_t* CStudioModelRenderer::GetPlayerModel(int player_index)
+{
+	auto model = force_model::get_team_model_override(g_PlayerExtraInfo[player_index + 1].teamname);
+	if (model)
+		return model;
+
+	return IEngineStudio.SetupPlayerModel(player_index);
+}
+
 
 /*
 ====================
@@ -1689,7 +1700,7 @@ int CStudioModelRenderer::StudioDrawPlayer( int flags, entity_state_t *pplayer )
 
 #else
 
-	m_pRenderModel = IEngineStudio.SetupPlayerModel( m_nPlayerIndex );
+	m_pRenderModel = GetPlayerModel(m_nPlayerIndex);
 
 #endif
 

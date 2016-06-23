@@ -54,6 +54,7 @@ HL1_OBJS = \
 	$(HL1_OBJ_DIR)/ev_common.o \
 	$(HL1_OBJ_DIR)/events.o \
 	$(HL1_OBJ_DIR)/flashlight.o \
+	$(HL1_OBJ_DIR)/forcemodel.o \
 	$(HL1_OBJ_DIR)/GameStudioModelRenderer.o \
 	$(HL1_OBJ_DIR)/geiger.o \
 	$(HL1_OBJ_DIR)/health.o \

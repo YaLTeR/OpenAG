@@ -32,6 +32,9 @@ public:
 	virtual int StudioDrawModel ( int flags );
 	virtual int StudioDrawPlayer ( int flags, struct entity_state_s *pplayer );
 
+private:
+	virtual model_t* GetPlayerModel(int player_index);
+
 public:
 	// Local interfaces
 	//

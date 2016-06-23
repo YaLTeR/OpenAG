@@ -32,6 +32,8 @@
 #include "demo_api.h"
 #include "vgui_ScorePanel.h"
 
+#include "forcemodel.h"
+
 hud_player_info_t	 g_PlayerInfoList[MAX_PLAYERS+1];	   // player info from the engine
 extra_player_info_t  g_PlayerExtraInfo[MAX_PLAYERS+1];   // additional player info sent directly to the client dll
 
@@ -368,6 +370,8 @@ void CHud :: Init( void )
 
 	HOOK_COMMAND( "agrecord", Agrecord );
 
+	force_model::hook_commands();
+
 	HOOK_MESSAGE( ValClass );
 	HOOK_MESSAGE( TeamNames );
 	HOOK_MESSAGE( Feign );
@@ -391,7 +395,6 @@ void CHud :: Init( void )
 
 	CVAR_CREATE( "hud_classautokill", "1", FCVAR_ARCHIVE | FCVAR_USERINFO );		// controls whether or not to suicide immediately on TF class switch
 	CVAR_CREATE( "hud_takesshots", "0", FCVAR_ARCHIVE );		// controls whether or not to automatically take screenshots at the end of a round
-
 
 	m_iLogo = 0;
 	m_iFOV = 0;
