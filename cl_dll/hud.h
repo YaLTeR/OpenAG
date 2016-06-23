@@ -324,6 +324,7 @@ private:
 
 	struct cvar_s *	m_HUD_saytext;
 	struct cvar_s *	m_HUD_saytext_time;
+	struct cvar_s * m_HUD_saytext_sound;
 };
 
 //

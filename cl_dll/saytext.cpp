@@ -58,6 +58,7 @@ int CHudSayText :: Init( void )
 
 	m_HUD_saytext =			gEngfuncs.pfnRegisterVariable( "hud_saytext", "1", 0 );
 	m_HUD_saytext_time =	gEngfuncs.pfnRegisterVariable( "hud_saytext_time", "5", 0 );
+	m_HUD_saytext_sound =	gEngfuncs.pfnRegisterVariable( "hud_saytext_sound", "0", FCVAR_ARCHIVE );
 
 	m_iFlags |= HUD_INTERMISSION; // is always drawn during an intermission
 
@@ -267,7 +268,9 @@ void CHudSayText :: SayTextPrint( const char *pszBuf, int iBufSize, int clientIn
 	}
 
 	m_iFlags |= HUD_ACTIVE;
-	PlaySound( "misc/talk.wav", 1 );
+
+	if (m_HUD_saytext_sound->value != 0.0f)
+		PlaySound( "misc/talk.wav", 1 );
 
 	Y_START = ScreenHeight - 60 - ( line_height * (MAX_LINES+2) );
 }
