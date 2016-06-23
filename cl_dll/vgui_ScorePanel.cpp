@@ -31,6 +31,8 @@
 #include "voice_status.h"
 #include "vgui_SpectatorPanel.h"
 
+#include "steam_id.h"
+
 extern hud_player_info_t	 g_PlayerInfoList[MAX_PLAYERS+1];	   // player info from the engine
 extern extra_player_info_t  g_PlayerExtraInfo[MAX_PLAYERS+1];   // additional player info sent directly to the client dll
 team_info_t			 g_TeamInfo[MAX_TEAMS+1];
@@ -59,7 +61,7 @@ SBColumnInfo g_ColumnInfo[NUM_COLUMNS] =
 {
 	{NULL,			24,			Label::a_east},		// tracker column
 	{NULL,			140,		Label::a_east},		// name
-	{NULL,			56,			Label::a_east},		// class
+	{"SteamID",		56,			Label::a_east},		// class
 	{"#SCORE",		40,			Label::a_east},
 	{"#DEATHS",		46,			Label::a_east},
 	{"#LATENCY",	46,			Label::a_east},
@@ -678,7 +680,7 @@ void ScorePanel::FillGrid()
 			}				
 
 			// Align 
-			if (col == COLUMN_NAME || col == COLUMN_CLASS)
+			if (col == COLUMN_NAME)
 			{
 				pLabel->setContentAlignment( vgui::Label::a_west );
 			}
@@ -803,7 +805,7 @@ void ScorePanel::FillGrid()
 					}
 					else
 					{
-						strcpy(sz, "");
+						snprintf(sz, ARRAYSIZE(sz), "%s", steam_id::get_steam_id(m_iSortedRows[row] - 1).c_str());
 					}
 					break;
 

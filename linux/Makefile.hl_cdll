@@ -77,6 +77,7 @@ HL1_OBJS = \
 	$(HL1_OBJ_DIR)/saytext.o \
 	$(HL1_OBJ_DIR)/status_icons.o \
 	$(HL1_OBJ_DIR)/statusbar.o \
+	$(HL1_OBJ_DIR)/steam_id.o \
 	$(HL1_OBJ_DIR)/studio_util.o \
 	$(HL1_OBJ_DIR)/StudioModelRenderer.o \
 	$(HL1_OBJ_DIR)/text_message.o \
