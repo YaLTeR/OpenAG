@@ -31,6 +31,7 @@
 #include "voice_status.h"
 #include "vgui_SpectatorPanel.h"
 
+#include "forcemodel.h"
 #include "steam_id.h"
 
 extern hud_player_info_t	 g_PlayerInfoList[MAX_PLAYERS+1];	   // player info from the engine
@@ -249,6 +250,7 @@ void ScorePanel::Initialize( void )
 	m_iPlayerNum = 0;
 	m_iNumTeams = 0;
 	memset( g_PlayerExtraInfo, 0, sizeof g_PlayerExtraInfo );
+	force_model::update_player_teams();
 	memset( g_TeamInfo, 0, sizeof g_TeamInfo );
 }
 

@@ -5,5 +5,7 @@ namespace force_model
 {
 	void hook_commands();
 
-	model_t* get_team_model_override(const std::string& team_name);
+	void update_player_team(int player_index);
+	void update_player_teams();
+	model_t* get_model_override(int player_index);
 };

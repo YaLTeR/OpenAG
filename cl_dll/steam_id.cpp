@@ -8,7 +8,7 @@ namespace steam_id
 	{
 		std::string steam_ids[MAX_PLAYERS];
 
-		void msgfunc_AuthID(const char* name, int size, void* buf)
+		int msgfunc_AuthID(const char* name, int size, void* buf)
 		{
 			BEGIN_READ(buf, size);
 
@@ -21,6 +21,8 @@ namespace steam_id
 				if (underscore)
 					steam_ids[slot - 1].assign(underscore + 1);
 			}
+
+			return 1;
 		}
 	}
 
@@ -31,9 +33,6 @@ namespace steam_id
 
 	const std::string& get_steam_id(size_t player_index)
 	{
-		if (player_index < MAX_PLAYERS)
-			return steam_ids[player_index];
-		else
-			return std::string();
+		return steam_ids[player_index];
 	}
 }

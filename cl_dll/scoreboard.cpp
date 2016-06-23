@@ -26,6 +26,8 @@
 #include <stdio.h>
 #include "vgui_TeamFortressViewport.h"
 
+#include "forcemodel.h"
+
 DECLARE_COMMAND( m_Scoreboard, ShowScores );
 DECLARE_COMMAND( m_Scoreboard, HideScores );
 
@@ -63,6 +65,7 @@ int CHudScoreboard :: VidInit( void )
 void CHudScoreboard :: InitHUDData( void )
 {
 	memset( g_PlayerExtraInfo, 0, sizeof g_PlayerExtraInfo );
+	force_model::update_player_teams();
 	m_iLastKilledBy = 0;
 	m_fLastKillTime = 0;
 	m_iPlayerNum = 0;
@@ -474,6 +477,8 @@ int CHudScoreboard :: MsgFunc_TeamInfo( const char *pszName, int iSize, void *pb
 	if ( cl > 0 && cl <= MAX_PLAYERS )
 	{  // set the players team
 		strncpy( g_PlayerExtraInfo[cl].teamname, READ_STRING(), MAX_TEAM_NAME );
+
+		force_model::update_player_team(cl - 1);
 	}
 
 	// rebuild the list of teams

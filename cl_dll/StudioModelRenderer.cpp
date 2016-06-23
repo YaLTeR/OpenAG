@@ -1650,7 +1650,7 @@ float g_flSpinDownTime[ 33 ];
 
 model_t* CStudioModelRenderer::GetPlayerModel(int player_index)
 {
-	auto model = force_model::get_team_model_override(g_PlayerExtraInfo[player_index + 1].teamname);
+	auto model = force_model::get_model_override(player_index);
 	if (model)
 		return model;
 

@@ -1,19 +1,45 @@
-#include <string>
-#include <unordered_map>
+#include <algorithm>
+#include <cstring>
+#include <vector>
 
 #include "hud.h"
 #include "cl_util.h"
 #include "com_model.h"
 #include "r_studioint.h"
+#include "forcemodel.h"
 
 extern engine_studio_api_t IEngineStudio;
+extern extra_player_info_t g_PlayerExtraInfo[MAX_PLAYERS + 1];
 
 namespace force_model
 {
 	namespace
 	{
-		// A map from team names to model names.
-		std::unordered_map<std::string, model_t*> team_model_map;
+		struct model_override
+		{
+			char* who;
+			model_t* model;
+
+			model_override(const char* who_, model_t* model)
+				: model(model)
+			{
+				auto len = strlen(who_);
+
+				who = new char[len + 1];
+				std::memcpy(who, who_, len + 1);
+			}
+
+			~model_override()
+			{
+				delete[] who;
+			}
+		};
+
+		// Overrides by the team name.
+		std::vector<model_override> team_model_overrides;
+
+		// Cache for fast lookup.
+		model_t* team_model_overrides_cache[MAX_PLAYERS];
 
 		void callback_cl_forceteammodel()
 		{
@@ -24,7 +50,7 @@ namespace force_model
 
 			auto model_name = gEngfuncs.Cmd_Argv(2);
 
-			char model_path[PATH_MAX];
+			char model_path[4096];
 			std::snprintf(model_path, ARRAYSIZE(model_path), "models/player/%s/%s.mdl", model_name, model_name);
 
 			auto model = IEngineStudio.Mod_ForName(model_path, 0);
@@ -33,18 +59,34 @@ namespace force_model
 				return;
 			}
 
-			team_model_map[gEngfuncs.Cmd_Argv(1)] = model;
+			auto team_name = gEngfuncs.Cmd_Argv(1);
+
+			auto it = std::find_if(
+				team_model_overrides.begin(),
+				team_model_overrides.end(),
+				[=](const model_override& entry) {
+					return !strcmp(entry.who, team_name);
+				});
+
+			if (it != team_model_overrides.end())
+				it->model = model;
+			else
+				team_model_overrides.emplace_back(team_name, model);
+
+			update_player_teams();
 		}
 
 		void callback_cl_forceteammodel_list()
 		{
-			if (team_model_map.size() == 0) {
-				gEngfuncs.Con_Printf("There are no model overrides.\n");
+			if (team_model_overrides.size() == 0) {
+				gEngfuncs.Con_Printf("There are no team model overrides.\n");
 				return;
 			}
 
-			for (const auto& entry : team_model_map)
-				gEngfuncs.Con_Printf("%s -> %s\n", entry.first.c_str(), entry.second->name);
+			for (unsigned i = 0; i < team_model_overrides.size(); ++i) {
+				const auto& entry = team_model_overrides[i];
+				gEngfuncs.Con_Printf("%u. %s -> %s\n", i + 1, entry.who, entry.model->name);
+			}
 		}
 
 		void callback_cl_forceteammodel_remove()
@@ -54,7 +96,18 @@ namespace force_model
 				return;
 			}
 
-			team_model_map.erase(gEngfuncs.Cmd_Argv(1));
+			auto it = std::find_if(
+				team_model_overrides.begin(),
+				team_model_overrides.end(),
+				[=](const model_override& entry) {
+					return !strcmp(entry.who, gEngfuncs.Cmd_Argv(1));
+				});
+
+			if (it != team_model_overrides.end()) {
+				team_model_overrides.erase(it);
+
+				update_player_teams();
+			}
 		}
 	}
 
@@ -65,13 +118,31 @@ namespace force_model
 		gEngfuncs.pfnAddCommand("cl_forceteammodel_remove", callback_cl_forceteammodel_remove);
 	}
 
-	model_t* get_team_model_override(const std::string& team_name)
+	void update_player_team(int player_index)
 	{
-		auto model = team_model_map.find(team_name);
+		auto team_name = g_PlayerExtraInfo[player_index + 1].teamname;
 
-		if (model != team_model_map.cend())
-			return model->second;
+		auto it = std::find_if(
+			team_model_overrides.cbegin(),
+			team_model_overrides.cend(),
+			[=](const model_override& entry) {
+				return !strcmp(entry.who, team_name);
+			});
+
+		if (it != team_model_overrides.cend())
+			team_model_overrides_cache[player_index] = it->model;
 		else
-			return nullptr;
+			team_model_overrides_cache[player_index] = nullptr;
+	}
+
+	void update_player_teams()
+	{
+		for (size_t i = 0; i < MAX_PLAYERS; ++i)
+			update_player_team(i);
+	}
+
+	model_t* get_model_override(int player_index)
+	{
+		return team_model_overrides_cache[player_index];
 	}
 }
