@@ -27,7 +27,7 @@ int CHudCountdown::VidInit()
 int CHudCountdown::Draw(float time)
 {
 	int r, g, b;
-	UnpackRGB(r, g, b, RGB_YELLOWISH);
+	UnpackRGB(r, g, b, gHUD.m_iDefaultHUDColor);
 
 	char str[72];
 

@@ -33,7 +33,7 @@ int CHudWatermark::Draw(float time)
 	}
 
 	int r, g, b;
-	UnpackRGB(r, g, b, RGB_YELLOWISH);
+	UnpackRGB(r, g, b, gHUD.m_iDefaultHUDColor);
 
 	gEngfuncs.pfnDrawString(ScreenWidth / 20, gHUD.m_scrinfo.iCharHeight, "OpenAG client build " __DATE__, r, g, b);
 	gEngfuncs.pfnDrawString(ScreenWidth / 20, gHUD.m_scrinfo.iCharHeight * 2, "j.mp/OpenAG", r, g, b);

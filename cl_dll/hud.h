@@ -575,6 +575,12 @@ public:
 	cvar_t	*m_pCvarDraw;
 
 	int m_iFontHeight;
+
+	cvar_t* m_pCvarColor;
+	unsigned long m_iDefaultHUDColor;
+
+	void UpdateDefaultHUDColor();
+
 	int DrawHudNumber(int x, int y, int iFlags, int iNumber, int r, int g, int b);
 	int DrawHudNumber(int x, int y, int number, int r, int g, int b);
 	int DrawHudNumberCentered(int x, int y, int number, int r, int g, int b);
@@ -649,7 +655,7 @@ public:
 	int Redraw( float flTime, int intermission );
 	int UpdateClientData( client_data_t *cdata, float time );
 
-	CHud() : m_iSpriteCount(0), m_pHudList(NULL) {}  
+	CHud() : m_iSpriteCount(0), m_pHudList(NULL), m_iDefaultHUDColor(RGB_YELLOWISH) {}
 	~CHud();			// destructor, frees allocated memory
 
 	// user messages

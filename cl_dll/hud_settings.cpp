@@ -40,7 +40,7 @@ int CHudSettings::Draw(float time)
 		return 0;
 
 	int r, g, b;
-	UnpackRGB(r, g, b, RGB_YELLOWISH);
+	UnpackRGB(r, g, b, gHUD.m_iDefaultHUDColor);
 
 	const auto x = ScreenWidth - ScreenWidth / 5;
 	int y = 0;

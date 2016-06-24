@@ -33,7 +33,7 @@ int CHudVote::Draw(float time)
 	}
 
 	int r, g, b;
-	UnpackRGB(r, g, b, RGB_YELLOWISH);
+	UnpackRGB(r, g, b, gHUD.m_iDefaultHUDColor);
 
 	char str[72];
 	const int x = ScreenWidth / 20;
