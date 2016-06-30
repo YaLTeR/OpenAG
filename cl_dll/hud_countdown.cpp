@@ -37,6 +37,11 @@ int CHudCountdown::Draw(float time)
 		else
 			sprintf(str, "Waiting for players to get ready...");
 	} else {
+		if (gHUD.m_flTime >= draw_until) {
+			m_iFlags &= ~HUD_ACTIVE;
+			return 0;
+		}
+
 		if (name1[0] != '\0' && name2[0] != '\0')
 			sprintf(str, "%s^0 vs. %s", name1, name2);
 		else
@@ -77,8 +82,11 @@ int CHudCountdown::MsgFunc_Countdown(const char* name, int size, void* buf)
 	if (seconds_left >= 0) {
 		m_iFlags |= HUD_ACTIVE;
 
-		if (play_sound && seconds_left <= 10)
+		if (play_sound && seconds_left <= 10) {
 			gEngfuncs.pfnPlaySoundByName(sound_names[seconds_left], 1.0f);
+
+			draw_until = gHUD.m_flTime + 5.0f;			
+		}
 	} else {
 		m_iFlags &= ~HUD_ACTIVE;
 	}

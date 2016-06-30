@@ -3,6 +3,8 @@
 
 class CHudCountdown : public CHudBase
 {
+	float draw_until;
+
 	int8_t seconds_left;
 	char name1[32];
 	char name2[32];
