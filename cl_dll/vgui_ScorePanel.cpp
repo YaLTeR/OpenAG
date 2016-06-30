@@ -771,7 +771,18 @@ void ScorePanel::FillGrid()
 						}
 					}
 					*/
-					sprintf(sz, "%s  ", strip_color_tags_thread_unsafe(pl_info->name));
+					
+					{
+						const char* name = nullptr;
+
+						if (steam_id::is_showing_real_names())
+							name = steam_id::get_real_name(m_iSortedRows[row] - 1).c_str();
+						if (!name || name[0] == '\0')
+							name = pl_info->name;
+
+						sprintf(sz, "%s", strip_color_tags_thread_unsafe(name));
+					}
+
 					break;
 				case COLUMN_VOICE:
 					sz[0] = 0;
