@@ -455,8 +455,8 @@ void CVoiceStatus::UpdateSpeakerStatus( int entindex, qboolean bTalking )
 						memset( &info, 0, sizeof( info ) );
 						gEngfuncs.pfnGetPlayerInfo( entindex, &info );
 
-						char paddedName[512];
-						_snprintf( paddedName, sizeof( paddedName ), "%s   ", info.name );
+						char name[512];
+						strip_color_tags(name, info.name, ARRAYSIZE(name));
 
 						int color[3];
 						m_pHelper->GetPlayerTextColor( entindex, color );
@@ -472,7 +472,7 @@ void CVoiceStatus::UpdateSpeakerStatus( int entindex, qboolean bTalking )
 						{
 							pLabel->m_pLabel->setFgColor( 255, 255, 255, 0 );
 							pLabel->m_pLabel->setBgColor( 0, 0, 0, 255 );
-							pLabel->m_pLabel->setText( "%s", paddedName );
+							pLabel->m_pLabel->setText( "%s   ", name);
 						}
 						
 						pLabel->m_clientindex = iClient;
