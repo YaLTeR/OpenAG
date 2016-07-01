@@ -132,6 +132,11 @@ namespace steam_id
 			update_real_names();
 
 			showing_real_names = true;
+
+			gEngfuncs.Con_Printf(
+				"Loaded %llu real names.\n",
+				static_cast<unsigned long long>(steam_id_to_real_name.size())
+			);
 		}
 
 		void callback_unloadauthid()
@@ -139,6 +144,8 @@ namespace steam_id
 			steam_id_to_real_name.clear();
 
 			showing_real_names = false;
+
+			gEngfuncs.Con_Printf("Unloaded all real names.\n");
 		}
 	}
 
