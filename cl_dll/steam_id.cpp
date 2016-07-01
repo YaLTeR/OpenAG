@@ -141,11 +141,13 @@ namespace steam_id
 
 		void callback_unloadauthid()
 		{
+			auto print_message = (steam_id_to_real_name.size() > 0);
 			steam_id_to_real_name.clear();
 
 			showing_real_names = false;
 
-			gEngfuncs.Con_Printf("Unloaded all real names.\n");
+			if (print_message)
+				gEngfuncs.Con_Printf("Unloaded all real names.\n");
 		}
 	}
 
