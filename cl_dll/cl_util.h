@@ -134,6 +134,20 @@ static char* strip_color_tags_thread_unsafe(const char* string)
 	return buf;
 }
 
+/*
+ * Returns true if the given string contains any color tags.
+ * A color tag is something that's stripped by strip_color_tags.
+ */
+static bool contains_color_tags(const char* string)
+{
+	for (; *string != '\0'; ++string) {
+		if (string[0] == '^' && string[1] >= '0' && string[1] <= '9')
+			return true;
+	}
+
+	return false;
+}
+
 inline 	client_textmessage_t	*TextMessageGet( const char *pName ) { return gEngfuncs.pfnTextMessageGet( pName ); }
 inline 	int						TextMessageDrawChar( int x, int y, int number, int r, int g, int b ) 
 { 

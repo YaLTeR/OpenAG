@@ -9,6 +9,7 @@
 #include "hud.h"
 #include "cl_util.h"
 #include "parsemsg.h"
+#include "forcemodel.h"
 
 namespace steam_id
 {
@@ -121,6 +122,8 @@ namespace steam_id
 
 					if (showing_real_names)
 						update_real_names();
+
+					force_model::update_player_steam_id(slot - 1);
 				}
 			}
 
