@@ -1,5 +1,6 @@
 #include <algorithm> 
 #include <cctype>
+#include <chrono>
 #include <functional> 
 #include <fstream>
 #include <locale>
@@ -128,7 +129,10 @@ namespace steam_id
 
 		void callback_loadauthid()
 		{
+			auto start = std::chrono::steady_clock::now();
 			parse_realnames();
+			auto end = std::chrono::steady_clock::now();
+
 			update_real_names();
 
 			showing_real_names = true;
@@ -137,6 +141,9 @@ namespace steam_id
 				"Loaded %llu real names.\n",
 				static_cast<unsigned long long>(steam_id_to_real_name.size())
 			);
+
+			auto parsing_took = std::chrono::duration<double, std::milli>(end - start);
+			gEngfuncs.Con_DPrintf("Parsing took %.2f ms.\n", parsing_took.count());
 		}
 
 		void callback_unloadauthid()
