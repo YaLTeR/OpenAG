@@ -31,6 +31,10 @@
 #include "../com_weapons.h"
 #include "../demo.h"
 
+#ifndef min
+#define min(a,b)  (((a) < (b)) ? (a) : (b))
+#endif
+
 extern globalvars_t *gpGlobals;
 extern int g_iUser1;
 
