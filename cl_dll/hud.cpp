@@ -238,6 +238,16 @@ void __CmdFunc_Agrecord()
 	}
 }
 
+void __CmdFunc_Append()
+{
+	if (gEngfuncs.Cmd_Argc() != 2) {
+		gEngfuncs.Con_Printf("append <command> - put the command into the end of the command buffer.\n");
+		return;
+	}
+
+	EngineClientCmd(gEngfuncs.Cmd_Argv(1));
+}
+
 // TFFree Command Menu Message Handlers
 int __MsgFunc_ValClass(const char *pszName, int iSize, void *pbuf)
 {
@@ -370,6 +380,8 @@ void CHud :: Init( void )
 	HOOK_COMMAND( "togglebrowser", ToggleServerBrowser );
 
 	HOOK_COMMAND( "agrecord", Agrecord );
+	HOOK_COMMAND( "append", Append );
+	EngineClientCmd("alias zpecial \"append _zpecial\"");
 
 	force_model::hook_commands();
 	steam_id::hook_messages();
