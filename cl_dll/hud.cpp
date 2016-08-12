@@ -129,6 +129,11 @@ int __MsgFunc_GameMode(const char *pszName, int iSize, void *pbuf )
 	return gHUD.MsgFunc_GameMode( pszName, iSize, pbuf );
 }
 
+int __MsgFunc_Gametype(const char *pszName, int iSize, void *pbuf)
+{
+	return gHUD.MsgFunc_Gametype( pszName, iSize, pbuf );
+}
+
 // TFFree Command Menu
 void __CmdFunc_OpenCommandMenu(void)
 {
@@ -372,6 +377,8 @@ void CHud :: Init( void )
 	HOOK_MESSAGE( SetFOV );
 	HOOK_MESSAGE( Concuss );
 
+	HOOK_MESSAGE( Gametype );
+
 	// TFFree CommandMenu
 	HOOK_COMMAND( "+commandmenu", OpenCommandMenu );
 	HOOK_COMMAND( "-commandmenu", CloseCommandMenu );
@@ -456,6 +463,7 @@ void CHud :: Init( void )
 	m_TextMessage.Init();
 	m_StatusIcons.Init();
 	m_Countdown.Init();
+	m_CTF.Init();
 	m_Debug.Init();
 	m_Location.Init();
 	m_Settings.Init();
@@ -612,6 +620,7 @@ void CHud :: VidInit( void )
 	m_TextMessage.VidInit();
 	m_StatusIcons.VidInit();
 	m_Countdown.VidInit();
+	m_CTF.VidInit();
 	m_Debug.VidInit();
 	m_Location.VidInit();
 	m_Settings.VidInit();

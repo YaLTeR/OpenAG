@@ -61,6 +61,7 @@ HL1_OBJS = \
 	$(HL1_OBJ_DIR)/hud_bench.o \
 	$(HL1_OBJ_DIR)/hud_benchtrace.o \
 	$(HL1_OBJ_DIR)/hud_countdown.o \
+	$(HL1_OBJ_DIR)/hud_ctf.o \
 	$(HL1_OBJ_DIR)/hud_debug.o \
 	$(HL1_OBJ_DIR)/hud_location.o \
 	$(HL1_OBJ_DIR)/hud_msg.o \

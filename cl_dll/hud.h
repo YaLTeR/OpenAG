@@ -93,6 +93,7 @@ struct HUDLIST {
 #include "hud_spectator.h"
 
 #include "hud_countdown.h"
+#include "hud_ctf.h"
 #include "hud_debug.h"
 #include "hud_location.h"
 #include "hud_settings.h"
@@ -559,6 +560,8 @@ private:
 	float						m_flMouseSensitivity;
 	int							m_iConcussionEffect; 
 
+	int							m_iGameType;
+
 public:
 
 	HSPRITE						m_hsprCursor;
@@ -623,6 +626,11 @@ public:
 		return m_rgrcRects[index];
 	}
 
+	int GetGameType() const
+	{
+		return m_iGameType;
+	}
+
 	
 	int GetSpriteIndex( const char *SpriteName );	// gets a sprite index, for use in the m_rghSprites[] array
 
@@ -644,6 +652,7 @@ public:
 	CHudBenchmark	m_Benchmark;
 
 	CHudCountdown	m_Countdown;
+	CHudCTF			m_CTF;
 	CHudDebug		m_Debug;
 	CHudLocation	m_Location;
 	CHudSettings	m_Settings;
@@ -669,6 +678,8 @@ public:
 	void _cdecl MsgFunc_ViewMode( const char *pszName, int iSize, void *pbuf );
 	int _cdecl MsgFunc_SetFOV(const char *pszName,  int iSize, void *pbuf);
 	int  _cdecl MsgFunc_Concuss( const char *pszName, int iSize, void *pbuf );
+
+	int MsgFunc_Gametype(const char *pszName, int iSize, void *pbuf);
 
 	// Screen information
 	SCREENINFO	m_scrinfo;
