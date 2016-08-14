@@ -264,8 +264,6 @@ bool HACK_GetPlayerUniqueID( int iPlayer, char playerID[16] )
 //-----------------------------------------------------------------------------
 void ScorePanel::Update()
 {
-	int i;
-
 	// Set the title
 	if (gViewPort->m_szServerName)
 	{
@@ -278,12 +276,12 @@ void ScorePanel::Update()
 	gViewPort->GetAllPlayersInfo();
 
 	// Clear out sorts
-	for (i = 0; i < NUM_ROWS; i++)
+	for (int i = 0; i < NUM_ROWS; i++)
 	{
 		m_iSortedRows[i] = 0;
 		m_iIsATeam[i] = TEAM_NO;
 	}
-	for (i = 0; i < MAX_PLAYERS; i++)
+	for (int i = 0; i < MAX_PLAYERS; i++)
 	{
 		m_bHasBeenSorted[i] = false;
 	}
@@ -315,8 +313,7 @@ void ScorePanel::Update()
 void ScorePanel::SortTeams()
 {
 	// clear out team scores
-	int i;
-	for ( i = 1; i <= m_iNumTeams; i++ )
+	for (int i = 1; i <= m_iNumTeams; i++)
 	{
 		if ( !g_TeamInfo[i].scores_overriden )
 			g_TeamInfo[i].frags = g_TeamInfo[i].deaths = 0;
@@ -324,12 +321,12 @@ void ScorePanel::SortTeams()
 	}
 
 	// recalc the team scores, then draw them
-	for ( i = 1; i < MAX_PLAYERS; i++ )
+	for (int i = 1; i < MAX_PLAYERS; i++)
 	{
 		if ( g_PlayerInfoList[i].name == NULL )
 			continue; // empty player slot, skip
 
-		if ( g_PlayerExtraInfo[i].teamname[0] == 0 )
+		if ( g_PlayerExtraInfo[i].teamname[0] == '\0' )
 			continue; // skip over players who are not in a team
 
 		// find what team this player is in
@@ -361,7 +358,7 @@ void ScorePanel::SortTeams()
 	}
 
 	// find team ping/packetloss averages
-	for ( i = 1; i <= m_iNumTeams; i++ )
+	for (int i = 1; i <= m_iNumTeams; i++)
 	{
 		g_TeamInfo[i].already_drawn = FALSE;
 
@@ -378,7 +375,7 @@ void ScorePanel::SortTeams()
 		int highest_frags = -99999; int lowest_deaths = 99999;
 		int best_team = 0;
 
-		for ( i = 1; i <= m_iNumTeams; i++ )
+		for (int i = 1; i <= m_iNumTeams; i++)
 		{
 			if ( g_TeamInfo[i].players < 1 )
 				continue;
@@ -475,57 +472,38 @@ void ScorePanel::SortPlayers( int iTeam, char *team )
 //-----------------------------------------------------------------------------
 void ScorePanel::RebuildTeams()
 {
-	// clear out player counts from teams
-	int i;
-	for ( i = 1; i <= m_iNumTeams; i++ )
-	{
-		g_TeamInfo[i].players = 0;
-	}
+	// Clear the team info.
+	memset(g_TeamInfo, 0, sizeof(g_TeamInfo));
 
 	// rebuild the team list
 	gViewPort->GetAllPlayersInfo();
 	m_iNumTeams = 0;
-	for ( i = 1; i < MAX_PLAYERS; i++ )
+
+	for (int i = 1; i < MAX_PLAYERS; i++)
 	{
 		if ( g_PlayerInfoList[i].name == NULL )
 			continue;
 
-		if ( g_PlayerExtraInfo[i].teamname[0] == 0 )
+		if ( g_PlayerExtraInfo[i].teamname[0] == '\0' )
 			continue; // skip over players who are not in a team
 
 		// is this player in an existing team?
 		int j;
 		for ( j = 1; j <= m_iNumTeams; j++ )
 		{
-			if ( g_TeamInfo[j].name[0] == '\0' )
-				break;
-
 			if ( !stricmp( g_PlayerExtraInfo[i].teamname, g_TeamInfo[j].name ) )
 				break;
 		}
 
 		if ( j > m_iNumTeams )
 		{ // they aren't in a listed team, so make a new one
-			// search through for an empty team slot
-			for ( int j = 1; j <= m_iNumTeams; j++ )
-			{
-				if ( g_TeamInfo[j].name[0] == '\0' )
-					break;
-			}
-			m_iNumTeams = max( j, m_iNumTeams );
+			++m_iNumTeams;
 
 			strncpy( g_TeamInfo[j].name, g_PlayerExtraInfo[i].teamname, MAX_TEAM_NAME );
 			g_TeamInfo[j].players = 0;
 		}
 
 		g_TeamInfo[j].players++;
-	}
-
-	// clear out any empty teams
-	for ( i = 1; i <= m_iNumTeams; i++ )
-	{
-		if ( g_TeamInfo[i].players < 1 )
-			memset( &g_TeamInfo[i], 0, sizeof(team_info_t) );
 	}
 
 	// Update the scoreboard
@@ -710,7 +688,7 @@ void ScorePanel::FillGrid()
 					}
 					else
 					{
-						sprintf( sz2, gViewPort->GetTeamName(team_info->teamnumber) );
+						sprintf( sz2, team_info->name );
 					}
 
 					strcpy(sz, sz2);

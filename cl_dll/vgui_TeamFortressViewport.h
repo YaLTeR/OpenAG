@@ -539,7 +539,7 @@ private:
 	int			m_iNumberOfTeams;
 	int			m_iBuildState;
 	int			m_iRandomPC;
-	char		m_sTeamNames[33][MAX_TEAMNAME_SIZE];
+	char		m_sTeamNames[MAX_TEAMS + 1][MAX_TEAMNAME_SIZE];
 
 	// Localisation strings
 	char		m_sDetpackStrings[3][MAX_BUTTON_SIZE];

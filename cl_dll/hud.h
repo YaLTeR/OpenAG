@@ -93,6 +93,7 @@ struct HUDLIST {
 #include "hud_spectator.h"
 
 #include "hud_countdown.h"
+#include "hud_debug.h"
 #include "hud_location.h"
 #include "hud_settings.h"
 #include "hud_timer.h"
@@ -643,6 +644,7 @@ public:
 	CHudBenchmark	m_Benchmark;
 
 	CHudCountdown	m_Countdown;
+	CHudDebug		m_Debug;
 	CHudLocation	m_Location;
 	CHudSettings	m_Settings;
 	CHudTimer		m_Timer;
