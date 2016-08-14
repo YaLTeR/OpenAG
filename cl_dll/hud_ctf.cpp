@@ -28,6 +28,9 @@ int CHudCTF::VidInit()
 	for (int i = 0; i < 4; ++i)
 		flag_sprites[i] = gHUD.GetSprite(flag_sprite_indices[i]);
 
+	blue_flag_player_index = 0;
+	red_flag_player_index = 0;
+
 	m_iFlags &= ~HUD_ACTIVE;
 
 	return 1;
@@ -117,7 +120,10 @@ int CHudCTF::MsgFunc_CTFSound(const char* name, int size, void* buf)
 
 int CHudCTF::MsgFunc_CTFFlag(const char* name, int size, void* buf)
 {
-	// Unused.
+	BEGIN_READ(buf, size);
+
+	blue_flag_player_index = READ_BYTE();
+	red_flag_player_index = READ_BYTE();
 
 	return 1;
 }

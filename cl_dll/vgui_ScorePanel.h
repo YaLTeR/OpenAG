@@ -264,6 +264,8 @@ private:
 	CommandButton				*m_pCloseButton;
 	CLabelHeader*	GetPlayerEntry(int x, int y)	{return &m_PlayerEntries[x][y];}
 
+	vgui::BitmapTGA* m_pFlagIcon;
+
 public:
 	
 	int				m_iNumTeams;
@@ -281,6 +283,7 @@ public:
 public:
 
 	ScorePanel(int x,int y,int wide,int tall);
+	~ScorePanel();
 
 	void Update( void );
 

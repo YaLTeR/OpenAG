@@ -15,10 +15,23 @@ class CHudCTF : public CHudBase
 	FlagState blue_flag_state;
 	FlagState red_flag_state;
 
+	int blue_flag_player_index;
+	int red_flag_player_index;
+
 public:
 	virtual int Init();
 	virtual int VidInit();
 	virtual int Draw(float time);
+
+	inline int GetBlueFlagPlayerIndex() const
+	{
+		return blue_flag_player_index;
+	}
+
+	inline int GetRedFlagPlayerIndex() const
+	{
+		return red_flag_player_index;
+	}
 
 	int MsgFunc_CTF(const char* name, int size, void* buf);
 	int MsgFunc_CTFSound(const char* name, int size, void* buf);

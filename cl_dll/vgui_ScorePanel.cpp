@@ -108,6 +108,9 @@ ScorePanel::ScorePanel(int x,int y,int wide,int tall) : Panel(x,y,wide,tall)
 
 	//m_pTrackerIcon = vgui_LoadTGANoInvertAlpha("gfx/vgui/640_scoreboardtracker.tga");
 
+	if ((m_pFlagIcon = vgui_LoadTGANoInvertAlpha("gfx/vgui/640_ag_ctf_score.tga")))
+		m_pFlagIcon->setColor(vgui::Color(255, 255, 255, 1));
+
 	// Initialize the top title.
 	m_TitleLabel.setFont(tfont);
 	m_TitleLabel.setText("");
@@ -236,6 +239,12 @@ ScorePanel::ScorePanel(int x,int y,int wide,int tall) : Panel(x,y,wide,tall)
 
 
 	Initialize();
+}
+
+ScorePanel::~ScorePanel()
+{
+	if (m_pFlagIcon)
+		delete m_pFlagIcon;
 }
 
 
@@ -815,6 +824,13 @@ void ScorePanel::FillGrid()
 						}
 					}
 					*/
+
+					if (m_pFlagIcon
+						&& (gHUD.m_CTF.GetBlueFlagPlayerIndex() == m_iSortedRows[row]
+							|| gHUD.m_CTF.GetRedFlagPlayerIndex() == m_iSortedRows[row])) {
+						pLabel->setImage(m_pFlagIcon);
+					}
+
 					break;
 
 #ifdef _TFC
