@@ -542,8 +542,6 @@ void ScorePanel::FillGrid()
 		m_iHighlightRow = -1;
 	}
 
-	bool started_filling_spectators = false;
-
 	bool bNextRowIsGap = false;
 	int row;
 	for(row=0; row < NUM_ROWS; row++)
@@ -641,13 +639,11 @@ void ScorePanel::FillGrid()
 				pLabel->setFont(tfont);
 
 				pGridRow->SetRowUnderline(0, true, YRES(3), 100, 100, 100, 0);
-
-				started_filling_spectators = true;
 			}
 			else
 			{
 				// team color text for player names
-				if (started_filling_spectators) {
+				if (g_IsSpectator[m_iSortedRows[row]]) {
 					pLabel->setFgColor(100, 100, 100, 0);
 				} else {
 					pLabel->setFgColor(	iTeamColors[ g_PlayerExtraInfo[ m_iSortedRows[row] ].teamnumber % iNumberOfTeamColors ][0],
@@ -665,7 +661,7 @@ void ScorePanel::FillGrid()
 					// Highlight this player
 					pLabel->setFgColor(Scheme::sc_white);
 
-					if (started_filling_spectators) {
+					if (g_IsSpectator[m_iSortedRows[row]]) {
 						pLabel->setBgColor(100, 100, 100, 196);
 					} else {
 						pLabel->setBgColor(	iTeamColors[ g_PlayerExtraInfo[ m_iSortedRows[row] ].teamnumber % iNumberOfTeamColors ][0],
