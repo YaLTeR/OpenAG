@@ -542,6 +542,8 @@ void ScorePanel::FillGrid()
 		m_iHighlightRow = -1;
 	}
 
+	bool started_filling_spectators = false;
+
 	bool bNextRowIsGap = false;
 	int row;
 	for(row=0; row < NUM_ROWS; row++)
@@ -639,14 +641,20 @@ void ScorePanel::FillGrid()
 				pLabel->setFont(tfont);
 
 				pGridRow->SetRowUnderline(0, true, YRES(3), 100, 100, 100, 0);
+
+				started_filling_spectators = true;
 			}
 			else
 			{
 				// team color text for player names
-				pLabel->setFgColor(	iTeamColors[ g_PlayerExtraInfo[ m_iSortedRows[row] ].teamnumber % iNumberOfTeamColors ][0],
-									iTeamColors[ g_PlayerExtraInfo[ m_iSortedRows[row] ].teamnumber % iNumberOfTeamColors ][1],
-									iTeamColors[ g_PlayerExtraInfo[ m_iSortedRows[row] ].teamnumber % iNumberOfTeamColors ][2],
-									0 );
+				if (started_filling_spectators) {
+					pLabel->setFgColor(100, 100, 100, 0);
+				} else {
+					pLabel->setFgColor(	iTeamColors[ g_PlayerExtraInfo[ m_iSortedRows[row] ].teamnumber % iNumberOfTeamColors ][0],
+										iTeamColors[ g_PlayerExtraInfo[ m_iSortedRows[row] ].teamnumber % iNumberOfTeamColors ][1],
+										iTeamColors[ g_PlayerExtraInfo[ m_iSortedRows[row] ].teamnumber % iNumberOfTeamColors ][2],
+										0 );
+				}
 
 				// Get the player's data
 				pl_info = &g_PlayerInfoList[ m_iSortedRows[row] ];
@@ -656,10 +664,15 @@ void ScorePanel::FillGrid()
 				{
 					// Highlight this player
 					pLabel->setFgColor(Scheme::sc_white);
-					pLabel->setBgColor(	iTeamColors[ g_PlayerExtraInfo[ m_iSortedRows[row] ].teamnumber % iNumberOfTeamColors ][0],
-										iTeamColors[ g_PlayerExtraInfo[ m_iSortedRows[row] ].teamnumber % iNumberOfTeamColors ][1],
-										iTeamColors[ g_PlayerExtraInfo[ m_iSortedRows[row] ].teamnumber % iNumberOfTeamColors ][2],
-										196 );
+
+					if (started_filling_spectators) {
+						pLabel->setBgColor(100, 100, 100, 196);
+					} else {
+						pLabel->setBgColor(	iTeamColors[ g_PlayerExtraInfo[ m_iSortedRows[row] ].teamnumber % iNumberOfTeamColors ][0],
+											iTeamColors[ g_PlayerExtraInfo[ m_iSortedRows[row] ].teamnumber % iNumberOfTeamColors ][1],
+											iTeamColors[ g_PlayerExtraInfo[ m_iSortedRows[row] ].teamnumber % iNumberOfTeamColors ][2],
+											196 );
+					}
 				}
 				else if ( m_iSortedRows[row] == m_iLastKilledBy && m_fLastKillTime && m_fLastKillTime > gHUD.m_flTime )
 				{
