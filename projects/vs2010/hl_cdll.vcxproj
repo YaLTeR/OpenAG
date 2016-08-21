@@ -196,6 +196,8 @@
     <ClCompile Include="..\..\cl_dll\hud_bench.cpp" />
     <ClCompile Include="..\..\cl_dll\hud_benchtrace.cpp" />
     <ClCompile Include="..\..\cl_dll\hud_countdown.cpp" />
+    <ClCompile Include="..\..\cl_dll\hud_ctf.cpp" />
+    <ClCompile Include="..\..\cl_dll\hud_debug.cpp" />
     <ClCompile Include="..\..\cl_dll\hud_location.cpp" />
     <ClCompile Include="..\..\cl_dll\hud_msg.cpp" />
     <ClCompile Include="..\..\cl_dll\hud_redraw.cpp" />
@@ -284,6 +286,8 @@
     <ClInclude Include="..\..\cl_dll\health.h" />
     <ClInclude Include="..\..\cl_dll\hud.h" />
     <ClInclude Include="..\..\cl_dll\hud_countdown.h" />
+    <ClInclude Include="..\..\cl_dll\hud_ctf.h" />
+    <ClInclude Include="..\..\cl_dll\hud_debug.h" />
     <ClInclude Include="..\..\cl_dll\hud_location.h" />
     <ClInclude Include="..\..\cl_dll\hud_servers.h" />
     <ClInclude Include="..\..\cl_dll\hud_servers_priv.h" />
