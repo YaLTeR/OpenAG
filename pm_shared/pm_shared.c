@@ -2104,10 +2104,12 @@ void PM_LadderMove( physent_t *pLadder )
 
 		AngleVectors( pmove->angles, vpn, v_right, NULL );
 
+		/* commenting this out to fix ladder lag in AG
 		if ( pmove->flags & FL_DUCKING )
 		{
 			flSpeed *= PLAYER_DUCKING_MULTIPLIER;
 		}
+		*/
 
 		if ( pmove->cmd.buttons & IN_BACK )
 		{
