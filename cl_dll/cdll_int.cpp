@@ -46,6 +46,11 @@ extern "C"
 #include "vgui_TeamFortressViewport.h"
 #include "../public/interface.h"
 
+#include "cvardef.h"
+#include "drawingutility.h"
+#include "customcrosshair.h"
+
+
 cl_enginefunc_t gEngfuncs;
 CHud gHUD;
 TeamFortressViewport *gViewPort = NULL;
@@ -216,6 +221,42 @@ redraw the HUD.
 int CL_DLLEXPORT HUD_Redraw( float time, int intermission )
 {
 //	RecClHudRedraw(time, intermission);
+
+/* megasausageking: custom crosshair drawing happens here */
+	bool bdrawcross = (CVAR_GET_FLOAT("cl_customcrosshair") == 1);
+	bool bdrawcircle = (CVAR_GET_FLOAT("cl_cross_circle") == 1);
+	float offsetX = CVAR_GET_FLOAT("cl_cross_x");
+	float offsetY = CVAR_GET_FLOAT("cl_cross_y");
+	float radius = CVAR_GET_FLOAT("cl_cross_circle_radius");
+	float circlewidth = CVAR_GET_FLOAT("cl_cross_circle_width");
+	float width = CVAR_GET_FLOAT("cl_cross_width");
+	float size = CVAR_GET_FLOAT("cl_cross_size");
+	float red = CVAR_GET_FLOAT("cl_cross_red");
+	float green = CVAR_GET_FLOAT("cl_cross_green");
+	float blue = CVAR_GET_FLOAT("cl_cross_blue");
+	float crossalpha = CVAR_GET_FLOAT("cl_cross_alpha");
+	float circlealpha = CVAR_GET_FLOAT("cl_cross_circle_alpha");
+	float gap = CVAR_GET_FLOAT("cl_cross_gap");
+	float dotsize = CVAR_GET_FLOAT("cl_cross_dot_size");
+	bool bdrawdot = (CVAR_GET_FLOAT("cl_cross_dot") == 1);
+	if (bdrawcross)
+	{
+		drawingutility::SetDrawingMatrix();
+		drawingutility::SetDrawingModes();
+		drawingutility::SetColor4f(red, green, blue, crossalpha);
+		if (size)
+			customcrosshair::DrawCrosshairLines(ScreenWidth / 2.0, ScreenHeight / 2.0, size, gap, width, offsetX, offsetY);
+		if (bdrawdot)
+			customcrosshair::DrawCrosshairDot(ScreenWidth / 2.0, ScreenHeight / 2.0, dotsize, offsetX, offsetY);
+		if (bdrawcircle)
+		{
+			drawingutility::SetColor4f(red, green, blue, circlealpha);
+			customcrosshair::DrawCrosshairCircle(ScreenWidth / 2.0, ScreenHeight / 2.0, circlewidth, radius, offsetX, offsetY);
+		}
+		drawingutility::RestoreDrawingMatrix();
+		drawingutility::RestoreDrawingModes();
+	}
+	/* megasausageking end */
 
 	gHUD.Redraw( time, intermission );
 
