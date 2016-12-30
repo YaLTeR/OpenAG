@@ -35,6 +35,8 @@
 #include "forcemodel.h"
 #include "steam_id.h"
 
+#include"CustomCrosshair.hpp"
+
 hud_player_info_t	 g_PlayerInfoList[MAX_PLAYERS+1];	   // player info from the engine
 extra_player_info_t  g_PlayerExtraInfo[MAX_PLAYERS+1];   // additional player info sent directly to the client dll
 
@@ -392,6 +394,7 @@ void CHud :: Init( void )
 
 	force_model::hook_commands();
 	steam_id::hook_messages();
+	CustomCrosshair::RegisterCvars();
 
 	HOOK_MESSAGE( ValClass );
 	HOOK_MESSAGE( TeamNames );
