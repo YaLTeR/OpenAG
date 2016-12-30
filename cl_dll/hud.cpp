@@ -35,6 +35,7 @@
 #include "forcemodel.h"
 #include "steam_id.h"
 
+
 hud_player_info_t	 g_PlayerInfoList[MAX_PLAYERS+1];	   // player info from the engine
 extra_player_info_t  g_PlayerExtraInfo[MAX_PLAYERS+1];   // additional player info sent directly to the client dll
 
@@ -470,6 +471,7 @@ void CHud :: Init( void )
 	m_Timer.Init();
 	m_Vote.Init();
 	m_Watermark.Init();
+	m_ScoreList.Init();
 	GetClientVoiceMgr()->Init(&g_VoiceStatusHelper, (vgui::Panel**)&gViewPort);
 
 	m_Menu.Init();
@@ -627,6 +629,7 @@ void CHud :: VidInit( void )
 	m_Timer.VidInit();
 	m_Vote.VidInit();
 	m_Watermark.VidInit();
+	m_ScoreList.VidInit();
 	GetClientVoiceMgr()->VidInit();
 }
 
