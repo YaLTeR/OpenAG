@@ -86,7 +86,7 @@ namespace DrawingUtility
   }
 
 
-  void DrawCircle(float centerX,float centerY, float radius,float width)
+  void DrawCircle(float centerX,float centerY, float radius,float width) // deprecated you can use DrawQCircle now
   {
     glLineWidth(width);
 
