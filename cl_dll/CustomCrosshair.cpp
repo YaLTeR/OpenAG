@@ -50,7 +50,7 @@ namespace CustomCrosshair
   /* crosshair center dot */
   void DrawCrosshairDot(float centerX, float centerY,float size,float offsetX, float offsetY)
   {
-    DrawingUtility::DrawRectangle(centerX -(size) + offsetX, centerY -(size) + offsetY,2*size,2*size);
+    DrawingUtility::DrawRectangle(centerX + offsetX, centerY + offsetY,size,size);
   }
 
   void DrawCrosshairCircle(float centerX, float centerY, float width, float radius, float offsetX, float offsetY)
@@ -83,19 +83,28 @@ namespace CustomCrosshair
       DrawingUtility::SetDrawingModes();
       DrawingUtility::SetColor4f(red,green,blue,crossalpha);
       if(size)
-	DrawCrosshairLines(ScreenWidth/2.0,ScreenHeight/2.0,size,gap,width,offsetX,offsetY);
+	DrawCrosshairQLines(ScreenWidth/2.0,ScreenHeight/2.0,size,gap,width,offsetX,offsetY);
       if(bdrawdot)
-	DrawCrosshairDot(ScreenWidth/2.0,ScreenHeight/2.0,dotsize,offsetX,offsetY);
+	DrawCrosshairDot(ScreenWidth/2.0 + offsetX ,ScreenHeight/2.0 + offsetY,dotsize,offsetX,offsetY);
       if(bdrawcircle)
 	{
 	  DrawingUtility::SetColor4f(red,green,blue,circlealpha);
-	  DrawCrosshairCircle(ScreenWidth/2.0,ScreenHeight/2.0,circlewidth,radius,offsetX,offsetY);
+	  DrawingUtility::DrawQCircle(ScreenWidth/2.0 + offsetX, ScreenHeight/2.0 + offsetY, radius, circlewidth);
+	  //DrawCrosshairCircle(ScreenWidth/2.0,ScreenHeight/2.0,circlewidth,radius,offsetX,offsetY);
 	}
       DrawingUtility::RestoreDrawingMatrix();
       DrawingUtility::RestoreDrawingModes();
     }
   }
 
+  
+  void DrawCrosshairQLines(float centerX, float centerY, float size,float gap, float width, float offsetX, float offsetY)
+  {
+    DrawingUtility::DrawQLine(-(size + gap) + (offsetX + centerX), offsetY + centerY,-gap + (centerX + offsetX), centerY + offsetY, width);
+    DrawingUtility::DrawQLine((size + gap) + offsetX + centerX ,0.0f + offsetY + centerY, centerX + offsetX + gap,centerY + offsetY, width);
+    DrawingUtility::DrawQLine(offsetX + centerX ,(size + gap)  + offsetY + centerY,offsetX+centerX, centerY + offsetY + gap,width);
+    DrawingUtility::DrawQLine(offsetX + centerX,-(size + gap) + offsetY + centerY,offsetX + centerX, -(gap) + centerY + offsetY,width);
+  }
   
 
   void DrawCrosshairLines(float centerX, float centerY, float size,float gap, float width, float offsetX, float offsetY)

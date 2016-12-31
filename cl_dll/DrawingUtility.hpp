@@ -18,8 +18,9 @@ namespace DrawingUtility
   /* range: 0.0f->1.0f */
   void SetColor4f(float r,float g,float b, float a);
 
-  /*todo:make line using gl quads instead.*/
-  void DrawLine(float startX,float startY, float endX, float endY, float width);
+  void DrawQLine(float startX,float startY, float endX, float endY, float width); // use this not drawline
+  void DrawQCircle(float centerX,float centerY, float radius,float width);
+  void DrawLine(float startX,float startY, float endX, float endY, float width);   // deprecated
 
   void DrawCircle(float centerX,float centerY, float radius,float width);
 
