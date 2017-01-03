@@ -30,7 +30,7 @@ namespace ScoreTabs
 
     cl_scores_width=CVAR_CREATE("cl_scores_width","0",FCVAR_ARCHIVE); 
     cl_scores_brightness=CVAR_CREATE("cl_scores_brightness","30",FCVAR_ARCHIVE);
-    cl_scores_hpad=CVAR_CREATE("cl_scores_hpad","5",FCVAR_ARCHIVE); // horizontal padding
+    cl_scores_hpad=CVAR_CREATE("cl_scores_hpad","0",FCVAR_ARCHIVE); // horizontal padding
     cl_scores_vpad=CVAR_CREATE("cl_scores_vpad","0",FCVAR_ARCHIVE); // vertical padding
     return 0;
   }
@@ -104,8 +104,8 @@ namespace ScoreTabs
       {
 	drawing_mode = DrawType::MANUAL; // user set width (clamp or extend)
 	width = static_cast<int>(cl_scores_width->value);
-      }
-    
+      } 
+   
     std::string current_line; // will store each tabs line
     std::vector<char> cstr; //  c-string for drawhudstring 
     int depth = static_cast<int>(cl_scores->value); // how many items should we draw
@@ -143,7 +143,6 @@ namespace ScoreTabs
 	    int i = 0; 
 	    cstr=std::vector<char>{};
 	    int cursize = current_line.size();
-
 	    while((copied < characters) && (i < cursize) ) // fill cstring until no space left. ignore tags 
 	      {
 		if(current_line[i] == '^' && ((current_line[i+1] <= '9') && (current_line[i+1] >= '0'))) 
@@ -162,7 +161,6 @@ namespace ScoreTabs
 	      }
 	    cstr.push_back('\0');
 
-	    int length_of_a_character = gHUD.m_scrinfo.charWidths['a']; // use width of 'a' as a reference for all characters
 	    int height_of_a_character=gHUD.m_scrinfo.iCharHeight;
 	    float x = cl_scores_x->value;
 	    float y = cl_scores_y->value + count*(height_of_a_character + 2*vpaddingsize);
@@ -176,10 +174,11 @@ namespace ScoreTabs
 	      }
 	    else
 	      UnpackRGB(r, g, b, gHUD.m_iDefaultHUDColor);
-	    
-	    gEngfuncs.pfnFillRGBA(x - hpaddingsize,y - vpaddingsize,(characters-1)*length_of_a_character + 2*hpaddingsize,height_of_a_character + 2*vpaddingsize,r,g,b,brightness);
+
+	    int endx = 0;
 	    ScaleColors(r,g,b,135);
-	    gHUD.DrawHudStringWithColorTags(x,y,&cstr[0],r,g,b);
+	    endx = gHUD.DrawHudStringWithColorTags(x,y,&cstr[0],r,g,b);
+	    gEngfuncs.pfnFillRGBA(x - hpaddingsize,y - vpaddingsize,2*hpaddingsize + endx,height_of_a_character + 2*vpaddingsize,r,g,b,brightness);
 
 	    count=count+1; // don't draw too many
 	    if(count>(depth-1))
