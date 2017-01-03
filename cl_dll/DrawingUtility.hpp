@@ -1,7 +1,5 @@
 #ifndef DRAWINGUTILITY_HPP
 #define DRAWINGUTILITY_HPP
-
-#include <GL/gl.h> // windows:link with old opengl lib. quest: dynamic link funcs instead here
 #define _USE_MATH_DEFINES 
 #include <math.h>
 

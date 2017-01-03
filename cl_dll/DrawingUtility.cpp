@@ -1,4 +1,6 @@
 #include "DrawingUtility.hpp"
+#include <windows.h>
+#include <GL/gl.h> // windows:link with old opengl lib. quest: dynamic link funcs instead here
 
 namespace DrawingUtility
 {
