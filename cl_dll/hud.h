@@ -100,6 +100,7 @@ struct HUDLIST {
 #include "hud_timer.h"
 #include "hud_vote.h"
 #include "hud_watermark.h"
+#include "cl_scores.hpp"
 
 
 //
@@ -659,6 +660,7 @@ public:
 	CHudTimer		m_Timer;
 	CHudVote		m_Vote;
 	CHudWatermark	m_Watermark;
+	ScoreTabs::ScoreList m_ScoreList;
 
 	void Init( void );
 	void VidInit( void );

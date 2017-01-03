@@ -1,0 +1,116 @@
+// +msk
+#include <iostream>
+#include <vector>
+#include <string>
+#include <sstream>
+#include "hud.h"
+#include "cl_util.h"
+
+
+extern hud_player_info_t   g_PlayerInfoList [MAX_PLAYERS + 1];
+extern extra_player_info_t g_PlayerExtraInfo[MAX_PLAYERS + 1];
+extern team_info_t g_TeamInfo[MAX_TEAMS + 1];
+// player_info.h (teaminfo and player info externs)
+
+namespace ScoreTabs
+{
+
+  int ScoreList::Init()
+  {
+    m_iFlags = 0;
+
+    gHUD.AddHudElem(this);
+
+    cl_scores=CVAR_CREATE("cl_scores","0",FCVAR_ARCHIVE); // msk: 0, 1 , 2 , ...
+    cl_scores_x=CVAR_CREATE("cl_scores_x","0",FCVAR_ARCHIVE); // msk: posi
+    cl_scores_y=CVAR_CREATE("cl_scores_y","0",FCVAR_ARCHIVE);
+    cl_scores_scale=CVAR_CREATE("cl_scores_scale","0",FCVAR_ARCHIVE); // msk: coef
+
+	
+    return 0;
+  }
+
+  
+
+  int ScoreList::VidInit()
+  {
+    m_iFlags |= HUD_ACTIVE;
+    return 1;
+  }
+
+  void ScoreList::DrawSortedTabs()
+  {
+    std::ostringstream oss;
+    std::string str;
+    std::vector<char> cstr; // make c string for half life
+    int count = 0;
+
+    if(tabs.size() != 0)
+      {
+	for(auto it = tabs.begin(); it != tabs.end(); ++it)
+	  {
+	    tab_t cur = *it;
+	    oss << "tabs[" << count << "] = (" << cur.name << "," << cur.score << ")" << std::endl;
+	    count = count + 1;
+	    str=oss.str();
+	    cstr= std::vector<char> {str.begin(), str.end()};
+	    cstr.push_back('\0'); 
+	    gEngfuncs.pfnConsolePrint(&cstr[0]); // debug
+	    // drawing happens here
+	    float x = cl_scores_x->value;
+	    float y = cl_scores_y->value;
+	    int caracteres = 100;
+	    int largeurcarac = 5;
+	    int hauteurcarac=5;
+	    int r,g,b;
+	    UnpackRGB(r, g, b, gHUD.m_iDefaultHUDColor);
+	    gEngfuncs.pfnFillRGBA(x,y,caracteres*largeurcarac,caracteres*hauteurcarac,r,g,b,255);
+	  }
+      }
+    
+  }
+
+  int ScoreList::Draw(float flTime)
+  {
+    // TODO: dont do anything if cl scores value is zero
+
+    bool bTeamplay = gHUD.m_Teamplay;
+    tabs.clear();
+
+    std::string name;
+    int frags;
+
+    // keep color tags in names
+
+    if (bTeamplay)
+      {
+	for(int i = 1; i <= MAX_TEAMS; ++i)
+	  {
+	    if(g_TeamInfo[i].name == nullptr || g_TeamInfo[i].name[0] == '\0')
+	      continue;
+	    else
+	      {
+		name=std::string(g_TeamInfo[i].name); 
+		frags=g_TeamInfo[i].frags;
+		tabs.push_back({frags, name});
+	      }
+
+	  }
+	std::sort(tabs.begin(), tabs.end());
+	DrawSortedTabs();
+      }
+
+    else // TODO: todo
+      {
+	/*for(int i = 1; i <= MAX_PLAYERS; ++i) 
+	  {
+	    name=std::string(g_PlayerInfoList[i].name);
+	    frags=g_PlayerExtraInfo[i].frags;
+	    tabs.push_back({frags, name});	  
+	  }*/
+      }
+
+    return 0;
+  }
+}
+// msk-
