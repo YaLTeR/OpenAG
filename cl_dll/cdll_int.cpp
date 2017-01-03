@@ -57,6 +57,8 @@ IParticleMan *g_pParticleMan = NULL;
 
 #include "update_checker.h"
 
+#include"CustomCrosshair.hpp"
+
 void CL_LoadParticleMan( void );
 void CL_UnloadParticleMan( void );
 
@@ -216,7 +218,8 @@ redraw the HUD.
 int CL_DLLEXPORT HUD_Redraw( float time, int intermission )
 {
 //	RecClHudRedraw(time, intermission);
-
+  CustomCrosshair::Draw();
+  
 	gHUD.Redraw( time, intermission );
 
 	return 1;

@@ -750,7 +750,7 @@ void ScorePanel::FillGrid()
 					break;
 				case COLUMN_LATENCY:
 					if ( m_iIsATeam[row] == TEAM_YES )
-						sprintf(sz, "%d", team_info->ping );
+						sprintf(sz, "%d/%d", team_info->ping, team_info->packetloss );
 					break;
 				default:
 					break;
@@ -872,7 +872,7 @@ void ScorePanel::FillGrid()
 					sprintf(sz, "%d",  g_PlayerExtraInfo[ m_iSortedRows[row] ].deaths );
 					break;
 				case COLUMN_LATENCY:
-					sprintf(sz, "%d", g_PlayerInfoList[ m_iSortedRows[row] ].ping );
+					sprintf(sz, "%d/%d", g_PlayerInfoList[ m_iSortedRows[row] ].ping, g_PlayerInfoList[m_iSortedRows[row]].packetloss );
 					break;
 #endif
 				default:

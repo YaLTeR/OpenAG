@@ -30,6 +30,7 @@ namespace ScoreTabs
 
     cl_scores_width=CVAR_CREATE("cl_scores_width","0",FCVAR_ARCHIVE); 
     cl_scores_brightness=CVAR_CREATE("cl_scores_brightness","30",FCVAR_ARCHIVE);
+
     cl_scores_hpad=CVAR_CREATE("cl_scores_hpad","0",FCVAR_ARCHIVE); // horizontal padding
     cl_scores_vpad=CVAR_CREATE("cl_scores_vpad","0",FCVAR_ARCHIVE); // vertical padding
     return 0;
@@ -143,6 +144,7 @@ namespace ScoreTabs
 	    int i = 0; 
 	    cstr=std::vector<char>{};
 	    int cursize = current_line.size();
+
 	    while((copied < characters) && (i < cursize) ) // fill cstring until no space left. ignore tags 
 	      {
 		if(current_line[i] == '^' && ((current_line[i+1] <= '9') && (current_line[i+1] >= '0'))) 
