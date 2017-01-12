@@ -73,6 +73,9 @@ HL1_OBJS = \
 	$(HL1_OBJ_DIR)/hud_update.o \
 	$(HL1_OBJ_DIR)/hud_vote.o \
 	$(HL1_OBJ_DIR)/hud_watermark.o \
+	$(HL1_OBJ_DIR)/DrawingUtility.o \
+	$(HL1_OBJ_DIR)/CustomCrosshair.o \
+	$(HL1_OBJ_DIR)/cl_scores.o \
 	$(HL1_OBJ_DIR)/in_camera.o \
 	$(HL1_OBJ_DIR)/input.o \
 	$(HL1_OBJ_DIR)/interpolation.o \
