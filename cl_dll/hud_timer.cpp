@@ -67,8 +67,11 @@ int CHudTimer::Draw(float time)
 		sprintf(str, "%dh %dm %ds", hours, minutes, seconds);
 	else if (minutes > 0)
 		sprintf(str, "%d:%02d", minutes, seconds);
-	else
+	else if (seconds_to_draw >= 0)
 		sprintf(str, "%d", seconds);
+	else
+		// Overtime!
+		sprintf(str, "%d", seconds_to_draw);
 
 	int r, g, b;
 	UnpackRGB(r, g, b, gHUD.m_iDefaultHUDColor);
@@ -87,12 +90,7 @@ int CHudTimer::MsgFunc_Timer(const char* name, int size, void* buf)
 
 	draw_until = gHUD.m_flTime + 5.0f;
 
-	if (seconds_passed >= 0
-		&& seconds_total >= 0
-		&& (seconds_total == 0 || seconds_passed <= seconds_total))
-		m_iFlags |= HUD_ACTIVE;
-	else
-		m_iFlags &= ~HUD_ACTIVE;
+	m_iFlags |= HUD_ACTIVE;
 
 	//gEngfuncs.Con_Printf("Timer: seconds_total = %d; seconds_passed = %d.\n", seconds_total, seconds_passed);
 
