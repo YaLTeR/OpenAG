@@ -23,11 +23,6 @@ int CHudSuddenDeath::VidInit()
 
 int CHudSuddenDeath::Draw(float time)
 {
-	if (gHUD.m_iIntermission) {
-		m_iFlags &= ~HUD_ACTIVE;
-		return 0;
-	}
-
 	int r, g, b;
 	UnpackRGB(r, g, b, gHUD.m_iDefaultHUDColor);
 
