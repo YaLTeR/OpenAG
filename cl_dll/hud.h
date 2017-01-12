@@ -97,6 +97,7 @@ struct HUDLIST {
 #include "hud_debug.h"
 #include "hud_location.h"
 #include "hud_settings.h"
+#include "hud_timeout.h"
 #include "hud_timer.h"
 #include "hud_vote.h"
 #include "hud_watermark.h"
@@ -656,6 +657,7 @@ public:
 	CHudDebug		m_Debug;
 	CHudLocation	m_Location;
 	CHudSettings	m_Settings;
+	CHudTimeout		m_Timeout;
 	CHudTimer		m_Timer;
 	CHudVote		m_Vote;
 	CHudWatermark	m_Watermark;

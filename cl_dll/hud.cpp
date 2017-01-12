@@ -467,6 +467,7 @@ void CHud :: Init( void )
 	m_Debug.Init();
 	m_Location.Init();
 	m_Settings.Init();
+	m_Timeout.Init();
 	m_Timer.Init();
 	m_Vote.Init();
 	m_Watermark.Init();
@@ -624,6 +625,7 @@ void CHud :: VidInit( void )
 	m_Debug.VidInit();
 	m_Location.VidInit();
 	m_Settings.VidInit();
+	m_Timeout.VidInit();
 	m_Timer.VidInit();
 	m_Vote.VidInit();
 	m_Watermark.VidInit();
