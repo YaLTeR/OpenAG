@@ -180,11 +180,11 @@ static size_t GetMapName(char* dest, size_t count)
 {
 	auto map_path = gEngfuncs.pfnGetLevelName();
 
-	auto slash = strrchr(map_path, '/');
+	const char* slash = strrchr(map_path, '/');
 	if (!slash)
 		slash = map_path - 1;
 
-	auto dot = strrchr(map_path, '.');
+	const char* dot = strrchr(map_path, '.');
 	if (!dot)
 		dot = map_path + strlen(map_path);
 

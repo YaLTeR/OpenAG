@@ -599,7 +599,7 @@ public:
 	int GetIsSettingDetpack() { return m_iIsSettingDetpack; };
 	int GetBuildState() { return m_iBuildState; };
 	int IsRandomPC() { return m_iRandomPC; };
-	char *GetTeamName( int iTeam ) { return iTeam < ARRAYSIZE(m_sTeamNames) ? m_sTeamNames[iTeam] : ""; };
+	char *GetTeamName( int iTeam ) { return iTeam < ARRAYSIZE(m_sTeamNames) ? m_sTeamNames[iTeam] : const_cast<char*>(""); };
 	int GetAllowSpectators() { return m_iAllowSpectators; };
 
 	// Message Handlers
