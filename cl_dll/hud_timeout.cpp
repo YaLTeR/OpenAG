@@ -58,7 +58,7 @@ int CHudTimeout::MsgFunc_Timeout(const char* name, int size, void* buf)
 	else
 		m_iFlags &= ~HUD_ACTIVE;
 
-	gEngfuncs.Con_Printf("Timeout: status = %hhu; seconds = %hhu.\n", status, seconds);
+	// gEngfuncs.Con_Printf("Timeout: status = %hhu; seconds = %hhu.\n", status, seconds);
 
 	return 1;
 }
