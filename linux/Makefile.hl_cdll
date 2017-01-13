@@ -58,6 +58,7 @@ HL1_OBJS = \
 	$(HL1_OBJ_DIR)/GameStudioModelRenderer.o \
 	$(HL1_OBJ_DIR)/geiger.o \
 	$(HL1_OBJ_DIR)/health.o \
+	$(HL1_OBJ_DIR)/hudgl.o \
 	$(HL1_OBJ_DIR)/hud_bench.o \
 	$(HL1_OBJ_DIR)/hud_benchtrace.o \
 	$(HL1_OBJ_DIR)/hud_countdown.o \

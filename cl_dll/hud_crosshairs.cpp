@@ -1,7 +1,7 @@
 #include "hud.h"
 #include "cl_util.h"
 #include "parsemsg.h"
-#include <GL/gl.h>
+#include "hudgl.h"
 
 int CHudCrosshairs::Init()
 {
@@ -18,21 +18,10 @@ int CHudCrosshairs::VidInit()
 
 int CHudCrosshairs::Draw(float time)
 {
-	glDisable(GL_TEXTURE_2D);
-	glEnable(GL_BLEND);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	HudGL gl;
 
-	glColor4f(1.0f, 0.0f, 0.0f, 0.8f);
-
-	glBegin(GL_LINES);
-	glVertex2f(20, 20);
-	glVertex2f(20, 200);
-	glEnd();
-
-	glColor3f(1.0f, 1.0f, 1.0f);
-	glDisable(GL_BLEND);
-	glEnable(GL_TEXTURE_2D);
+	gl.color(1.0f, 0.0f, 0.0f, 0.8f);
+	gl.line(Vector2D(20, 20), Vector2D(20, 200));
 
 	return 0;
 }
