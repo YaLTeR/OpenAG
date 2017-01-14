@@ -10,10 +10,13 @@ HudGL::HudGL() {
 	glDisable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 HudGL::~HudGL() {
+	// Reset the line width in case we changed it.
+	glLineWidth(1.0f);
+
 	// Same steps as FillRGBA does.
 	glColor3f(1.0f, 1.0f, 1.0f);
 	glDisable(GL_BLEND);
@@ -22,6 +25,10 @@ HudGL::~HudGL() {
 
 void HudGL::color(float r, float g, float b, float a) const {
 	glColor4f(r, g, b, a);
+}
+
+void HudGL::line_width(float width) const {
+	glLineWidth(width);
 }
 
 void HudGL::line(const Vector2D& start, const Vector2D& end) const {
