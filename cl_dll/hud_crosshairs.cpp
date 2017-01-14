@@ -22,8 +22,10 @@ int CHudCrosshairs::Draw(float time)
 	HudGL gl;
 
 	gl.color(1.0f, 0.0f, 0.0f, 1.0f);
-	gl.line_width(hud_crosshairs_test->value);
-	gl.line(Vector2D(20.5, 20.0), Vector2D(20.5, 200.0));
+	// gl.line_width(hud_crosshairs_test->value);
+	gl.line(Vector2D(20.5, 20.5), Vector2D(20.5, 21.5));
+
+	gl.circle(Vector2D(50.5, 50.5), HudGL::compute_circle(hud_crosshairs_test->value));
 
 	return 0;
 }

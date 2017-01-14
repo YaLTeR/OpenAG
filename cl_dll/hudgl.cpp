@@ -37,3 +37,28 @@ void HudGL::line(const Vector2D& start, const Vector2D& end) const {
 	glVertex2f(end.x, end.y);
 	glEnd();
 }
+
+void HudGL::circle(const Vector2D& center, const std::vector<Vector2D>& points) const {
+	glBegin(GL_LINE_STRIP);
+
+	for (const auto& point : points)
+		glVertex2f(center.x + point.x, center.y + point.y);
+
+	glVertex2f(center.x + points[0].x, center.y + points[0].y);
+	glEnd();
+}
+
+std::vector<Vector2D> HudGL::compute_circle(float radius) {
+	// Maximum allowed distance between the circle and the rendered line segment.
+	constexpr float MAX_ERROR = 0.1f;
+	const unsigned segment_count = std::ceil(M_PI / std::acos((radius - MAX_ERROR) / radius));
+
+	std::vector<Vector2D> points;
+
+	for (unsigned i = 0; i < segment_count; ++i) {
+		float angle = M_PI * 2 * i / segment_count;
+		points.emplace_back(radius * std::cos(angle), radius * std::sin(angle));
+	}
+
+	return points;
+}
