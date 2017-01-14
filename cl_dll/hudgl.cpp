@@ -67,6 +67,7 @@ std::vector<Vector2D> HudGL::compute_circle(float radius) {
 	const unsigned segment_count = std::ceil(M_PI / std::acos((radius - MAX_ERROR) / radius));
 
 	std::vector<Vector2D> points;
+	points.reserve(segment_count);
 
 	for (unsigned i = 0; i < segment_count; ++i) {
 		float angle = M_PI * 2 * i / segment_count;
