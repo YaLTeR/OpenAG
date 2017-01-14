@@ -463,6 +463,7 @@ void CHud :: Init( void )
 	m_TextMessage.Init();
 	m_StatusIcons.Init();
 	m_Countdown.Init();
+	m_Crosshairs.Init();
 	m_CTF.Init();
 	m_Debug.Init();
 	m_Location.Init();
@@ -622,6 +623,7 @@ void CHud :: VidInit( void )
 	m_TextMessage.VidInit();
 	m_StatusIcons.VidInit();
 	m_Countdown.VidInit();
+	m_Crosshairs.VidInit();
 	m_CTF.VidInit();
 	m_Debug.VidInit();
 	m_Location.VidInit();

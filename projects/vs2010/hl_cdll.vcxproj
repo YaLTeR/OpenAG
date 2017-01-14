@@ -87,7 +87,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>..\..\utils\vgui\lib\win32_vc6\vgui.lib;wsock32.lib;..\..\lib\public\sdl2.lib;..\..\lib\public\libcurl_a.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\..\utils\vgui\lib\win32_vc6\vgui.lib;wsock32.lib;..\..\lib\public\sdl2.lib;opengl32.lib;..\..\lib\public\libcurl_a.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <BaseAddress>
       </BaseAddress>
       <AdditionalLibraryDirectories>
@@ -121,7 +121,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>..\..\utils\vgui\lib\win32_vc6\vgui.lib;wsock32.lib;..\..\lib\public\sdl2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\..\utils\vgui\lib\win32_vc6\vgui.lib;wsock32.lib;..\..\lib\public\sdl2.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <BaseAddress>
       </BaseAddress>
       <AdditionalLibraryDirectories>
@@ -155,7 +155,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>..\..\utils\vgui\lib\win32_vc6\vgui.lib;wsock32.lib;..\..\lib\public\sdl2.lib;..\..\lib\public\libcurl_a.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\..\utils\vgui\lib\win32_vc6\vgui.lib;wsock32.lib;..\..\lib\public\sdl2.lib;opengl32.lib;..\..\lib\public\libcurl_a.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <BaseAddress>
       </BaseAddress>
       <AdditionalLibraryDirectories>
@@ -193,9 +193,11 @@
     <ClCompile Include="..\..\cl_dll\hl\hl_objects.cpp" />
     <ClCompile Include="..\..\cl_dll\hl\hl_weapons.cpp" />
     <ClCompile Include="..\..\cl_dll\hud.cpp" />
+    <ClCompile Include="..\..\cl_dll\hudgl.cpp" />
     <ClCompile Include="..\..\cl_dll\hud_bench.cpp" />
     <ClCompile Include="..\..\cl_dll\hud_benchtrace.cpp" />
     <ClCompile Include="..\..\cl_dll\hud_countdown.cpp" />
+    <ClCompile Include="..\..\cl_dll\hud_crosshairs.cpp" />
     <ClCompile Include="..\..\cl_dll\hud_ctf.cpp" />
     <ClCompile Include="..\..\cl_dll\hud_debug.cpp" />
     <ClCompile Include="..\..\cl_dll\hud_location.cpp" />
@@ -287,7 +289,9 @@
     <ClInclude Include="..\..\cl_dll\GameStudioModelRenderer.h" />
     <ClInclude Include="..\..\cl_dll\health.h" />
     <ClInclude Include="..\..\cl_dll\hud.h" />
+    <ClInclude Include="..\..\cl_dll\hudgl.h" />
     <ClInclude Include="..\..\cl_dll\hud_countdown.h" />
+    <ClInclude Include="..\..\cl_dll\hud_crosshairs.h" />
     <ClInclude Include="..\..\cl_dll\hud_ctf.h" />
     <ClInclude Include="..\..\cl_dll\hud_debug.h" />
     <ClInclude Include="..\..\cl_dll\hud_location.h" />
