@@ -204,6 +204,8 @@
     <ClCompile Include="..\..\cl_dll\hud_servers.cpp" />
     <ClCompile Include="..\..\cl_dll\hud_settings.cpp" />
     <ClCompile Include="..\..\cl_dll\hud_spectator.cpp" />
+    <ClCompile Include="..\..\cl_dll\hud_suddendeath.cpp" />
+    <ClCompile Include="..\..\cl_dll\hud_timeout.cpp" />
     <ClCompile Include="..\..\cl_dll\hud_timer.cpp" />
     <ClCompile Include="..\..\cl_dll\hud_update.cpp" />
     <ClCompile Include="..\..\cl_dll\hud_vote.cpp" />
@@ -293,6 +295,8 @@
     <ClInclude Include="..\..\cl_dll\hud_servers_priv.h" />
     <ClInclude Include="..\..\cl_dll\hud_settings.h" />
     <ClInclude Include="..\..\cl_dll\hud_spectator.h" />
+    <ClInclude Include="..\..\cl_dll\hud_suddendeath.h" />
+    <ClInclude Include="..\..\cl_dll\hud_timeout.h" />
     <ClInclude Include="..\..\cl_dll\hud_timer.h" />
     <ClInclude Include="..\..\cl_dll\hud_vote.h" />
     <ClInclude Include="..\..\cl_dll\hud_watermark.h" />
