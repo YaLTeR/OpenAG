@@ -7,14 +7,14 @@ int CHudCrosshairs::Init()
 {
 	m_iFlags = HUD_ACTIVE;
 
-	cl_cross =                  CVAR_CREATE("cl_cross", "0", FCVAR_ARCHIVE);
-	cl_cross_color =            CVAR_CREATE("cl_cross_color", "0 255 0", FCVAR_ARCHIVE);
-	cl_cross_alpha =            CVAR_CREATE("cl_cross_alpha", "200", FCVAR_ARCHIVE);
-	cl_cross_thickness =        CVAR_CREATE("cl_cross_thickness", "1", FCVAR_ARCHIVE);
-	cl_cross_size =             CVAR_CREATE("cl_cross_size", "10", FCVAR_ARCHIVE);
-	cl_cross_gap =              CVAR_CREATE("cl_cross_gap", "3", FCVAR_ARCHIVE);
-	cl_cross_circle_radius =    CVAR_CREATE("cl_cross_circle_radius", "0", FCVAR_ARCHIVE);
-	cl_cross_dot_size =         CVAR_CREATE("cl_cross_dot_size", "0", FCVAR_ARCHIVE);
+	cl_cross =               CVAR_CREATE("cl_cross", "0", FCVAR_ARCHIVE);
+	cl_cross_color =         CVAR_CREATE("cl_cross_color", "0 255 0", FCVAR_ARCHIVE);
+	cl_cross_alpha =         CVAR_CREATE("cl_cross_alpha", "200", FCVAR_ARCHIVE);
+	cl_cross_thickness =     CVAR_CREATE("cl_cross_thickness", "1", FCVAR_ARCHIVE);
+	cl_cross_size =          CVAR_CREATE("cl_cross_size", "10", FCVAR_ARCHIVE);
+	cl_cross_gap =           CVAR_CREATE("cl_cross_gap", "3", FCVAR_ARCHIVE);
+	cl_cross_circle_radius = CVAR_CREATE("cl_cross_circle_radius", "0", FCVAR_ARCHIVE);
+	cl_cross_dot_size =      CVAR_CREATE("cl_cross_dot_size", "0", FCVAR_ARCHIVE);
 	
 	gHUD.AddHudElem(this);
 	return 0;
@@ -30,14 +30,14 @@ int CHudCrosshairs::Draw(float time)
 	if (cl_cross->value == 0.0f)
 		return 0;
 
-	unsigned short alpha;
+	unsigned char alpha;
 	if (sscanf(cl_cross_alpha->string, "%hhu", &alpha) != 1)
 		alpha = 200;
 
 	if (alpha == 0)
 		return 0;
 
-	unsigned short r, g, b;
+	unsigned char r, g, b;
 	if (sscanf(cl_cross_color->string, "%hhu %hhu %hhu", &r, &g, &b) != 3) {
 		r = 0;
 		g = 255;

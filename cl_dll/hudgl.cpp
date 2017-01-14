@@ -1,9 +1,15 @@
-#include "hud.h"
-#include "cl_util.h"
-#include "parsemsg.h"
-#include <GL/gl.h>
-
+#include "util_vector.h"
 #include "hudgl.h"
+
+#define _USE_MATH_DEFINES
+#include <math.h>
+#include <vector>
+
+#ifdef _WIN32
+#include <Windows.h>
+#endif
+
+#include <GL/gl.h>
 
 HudGL::HudGL() {
 	// Same steps as FillRGBA does.
@@ -27,7 +33,7 @@ void HudGL::color(float r, float g, float b, float a) const {
 	glColor4f(r, g, b, a);
 }
 
-void HudGL::color(unsigned short r, unsigned short g, unsigned short b, unsigned short a) const {
+void HudGL::color(unsigned char r, unsigned char g, unsigned char b, unsigned char a) const {
 	glColor4ub(r, g, b, a);
 }
 
