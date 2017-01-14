@@ -27,6 +27,10 @@ void HudGL::color(float r, float g, float b, float a) const {
 	glColor4f(r, g, b, a);
 }
 
+void HudGL::color(unsigned short r, unsigned short g, unsigned short b, unsigned short a) const {
+	glColor4ub(r, g, b, a);
+}
+
 void HudGL::line_width(float width) const {
 	glLineWidth(width);
 }
@@ -45,6 +49,15 @@ void HudGL::circle(const Vector2D& center, const std::vector<Vector2D>& points) 
 		glVertex2f(center.x + point.x, center.y + point.y);
 
 	glVertex2f(center.x + points[0].x, center.y + points[0].y);
+	glEnd();
+}
+
+void HudGL::rectangle(const Vector2D& corner_a, const Vector2D& corner_b) const {
+	glBegin(GL_QUADS);
+	glVertex2f(corner_a.x, corner_a.y);
+	glVertex2f(corner_a.x, corner_b.y);
+	glVertex2f(corner_b.x, corner_b.y);
+	glVertex2f(corner_b.x, corner_a.y);
 	glEnd();
 }
 
