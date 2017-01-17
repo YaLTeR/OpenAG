@@ -2485,6 +2485,7 @@ int TeamFortressViewport::MsgFunc_TeamScore( const char *pszName, int iSize, voi
 	g_TeamInfo[i].frags = READ_SHORT();
 	g_TeamInfo[i].deaths = READ_SHORT();
 
+	// Update the scoreboard.
 	m_pScoreBoard->RebuildTeams();
 
 	return 1;
