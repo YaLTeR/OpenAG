@@ -246,7 +246,9 @@ void __CmdFunc_Agrecord()
 void __CmdFunc_Append()
 {
 	if (gEngfuncs.Cmd_Argc() != 2) {
-		gEngfuncs.Con_Printf("append <command> - put the command into the end of the command buffer.\n");
+		if (!gEngfuncs.pDemoAPI->IsPlayingback())
+			gEngfuncs.Con_Printf("append <command> - put the command into the end of the command buffer.\n");
+
 		return;
 	}
 
