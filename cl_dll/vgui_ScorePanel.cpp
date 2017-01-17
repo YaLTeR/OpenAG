@@ -17,8 +17,6 @@
 //=============================================================================
 
 
-#include <algorithm>
-
 #include<VGUI_LineBorder.h>
 
 #include "hud.h"
@@ -483,33 +481,12 @@ void ScorePanel::SortPlayers( int iTeam, char *team )
 //-----------------------------------------------------------------------------
 void ScorePanel::RebuildTeams()
 {
-	// Save the overriden scores.
-	struct overriden {
-		char name[MAX_TEAM_NAME];
-		short frags;
-		short deaths;
-	};
-
-	std::vector<overriden> saved_scores;
-
-	for (int i = 1; i <= m_iNumTeams; ++i) {
-		if (!g_TeamInfo[i].scores_overriden)
-			continue;
-
-		overriden score;
-		strncpy(score.name, g_TeamInfo[i].name, MAX_TEAM_NAME);
-		score.frags = g_TeamInfo[i].frags;
-		score.deaths = g_TeamInfo[i].deaths;
-
-		saved_scores.push_back(score);
-	}
-	
 	// Clear the team info.
-	memset(g_TeamInfo, 0, sizeof(g_TeamInfo));
+	for (int i = 1; i <= m_iNumTeams; ++i)
+		g_TeamInfo[i].players = 0;
 
 	// rebuild the team list
 	gViewPort->GetAllPlayersInfo();
-	m_iNumTeams = 0;
 
 	for (int i = 1; i < MAX_PLAYERS; i++)
 	{
@@ -538,16 +515,30 @@ void ScorePanel::RebuildTeams()
 		g_TeamInfo[j].players++;
 	}
 
-	// Restore the saved scores.
+	// Clear out empty teams.
 	for (int i = 1; i <= m_iNumTeams; ++i) {
-		auto score = std::find_if(saved_scores.cbegin(), saved_scores.cend(), [&](const overriden& score) {
-			return !strncmp(g_TeamInfo[i].name, score.name, MAX_TEAM_NAME);
-		});
+		if (g_TeamInfo[i].players != 0)
+			continue;
 
-		if (score != saved_scores.cend()) {
-			g_TeamInfo[i].scores_overriden = TRUE;
-			g_TeamInfo[i].frags = score->frags;
-			g_TeamInfo[i].deaths = score->deaths;
+		// This team is empty, see if there are non-empty teams after this one.
+		// If so, move one into this spot.
+		int j;
+		for (j = i + 1; j <= m_iNumTeams; ++j) {
+			if (g_TeamInfo[j].players == 0)
+				continue;
+
+			// Found a non-empty team.
+			memcpy(&g_TeamInfo[i], &g_TeamInfo[j], sizeof(*g_TeamInfo));
+			memset(&g_TeamInfo[j], 0, sizeof(*g_TeamInfo));
+			break;
+		}
+
+		if (j > m_iNumTeams) {
+			// All teams starting from this one are empty. Clear them out.
+			for (j = i; j <= m_iNumTeams; ++j)
+				memset(&g_TeamInfo[j], 0, sizeof(*g_TeamInfo));
+
+			break;
 		}
 	}
 
