@@ -148,7 +148,7 @@ void CommandButton::RecalculateText( void )
 		szBuf[MAX_BUTTON_SIZE-1] = 0;
 	}
 
-	Button::setText( szBuf );
+	Button::setText( "%s", szBuf );
 }
 
 void CommandButton::setText( const char *text )

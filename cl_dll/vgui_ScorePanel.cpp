@@ -742,7 +742,8 @@ void ScorePanel::FillGrid()
 					}
 					else
 					{
-						sprintf( sz2, team_info->name );
+						strncpy( sz2, team_info->name, ARRAYSIZE(sz2) - 1 );
+						sz2[ARRAYSIZE(sz2) - 1] = '\0';
 					}
 
 					strcpy(sz, sz2);
