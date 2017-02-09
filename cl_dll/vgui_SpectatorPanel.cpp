@@ -278,15 +278,15 @@ void SpectatorPanel::ShowMenu(bool isVisible)
 		gViewPort->HideCommandMenu();
 
 		// if switching from visible menu to invisible menu, show help text
-		if ( m_menuVisible && this->isVisible() )
-		{
-			char string[ 64 ];
+		//if ( m_menuVisible && this->isVisible() )
+		//{
+		//        char string[ 64 ];
 
-			_snprintf( string, sizeof( string ) - 1, "%c%s", HUD_PRINTCENTER, CHudTextMessage::BufferedLocaliseTextString( "#Spec_Duck" ) );
-			string[ sizeof( string ) - 1 ] = '\0';
+		//        _snprintf( string, sizeof( string ) - 1, "%c%s", HUD_PRINTCENTER, CHudTextMessage::BufferedLocaliseTextString( "#Spec_Duck" ) );
+		//        string[ sizeof( string ) - 1 ] = '\0';
 
-			gHUD.m_TextMessage.MsgFunc_TextMsg( NULL, strlen( string ) + 1, string );
-		}
+		//        gHUD.m_TextMessage.MsgFunc_TextMsg( NULL, strlen( string ) + 1, string );
+		//}
 	}
 
 	m_menuVisible = isVisible;
