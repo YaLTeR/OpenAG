@@ -99,6 +99,7 @@ struct HUDLIST {
 #include "hud_location.h"
 #include "hud_scores.h"
 #include "hud_settings.h"
+#include "hud_speedometer.h"
 #include "hud_suddendeath.h"
 #include "hud_timeout.h"
 #include "hud_timer.h"
@@ -665,6 +666,7 @@ public:
 	CHudLocation	m_Location;
 	CHudScores	m_Scores;
 	CHudSettings	m_Settings;
+	CHudSpeedometer	m_Speedometer;
 	CHudSuddenDeath		m_SuddenDeath;
 	CHudTimeout		m_Timeout;
 	CHudTimer		m_Timer;

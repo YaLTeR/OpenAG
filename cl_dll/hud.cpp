@@ -471,6 +471,7 @@ void CHud :: Init( void )
 	m_Location.Init();
 	m_Scores.Init();
 	m_Settings.Init();
+	m_Speedometer.Init();
 	m_SuddenDeath.Init();
 	m_Timeout.Init();
 	m_Timer.Init();
@@ -632,6 +633,7 @@ void CHud :: VidInit( void )
 	m_Location.VidInit();
 	m_Scores.VidInit();
 	m_Settings.VidInit();
+	m_Speedometer.VidInit();
 	m_SuddenDeath.VidInit();
 	m_Timeout.VidInit();
 	m_Timer.VidInit();
