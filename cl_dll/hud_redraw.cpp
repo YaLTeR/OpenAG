@@ -176,6 +176,15 @@ int CHud :: Redraw( float flTime, int intermission )
 			pList = pList->pNext;
 		}
 	}
+	else
+	{
+		// Hack to draw CHudCrosshairs even when hud_draw is 0.
+		if (!Bench_Active()
+			&& !intermission
+			&& !(m_iHideHUDDisplay & HIDEHUD_ALL)
+			&& m_Crosshairs.m_iFlags & HUD_ACTIVE)
+			m_Crosshairs.Draw(flTime);
+	}
 
 	// are we in demo mode? do we need to draw the logo in the top corner?
 	if (m_iLogo)
