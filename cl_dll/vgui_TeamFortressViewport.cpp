@@ -2532,6 +2532,8 @@ int TeamFortressViewport::MsgFunc_Spectator( const char *pszName, int iSize, voi
 		g_IsSpectator[cl] = READ_BYTE();
 	}
 
+	m_pScoreBoard->RebuildTeams();
+
 	return 1;
 }
 

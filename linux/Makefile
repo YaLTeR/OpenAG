@@ -29,8 +29,8 @@ ARCH=i386
 ELF-GC-DYNSTR=./elf-gc-dynstr
 
 ifeq ($(OS),Linux)
-	CC="gcc -m32"
-	CPLUS="g++ -m32 -std=c++0x"
+	CC="clang -m32"
+	CPLUS="clang++ -m32 -std=c++0x"
 	CPP_LIB:=-L$(shell g++ -m32 -print-file-name=libstdc++.a | xargs dirname) -l:libstdc++.a -ldl -lpthread
 endif
 
@@ -80,9 +80,9 @@ ARCH_CFLAGS_AMD64=-m64 -gdwarf-2 -g2
 endif
 
 ifeq ($(OS),Linux)
-ARCH_CFLAGS_I486+=-march=pentium-m -mfpmath=387
-ARCH_CFLAGS_I686+=-march=pentium-m -mfpmath=387
-ARCH_CFLAGS_AMD+=-march=k6 -mfpmath=387
+ARCH_CFLAGS_I486+=-march=pentium-m -mfpmath=387 -mno-sse
+ARCH_CFLAGS_I686+=-march=pentium-m -mfpmath=387 -mno-sse
+ARCH_CFLAGS_AMD+=-march=k6 -mfpmath=387 -mno-sse
 endif
 
 ifeq ($(OS),Darwin)

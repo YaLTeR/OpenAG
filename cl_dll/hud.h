@@ -97,6 +97,7 @@ struct HUDLIST {
 #include "hud_ctf.h"
 #include "hud_debug.h"
 #include "hud_location.h"
+#include "hud_scores.h"
 #include "hud_settings.h"
 #include "hud_suddendeath.h"
 #include "hud_timeout.h"
@@ -597,8 +598,11 @@ public:
 	int GetNumWidth(int iNumber, int iFlags);
 
 	int DrawHudStringCentered(int x, int y, char* string, int r, int g, int b);
+	int DrawHudStringRightAligned(int x, int y, char* string, int r, int g, int b);
+	int GetHudStringWidth(char* string);
 	int DrawHudStringWithColorTags(int x, int y, char* string, int r, int g, int b);
 	int DrawHudStringCenteredWithColorTags(int x, int y, char* string, int r, int g, int b);
+	int GetHudStringWidthWithColorTags(const char* string);
 	int DrawConsoleStringWithColorTags(
 		int x,
 		int y,
@@ -659,6 +663,7 @@ public:
 	CHudCTF			m_CTF;
 	CHudDebug		m_Debug;
 	CHudLocation	m_Location;
+	CHudScores	m_Scores;
 	CHudSettings	m_Settings;
 	CHudSuddenDeath		m_SuddenDeath;
 	CHudTimeout		m_Timeout;

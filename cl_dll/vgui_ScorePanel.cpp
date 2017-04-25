@@ -314,6 +314,9 @@ void ScorePanel::Update()
 	{
 		 m_pCloseButton->setVisible ( false );
 	}
+
+	// Update the cl_scores table.
+	gHUD.m_Scores.UpdateRows();
 }
 
 //-----------------------------------------------------------------------------
