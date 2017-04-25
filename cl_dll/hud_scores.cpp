@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <array>
 
 #include "hud.h"
 #include "cl_util.h"
@@ -17,6 +18,11 @@ extern int iTeamColors[5][3];
 extern hud_player_info_t   g_PlayerInfoList [MAX_PLAYERS + 1];
 extern extra_player_info_t g_PlayerExtraInfo[MAX_PLAYERS + 1];
 extern team_info_t g_TeamInfo[MAX_TEAMS + 1];
+extern TeamFortressViewport* gViewPort;
+constexpr size_t TEAM_YES = 1; // From vgui_ScorePanel.cpp.
+
+constexpr int PADDING = 10; // Extra fill space from the sides of the scoreboard.
+constexpr int GAP = 10; // Space between the scores and the names.
 
 int CHudScores::Init()
 {
@@ -36,7 +42,7 @@ int CHudScores::VidInit()
 
 int CHudScores::Draw(float time)
 {
-	if (cl_scores->value < 1.0f || rows.empty())
+	if (cl_scores->value < 1.0f)
 		return 0;
 
 	const size_t rows_to_draw = static_cast<size_t>(cl_scores->value);
@@ -47,9 +53,60 @@ int CHudScores::Draw(float time)
 		y = 0;
 	}
 
-	auto last_row = rows.cend();
-	if (rows_to_draw < rows.size())
-		last_row = rows.cbegin() + rows_to_draw;
+	std::array<ScoreRow, NUM_ROWS> rows;
+	size_t row_count = 0;
+
+	const auto scoreboard = gViewPort->GetScoreBoard();
+	if (!gHUD.m_Teamplay) {
+		gViewPort->GetAllPlayersInfo();
+
+		for (int row = 0; row < scoreboard->m_iRows; ++row) {
+			if (scoreboard->m_iIsATeam[row])
+				continue;
+
+			const auto sorted = scoreboard->m_iSortedRows[row];
+			if (g_IsSpectator[sorted])
+				continue;
+
+			const int score = g_PlayerExtraInfo[sorted].frags;
+			const uint8_t color = g_PlayerExtraInfo[sorted].teamnumber % iNumberOfTeamColors;
+			char* name = nullptr;
+			if (steam_id::is_showing_real_names())
+				name = const_cast<char*>(steam_id::get_real_name(sorted - 1).c_str());
+			if (!name || name[0] == '\0')
+				name = g_PlayerInfoList[sorted].name;
+
+			if (!name || name[0] == '\0')
+				continue;
+
+			rows[row_count].score = score;
+			rows[row_count].name = name;
+			rows[row_count].color = color;
+
+			if (++row_count >= rows_to_draw)
+				break;
+		}
+	} else {
+		for (int row = 0; row < scoreboard->m_iRows; ++row) {
+			if (scoreboard->m_iIsATeam[row] != TEAM_YES)
+				continue;
+
+			const auto sorted = scoreboard->m_iSortedRows[row];
+
+			const int score = g_TeamInfo[sorted].frags;
+			const uint8_t color = g_TeamInfo[sorted].teamnumber % iNumberOfTeamColors;
+			char* name = g_TeamInfo[sorted].name;
+
+			rows[row_count].score = score;
+			rows[row_count].name = name;
+			rows[row_count].color = color;
+
+			if (++row_count >= rows_to_draw)
+				break;
+		}
+	}
+
+	const auto last_row = rows.cbegin() + row_count;
 
 	// Figure out the scoreboard dimensions.
 	int score_width = 0, name_width = 0;
@@ -57,13 +114,10 @@ int CHudScores::Draw(float time)
 		char buf[16];
 		std::snprintf(buf, ARRAYSIZE(buf), "%d", row->score);
 		score_width = std::max(score_width, gHUD.GetHudStringWidth(buf));
-		name_width = std::max(name_width, gHUD.GetHudStringWidthWithColorTags(const_cast<char*>(row->name.c_str())));
+		name_width = std::max(name_width, gHUD.GetHudStringWidthWithColorTags(row->name));
 	}
 
 	// Draw the scoreboard.
-	constexpr int PADDING = 10; // Extra fill space from the sides of the scoreboard.
-	constexpr int GAP = 10; // Space between the scores and the names.
-
 	for (auto row = rows.cbegin(); row != last_row; ++row) {
 		int r = iTeamColors[row->color][0],
 		    g = iTeamColors[row->color][1],
@@ -79,7 +133,7 @@ int CHudScores::Draw(float time)
 
 		gHUD.DrawHudStringWithColorTags(x + PADDING + score_width + GAP,
 		                                y,
-		                                const_cast<char*>(row->name.c_str()),
+		                                row->name,
 		                                r,
 		                                g,
 		                                b);
@@ -88,47 +142,4 @@ int CHudScores::Draw(float time)
 	}
 
 	return 0;
-}
-
-void CHudScores::UpdateRows()
-{
-	extern TeamFortressViewport* gViewPort;
-	const auto scoreboard = gViewPort->GetScoreBoard();
-	constexpr size_t TEAM_YES = 1; // From vgui_ScorePanel.cpp.
-
-	rows.clear();
-
-	if (!gHUD.m_Teamplay) {
-		for (int row = 0; row < scoreboard->m_iRows; ++row) {
-			if (scoreboard->m_iIsATeam[row])
-				continue;
-
-			const auto sorted = scoreboard->m_iSortedRows[row];
-			if (g_IsSpectator[sorted])
-				continue;
-
-			const int score = g_PlayerExtraInfo[sorted].frags;
-			const uint8_t color = g_PlayerExtraInfo[sorted].teamnumber % iNumberOfTeamColors;
-			std::string name;
-			if (steam_id::is_showing_real_names())
-				name = steam_id::get_real_name(sorted - 1);
-			if (name.empty())
-				name = g_PlayerInfoList[sorted].name;
-
-			rows.emplace_back(score, std::move(name), color);
-		}
-	} else {
-		for (int row = 0; row < scoreboard->m_iRows; ++row) {
-			if (scoreboard->m_iIsATeam[row] != TEAM_YES)
-				continue;
-
-			const auto sorted = scoreboard->m_iSortedRows[row];
-
-			const int score = g_TeamInfo[sorted].frags;
-			const uint8_t color = g_TeamInfo[sorted].teamnumber % iNumberOfTeamColors;
-			const std::string name = g_TeamInfo[sorted].name;
-
-			rows.emplace_back(score, std::move(name), color);
-		}
-	}
 }
