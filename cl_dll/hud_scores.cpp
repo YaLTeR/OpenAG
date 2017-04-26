@@ -13,6 +13,10 @@
 #undef max
 #endif
 
+#ifdef min
+#undef min
+#endif
+
 extern int iNumberOfTeamColors;
 extern int iTeamColors[5][3];
 extern hud_player_info_t   g_PlayerInfoList [MAX_PLAYERS + 1];
@@ -47,7 +51,7 @@ int CHudScores::Draw(float time)
 		return 0;
 
 	const size_t rows_to_draw = static_cast<size_t>(cl_scores->value);
-	const int alpha = static_cast<int>(cl_scores_alpha->value);
+	const uint8_t alpha = static_cast<uint8_t>(std::min(255.0f, std::max(0.0f, cl_scores_alpha->value)));
 
 	int x, y;
 	if (sscanf(cl_scores_pos->string, "%d %d", &x, &y) != 2) {
