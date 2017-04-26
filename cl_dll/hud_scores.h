@@ -5,6 +5,7 @@ class CHudScores : public CHudBase
 {
 	cvar_t* cl_scores;
 	cvar_t* cl_scores_pos;
+	cvar_t* cl_scores_alpha;
 
 	struct ScoreRow {
 		int score;
