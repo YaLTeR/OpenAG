@@ -68,7 +68,9 @@ HL1_OBJS = \
 	$(HL1_OBJ_DIR)/hud_location.o \
 	$(HL1_OBJ_DIR)/hud_msg.o \
 	$(HL1_OBJ_DIR)/hud_redraw.o \
+	$(HL1_OBJ_DIR)/hud_scores.o \
 	$(HL1_OBJ_DIR)/hud_settings.o \
+	$(HL1_OBJ_DIR)/hud_speedometer.o \
 	$(HL1_OBJ_DIR)/hud_suddendeath.o \
 	$(HL1_OBJ_DIR)/hud_timeout.o \
 	$(HL1_OBJ_DIR)/hud_timer.o \

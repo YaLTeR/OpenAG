@@ -148,6 +148,17 @@ static bool contains_color_tags(const char* string)
 	return false;
 }
 
+static size_t count_digits(int n)
+{
+	size_t result = 0;
+
+	do {
+		++result;
+	} while ((n /= 10) != 0);
+
+	return result;
+}
+
 inline 	client_textmessage_t	*TextMessageGet( const char *pName ) { return gEngfuncs.pfnTextMessageGet( pName ); }
 inline 	int						TextMessageDrawChar( int x, int y, int number, int r, int g, int b ) 
 { 

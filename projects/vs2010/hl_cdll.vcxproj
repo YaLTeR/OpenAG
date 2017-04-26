@@ -203,9 +203,11 @@
     <ClCompile Include="..\..\cl_dll\hud_location.cpp" />
     <ClCompile Include="..\..\cl_dll\hud_msg.cpp" />
     <ClCompile Include="..\..\cl_dll\hud_redraw.cpp" />
+    <ClCompile Include="..\..\cl_dll\hud_scores.cpp" />
     <ClCompile Include="..\..\cl_dll\hud_servers.cpp" />
     <ClCompile Include="..\..\cl_dll\hud_settings.cpp" />
     <ClCompile Include="..\..\cl_dll\hud_spectator.cpp" />
+    <ClCompile Include="..\..\cl_dll\hud_speedometer.cpp" />
     <ClCompile Include="..\..\cl_dll\hud_suddendeath.cpp" />
     <ClCompile Include="..\..\cl_dll\hud_timeout.cpp" />
     <ClCompile Include="..\..\cl_dll\hud_timer.cpp" />
@@ -295,10 +297,12 @@
     <ClInclude Include="..\..\cl_dll\hud_ctf.h" />
     <ClInclude Include="..\..\cl_dll\hud_debug.h" />
     <ClInclude Include="..\..\cl_dll\hud_location.h" />
+    <ClInclude Include="..\..\cl_dll\hud_scores.h" />
     <ClInclude Include="..\..\cl_dll\hud_servers.h" />
     <ClInclude Include="..\..\cl_dll\hud_servers_priv.h" />
     <ClInclude Include="..\..\cl_dll\hud_settings.h" />
     <ClInclude Include="..\..\cl_dll\hud_spectator.h" />
+    <ClInclude Include="..\..\cl_dll\hud_speedometer.h" />
     <ClInclude Include="..\..\cl_dll\hud_suddendeath.h" />
     <ClInclude Include="..\..\cl_dll\hud_timeout.h" />
     <ClInclude Include="..\..\cl_dll\hud_timer.h" />
