@@ -22,9 +22,47 @@ static char* fmt(const char* fmt, ...)
 	return buffer;
 }
 
+static std::vector<std::string> split(const std::string& string, char c)
+{
+	std::vector<std::string> result;
+
+	for (std::string::size_type pos = string.find(c), prev = 0; pos != std::string::npos; prev = pos + 1, pos = string.find(c, pos + 1))
+		result.emplace_back(string, prev, pos - prev);
+
+	return result;
+}
+
+void CHudDebug::DumpEntityData(const cl_entity_t* ent, float time)
+{
+	if (output && hud_debug_filename->string[0] == '\0') {
+		fclose(output);
+		output = nullptr;
+	}
+
+	if (!output && hud_debug_filename->string[0] != '\0') {
+		output = fopen(hud_debug_filename->string, "w");
+	}
+
+	if (!output)
+		return;
+
+	fprintf(output, "%.8f ", time);
+	fprintf(output, "%.8f %.8f %.8f ", ent->origin[0], ent->origin[1], ent->origin[2]);
+	fprintf(output, "%.8f %.8f %.8f %.8f ", ent->curstate.msg_time, ent->curstate.origin[0], ent->curstate.origin[1], ent->curstate.origin[2]);
+	fprintf(output, "%.8f %.8f %.8f %.8f ", ent->prevstate.msg_time, ent->prevstate.origin[0], ent->prevstate.origin[1], ent->prevstate.origin[2]);
+
+	const auto& posdata = ent->ph[ent->current_position];
+	fprintf(output, "%.8f ", posdata.animtime);
+	fprintf(output, "%.8f %.8f %.8f ", posdata.origin[0], posdata.origin[1], posdata.origin[2]);
+
+	fputc('\n', output);
+}
+
 int CHudDebug::Init()
 {
 	hud_debug = CVAR_CREATE("hud_debug", "0", 0);
+	hud_debug_filename = CVAR_CREATE("hud_debug_filename", "", 0);
+	output = nullptr;
 
 	m_iFlags = HUD_ACTIVE;
 
@@ -45,20 +83,34 @@ int CHudDebug::Draw(float time)
 	int r, g, b;
 	UnpackRGB(r, g, b, gHUD.m_iDefaultHUDColor);
 
-	int y = 20;
+	int y = 50;
 
-	gHUD.DrawHudStringWithColorTags(0, y, "m_sTeamNames:", r, g, b);
-	for (int i = 0; i < gViewPort->GetNumberOfTeams(); ++i) {
-		gHUD.DrawHudStringWithColorTags(0, y += gHUD.m_scrinfo.iCharHeight, fmt(" %d: `%s`", i + 1, gViewPort->GetTeamName(i + 1)), r, g, b);
+	gHUD.DrawHudString(0, y, 0, fmt("time: %.8f", time), r, g, b);
+	gHUD.DrawHudStringWithColorTags(0, y += gHUD.m_scrinfo.iCharHeight, "g_iUser2:", r, g, b);
+
+	if (g_iUser2) {
+		const auto ent = gEngfuncs.GetEntityByIndex(g_iUser2);
+		if (ent) {
+			gHUD.DrawHudString(0, y += gHUD.m_scrinfo.iCharHeight, 0, fmt("origin: %.8f %.8f %.8f\n", ent->origin[0], ent->origin[1], ent->origin[2]), r, g, b);
+			gHUD.DrawHudString(0, y += gHUD.m_scrinfo.iCharHeight, 0, fmt("ph origin: %.8f %.8f %.8f\n", ent->ph[ent->current_position].origin[0], ent->ph[ent->current_position].origin[1], ent->ph[ent->current_position].origin[2]), r, g, b);
+			gHUD.DrawHudString(0, y += gHUD.m_scrinfo.iCharHeight, 0, fmt("ph animtime: %.8f\n", ent->ph[ent->current_position].animtime), r, g, b);
+
+			auto dif = ent->curstate.msg_time - ent->prevstate.msg_time;
+			gHUD.DrawHudString(0, y += gHUD.m_scrinfo.iCharHeight, 0, fmt("time dif: %.8f\n", dif), r, g, b);
+
+			DumpEntityData(ent, time);
+		}
 	}
 
-	gHUD.DrawHudStringWithColorTags(0, y += gHUD.m_scrinfo.iCharHeight, "g_PlayerExtraInfo teams:", r, g, b);
-	for (int i = 0; i < MAX_PLAYERS; ++i) {
-		if (g_PlayerExtraInfo[i + 1].teamname[0] == '\0')
-			continue;
-		
-		gHUD.DrawHudStringWithColorTags(0, y += gHUD.m_scrinfo.iCharHeight, fmt(" %d: %hd `%s`", i + 1, g_PlayerExtraInfo[i + 1].teamnumber, g_PlayerExtraInfo[i + 1].teamname), r, g, b);
-	}
+	for (const auto& str : split(additional_data, '\n'))
+		gHUD.DrawHudString(0, y += gHUD.m_scrinfo.iCharHeight, 0, const_cast<char*>(str.c_str()), r, g, b);
+
+	additional_data.clear();
 
 	return 0;
+}
+
+void CHudDebug::AddString(const std::string& string)
+{
+	additional_data += string;
 }
