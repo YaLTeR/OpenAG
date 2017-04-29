@@ -48,20 +48,6 @@ int CHudCrosshairs::Draw(float time)
 	Vector2D center(ScreenWidth / 2.0f, ScreenHeight / 2.0f);
 
 	HudGL gl;
-	gl.color(r, g, b, alpha);
-
-	// Draw the crosshairs.
-	if (cl_cross_thickness->value > 0.0f) {
-		gl.line_width(cl_cross_thickness->value);
-
-		auto size = cl_cross_size->value;
-		auto gap = cl_cross_gap->value;
-
-		gl.line(Vector2D(center.x, center.y - gap - size), Vector2D(center.x, center.y - gap));
-		gl.line(Vector2D(center.x, center.y + gap + size), Vector2D(center.x, center.y + gap));
-		gl.line(Vector2D(center.x - gap - size, center.y), Vector2D(center.x - gap, center.y));
-		gl.line(Vector2D(center.x + gap + size, center.y), Vector2D(center.x + gap, center.y));
-	}
 
 	// Draw the outline.
 	if (cl_cross_outline->value > 0.0f) {
@@ -97,8 +83,21 @@ int CHudCrosshairs::Draw(float time)
 		gl.line(Vector2D(center.x + gap + size - half_width, center.y + half_thickness), Vector2D(center.x + gap + half_width, center.y + half_thickness));
 		gl.line(Vector2D(center.x + gap, center.y + offset), Vector2D(center.x + gap, center.y - offset));
 		gl.line(Vector2D(center.x + gap + half_width, center.y - half_thickness), Vector2D(center.x + gap + size - half_width, center.y - half_thickness));
+	}
 
-		gl.color(r, g, b, alpha);
+	gl.color(r, g, b, alpha);
+
+	// Draw the crosshairs.
+	if (cl_cross_thickness->value > 0.0f) {
+		gl.line_width(cl_cross_thickness->value);
+
+		auto size = cl_cross_size->value;
+		auto gap = cl_cross_gap->value;
+
+		gl.line(Vector2D(center.x, center.y - gap - size), Vector2D(center.x, center.y - gap));
+		gl.line(Vector2D(center.x, center.y + gap + size), Vector2D(center.x, center.y + gap));
+		gl.line(Vector2D(center.x - gap - size, center.y), Vector2D(center.x - gap, center.y));
+		gl.line(Vector2D(center.x + gap + size, center.y), Vector2D(center.x + gap, center.y));
 	}
 
 	// Draw the circle.
