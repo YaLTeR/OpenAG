@@ -9,6 +9,7 @@ class CHudCrosshairs : public CHudBase
 	cvar_t* cl_cross_thickness;
 	cvar_t* cl_cross_size;
 	cvar_t* cl_cross_gap;
+	cvar_t* cl_cross_outline;
 	cvar_t* cl_cross_circle_radius;
 	cvar_t* cl_cross_dot_size;
 

@@ -13,6 +13,7 @@ int CHudCrosshairs::Init()
 	cl_cross_thickness =     CVAR_CREATE("cl_cross_thickness", "2", FCVAR_ARCHIVE);
 	cl_cross_size =          CVAR_CREATE("cl_cross_size", "10", FCVAR_ARCHIVE);
 	cl_cross_gap =           CVAR_CREATE("cl_cross_gap", "3", FCVAR_ARCHIVE);
+	cl_cross_outline =       CVAR_CREATE("cl_cross_outline", "0", FCVAR_ARCHIVE);
 	cl_cross_circle_radius = CVAR_CREATE("cl_cross_circle_radius", "0", FCVAR_ARCHIVE);
 	cl_cross_dot_size =      CVAR_CREATE("cl_cross_dot_size", "0", FCVAR_ARCHIVE);
 	
@@ -60,6 +61,44 @@ int CHudCrosshairs::Draw(float time)
 		gl.line(Vector2D(center.x, center.y + gap + size), Vector2D(center.x, center.y + gap));
 		gl.line(Vector2D(center.x - gap - size, center.y), Vector2D(center.x - gap, center.y));
 		gl.line(Vector2D(center.x + gap + size, center.y), Vector2D(center.x + gap, center.y));
+	}
+
+	// Draw the outline.
+	if (cl_cross_outline->value > 0.0f) {
+		gl.color(0, 0, 0, alpha);
+		gl.line_width(cl_cross_outline->value);
+
+		auto size = cl_cross_size->value;
+		auto gap = cl_cross_gap->value;
+		auto half_thickness = cl_cross_thickness->value / 2.0f;
+		auto half_width = cl_cross_outline->value / 2.0f;
+		auto offset = half_thickness + half_width;
+
+		// Top line
+		gl.line(Vector2D(center.x - offset, center.y - gap - size), Vector2D(center.x + offset, center.y - gap - size));
+		gl.line(Vector2D(center.x + half_thickness, center.y - gap - size + half_width), Vector2D(center.x + half_thickness, center.y - gap - half_width));
+		gl.line(Vector2D(center.x + offset, center.y - gap), Vector2D(center.x - offset, center.y - gap));
+		gl.line(Vector2D(center.x - half_thickness, center.y - gap - half_width), Vector2D(center.x - half_thickness, center.y - gap - size + half_width));
+
+		// Bottom line
+		gl.line(Vector2D(center.x - offset, center.y + gap + size), Vector2D(center.x + offset, center.y + gap + size));
+		gl.line(Vector2D(center.x + half_thickness, center.y + gap + size - half_width), Vector2D(center.x + half_thickness, center.y + gap + half_width));
+		gl.line(Vector2D(center.x + offset, center.y + gap), Vector2D(center.x - offset, center.y + gap));
+		gl.line(Vector2D(center.x - half_thickness, center.y + gap + half_width), Vector2D(center.x - half_thickness, center.y + gap + size - half_width));
+
+		// Left line
+		gl.line(Vector2D(center.x - gap - size, center.y - offset), Vector2D(center.x - gap - size, center.y + offset));
+		gl.line(Vector2D(center.x - gap - size + half_width, center.y + half_thickness), Vector2D(center.x - gap - half_width, center.y + half_thickness));
+		gl.line(Vector2D(center.x - gap, center.y + offset), Vector2D(center.x - gap, center.y - offset));
+		gl.line(Vector2D(center.x - gap - half_width, center.y - half_thickness), Vector2D(center.x - gap - size + half_width, center.y - half_thickness));
+
+		// Right line
+		gl.line(Vector2D(center.x + gap + size, center.y - offset), Vector2D(center.x + gap + size, center.y + offset));
+		gl.line(Vector2D(center.x + gap + size - half_width, center.y + half_thickness), Vector2D(center.x + gap + half_width, center.y + half_thickness));
+		gl.line(Vector2D(center.x + gap, center.y + offset), Vector2D(center.x + gap, center.y - offset));
+		gl.line(Vector2D(center.x + gap + half_width, center.y - half_thickness), Vector2D(center.x + gap + size - half_width, center.y - half_thickness));
+
+		gl.color(r, g, b, alpha);
 	}
 
 	// Draw the circle.
