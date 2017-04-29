@@ -178,12 +178,18 @@ int CHud :: Redraw( float flTime, int intermission )
 	}
 	else
 	{
-		// Hack to draw CHudCrosshairs even when hud_draw is 0.
+		// Hack to draw some HUDs even when hud_draw is 0.
 		if (!Bench_Active()
 			&& !intermission
-			&& !(m_iHideHUDDisplay & HIDEHUD_ALL)
-			&& m_Crosshairs.m_iFlags & HUD_ACTIVE)
-			m_Crosshairs.Draw(flTime);
+			&& !(m_iHideHUDDisplay & HIDEHUD_ALL))
+		{
+			if (m_Crosshairs.m_iFlags & HUD_ACTIVE)
+				m_Crosshairs.Draw(flTime);
+
+			if (gHUD.m_pCvarDrawDeathNoticesAlways->value != 0.0f
+				&& m_DeathNotice.m_iFlags & HUD_ACTIVE)
+				m_DeathNotice.Draw(flTime);
+		}
 	}
 
 	// are we in demo mode? do we need to draw the logo in the top corner?

@@ -582,6 +582,7 @@ public:
 	int		m_iRes;
 	cvar_t  *m_pCvarStealMouse;
 	cvar_t	*m_pCvarDraw;
+	cvar_t	*m_pCvarDrawDeathNoticesAlways;
 
 	int m_iFontHeight;
 
