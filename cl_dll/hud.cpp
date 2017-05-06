@@ -391,7 +391,7 @@ void CHud :: Init( void )
 	HOOK_COMMAND( "agrecord", Agrecord );
 	HOOK_COMMAND( "append", Append );
 	EngineClientCmd("alias zpecial \"append _zpecial\"");
-
+	
 	force_model::hook_commands();
 	steam_id::hook_messages();
 
@@ -418,6 +418,26 @@ void CHud :: Init( void )
 
 	CVAR_CREATE( "hud_classautokill", "1", FCVAR_ARCHIVE | FCVAR_USERINFO );		// controls whether or not to suicide immediately on TF class switch
 	CVAR_CREATE( "hud_takesshots", "0", FCVAR_ARCHIVE );		// controls whether or not to automatically take screenshots at the end of a round
+
+	/* megasausageking: custom crosshair commands */
+	CVAR_CREATE("cl_cross_alpha","1", FCVAR_ARCHIVE);
+	CVAR_CREATE("cl_customcrosshair","0",FCVAR_ARCHIVE);
+	CVAR_CREATE("cl_cross_dot","0", FCVAR_ARCHIVE);
+	CVAR_CREATE("cl_cross_dot_size","1",FCVAR_ARCHIVE);
+	CVAR_CREATE("cl_cross_red","0",FCVAR_ARCHIVE);
+	CVAR_CREATE("cl_cross_green","1",FCVAR_ARCHIVE);
+	CVAR_CREATE("cl_cross_blue","0",FCVAR_ARCHIVE);
+	CVAR_CREATE("cl_cross_circle","0",FCVAR_ARCHIVE);
+	CVAR_CREATE("cl_cross_drawoutline","0",FCVAR_ARCHIVE);
+	CVAR_CREATE("cl_cross_circle_radius","20",FCVAR_ARCHIVE);
+	CVAR_CREATE("cl_cross_circle_width","2",FCVAR_ARCHIVE);
+	CVAR_CREATE("cl_cross_circle_alpha","0.5",FCVAR_ARCHIVE);
+	CVAR_CREATE("cl_cross_size","10",FCVAR_ARCHIVE);
+	CVAR_CREATE("cl_cross_gap","0",FCVAR_ARCHIVE);
+	CVAR_CREATE("cl_cross_x","0",FCVAR_ARCHIVE);
+	CVAR_CREATE("cl_cross_y","0",FCVAR_ARCHIVE);
+	CVAR_CREATE("cl_cross_width","2",FCVAR_ARCHIVE);
+	/* megasausageking end */
 
 	// Implemented server-side, needs to be registered client-side.
 	CVAR_CREATE( "cl_autowepswitch", "1", FCVAR_ARCHIVE | FCVAR_USERINFO | FCVAR_CLIENTDLL );
@@ -478,6 +498,7 @@ void CHud :: Init( void )
 	m_Timer.Init();
 	m_Vote.Init();
 	m_Watermark.Init();
+	//m_Reticle.Init();
 	GetClientVoiceMgr()->Init(&g_VoiceStatusHelper, (vgui::Panel**)&gViewPort);
 
 	m_Menu.Init();
@@ -640,6 +661,7 @@ void CHud :: VidInit( void )
 	m_Timer.VidInit();
 	m_Vote.VidInit();
 	m_Watermark.VidInit();
+	//m_Reticle.VidInit();
 	GetClientVoiceMgr()->VidInit();
 }
 
