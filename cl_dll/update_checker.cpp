@@ -3,7 +3,12 @@
 #include <atomic>
 #include <cstdint>
 #include <cstring>
+#include <mutex>
 #include <thread>
+
+#ifndef _WIN32
+#include <dlfcn.h>
+#endif
 
 #define CURL_STATICLIB
 #include "curl/curl.h"
@@ -25,6 +30,37 @@ namespace update_checker
 	{
 		atomic<bool> update_available{ false };
 
+		#ifdef _WIN32
+		constexpr auto my_curl_easy_init = curl_easy_init;
+		constexpr auto my_curl_easy_setopt = curl_easy_setopt;
+		constexpr auto my_curl_easy_perform = curl_easy_perform;
+		constexpr auto my_curl_easy_cleanup = curl_easy_cleanup;
+		#else
+		// Due to problems with CURL_OPENSSL_{3,4}, load libcurl statically on Linux.
+		std::once_flag flag_get_curl_pointers;
+
+		decltype(curl_easy_init)* my_curl_easy_init = nullptr;
+		decltype(curl_easy_setopt)* my_curl_easy_setopt = nullptr;
+		decltype(curl_easy_perform)* my_curl_easy_perform = nullptr;
+		decltype(curl_easy_cleanup)* my_curl_easy_cleanup = nullptr;
+
+		void get_curl_pointers()
+		{
+			auto so = dlopen("libcurl.so.4", RTLD_LAZY);
+			if (so) {
+				#define GET(ptr, name) \
+					ptr = reinterpret_cast<decltype(ptr)>(dlsym(so, name))
+
+				GET(my_curl_easy_init, "curl_easy_init");
+				GET(my_curl_easy_setopt, "curl_easy_setopt");
+				GET(my_curl_easy_perform, "curl_easy_perform");
+				GET(my_curl_easy_cleanup, "curl_easy_cleanup");
+
+				#undef GET
+			}
+		}
+		#endif
+
 		struct user_data
 		{
 			uint64_t value;
@@ -34,6 +70,14 @@ namespace update_checker
 			{
 			}
 		};
+
+		bool is_curl_available()
+		{
+			return my_curl_easy_init
+				&& my_curl_easy_setopt
+				&& my_curl_easy_cleanup
+				&& my_curl_easy_perform;
+		}
 
 		size_t write_callback(char* ptr, size_t size, size_t nmemb, void* userdata)
 		{
@@ -52,23 +96,30 @@ namespace update_checker
 
 		void actually_check_for_updates()
 		{
-			CURL *curl = curl_easy_init();
+			#ifndef _WIN32
+			std::call_once(flag_get_curl_pointers, get_curl_pointers);
+			#endif
+
+			if (!is_curl_available())
+				return;
+
+			CURL *curl = my_curl_easy_init();
 
 			if (curl) {
 				user_data data;
 
-				curl_easy_setopt(curl, CURLOPT_URL, UPDATE_URL);
-				curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+				my_curl_easy_setopt(curl, CURLOPT_URL, UPDATE_URL);
+				my_curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
 
-				curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
-				curl_easy_setopt(curl, CURLOPT_WRITEDATA, &data);
+				my_curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
+				my_curl_easy_setopt(curl, CURLOPT_WRITEDATA, &data);
 
-				curl_easy_perform(curl);
+				my_curl_easy_perform(curl);
 
 				update_available =
 					(data.bytes_received == sizeof(data.value) && data.value > CURRENT_VERSION);
 
-				curl_easy_cleanup(curl);
+				my_curl_easy_cleanup(curl);
 			}
 		}
 	}
