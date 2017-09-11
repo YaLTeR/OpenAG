@@ -11,8 +11,7 @@ OpenAG is an open-source client of the Half-Life promod Adrenaline Gamer, comple
 
 ## Linux
 1. Get a 32-bit/multilib **gcc** build environment set up.
-2. Make sure you have 32-bit/multilib **zlib** and **libidn**.
-3. Go into the `linux` folder and type `make`.
+2. Go into the `linux` folder and type `make`.
 
 If, after making changes to the code and recompiling, the game crashes on launch, try doing `make clean` followed by `make`. This is a frequent issue.
 
