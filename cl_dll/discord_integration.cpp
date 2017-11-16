@@ -170,8 +170,6 @@ namespace discord_integration
 				presence.partyId = party_id.c_str();
 				presence.partySize = current_player_count;
 				presence.partyMax = current_max_player_count;
-
-				gEngfuncs.Con_Printf("Player count: %d\n", presence.partySize);
 			}
 
 			presence.state = state.c_str();
