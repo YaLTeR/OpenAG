@@ -96,7 +96,8 @@ namespace discord_integration
 			if (address.empty())
 				return;
 
-			EngineClientCmd(("connect "s + address + "\n"s).data());
+			auto command = "connect "s + address + "\n"s;
+			EngineClientCmd(command.data());
 		}
 
 		// void handle_spectateGame(const char* spectate_secret)
@@ -185,7 +186,7 @@ namespace discord_integration
 		handlers.ready = handle_ready;
 		handlers.errored = handle_errored;
 		handlers.disconnected = handle_disconnected;
-		// handlers.joinGame = handle_joinGame;
+		handlers.joinGame = handle_joinGame;
 		// handlers.spectateGame = handle_spectateGame;
 		// handlers.joinRequest = handle_joinRequest;
 		Discord_Initialize(CLIENT_ID, &handlers, 1, STEAM_APP_ID);
