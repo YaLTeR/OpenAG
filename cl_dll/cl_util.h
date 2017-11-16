@@ -102,6 +102,10 @@ template<typename T, size_t N>
 char (&ArraySizeHelper(T (&)[N]))[N];
 #define ARRAYSIZE(x) sizeof(ArraySizeHelper(x))
 
+#define max(a, b)  (((a) > (b)) ? (a) : (b))
+#define min(a, b)  (((a) < (b)) ? (a) : (b))
+//#define fabs(x)	   ((x) > 0 ? (x) : 0 - (x))
+
 /*
  * Copies at most count characters (including the terminating null character)
  * from src to dest, omitting the color tags. The resulting array is always
@@ -157,6 +161,26 @@ static size_t count_digits(int n)
 	} while ((n /= 10) != 0);
 
 	return result;
+}
+
+static size_t get_map_name(char* dest, size_t count)
+{
+	auto map_path = gEngfuncs.pfnGetLevelName();
+
+	const char* slash = strrchr(map_path, '/');
+	if (!slash)
+		slash = map_path - 1;
+
+	const char* dot = strrchr(map_path, '.');
+	if (!dot)
+		dot = map_path + strlen(map_path);
+
+	size_t bytes_to_copy = min(count - 1, dot - slash - 1);
+
+	strncpy(dest, slash + 1, bytes_to_copy);
+	dest[bytes_to_copy] = '\0';
+
+	return bytes_to_copy;
 }
 
 inline 	client_textmessage_t	*TextMessageGet( const char *pName ) { return gEngfuncs.pfnTextMessageGet( pName ); }
@@ -229,10 +253,6 @@ inline int safe_sprintf( char *dst, int len_dst, const char *format, ...)
 // sound functions
 inline void PlaySound( char *szSound, float vol ) { gEngfuncs.pfnPlaySoundByName( szSound, vol ); }
 inline void PlaySound( int iSound, float vol ) { gEngfuncs.pfnPlaySoundByIndex( iSound, vol ); }
-
-#define max(a, b)  (((a) > (b)) ? (a) : (b))
-#define min(a, b)  (((a) < (b)) ? (a) : (b))
-//#define fabs(x)	   ((x) > 0 ? (x) : 0 - (x))
 
 void ScaleColors( int &r, int &g, int &b, int a );
 

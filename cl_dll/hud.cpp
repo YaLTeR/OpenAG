@@ -176,26 +176,6 @@ void __CmdFunc_ToggleServerBrowser( void )
 	}
 }
 
-static size_t GetMapName(char* dest, size_t count)
-{
-	auto map_path = gEngfuncs.pfnGetLevelName();
-
-	const char* slash = strrchr(map_path, '/');
-	if (!slash)
-		slash = map_path - 1;
-
-	const char* dot = strrchr(map_path, '.');
-	if (!dot)
-		dot = map_path + strlen(map_path);
-
-	size_t bytes_to_copy = min(count - 1, dot - slash - 1);
-
-	strncpy(dest, slash + 1, bytes_to_copy);
-	dest[count - 1] = '\0';
-
-	return bytes_to_copy;
-}
-
 void __CmdFunc_Agrecord()
 {
 	/*
@@ -211,7 +191,7 @@ void __CmdFunc_Agrecord()
 	auto written = std::strftime(cmd, sizeof(cmd), "record %Y%m%d_%H%M%S_", std::localtime(&curtime));
 	if (written > 0) {
 		char mapname[256];
-		auto mapname_len = GetMapName(mapname, ARRAYSIZE(mapname));
+		auto mapname_len = get_map_name(mapname, ARRAYSIZE(mapname));
 
 		/*
 		 * We want to leave at least one more byte for '\0'.
