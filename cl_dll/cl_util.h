@@ -175,7 +175,7 @@ static size_t get_map_name(char* dest, size_t count)
 	if (!dot)
 		dot = map_path + strlen(map_path);
 
-	size_t bytes_to_copy = min(count - 1, dot - slash - 1);
+	size_t bytes_to_copy = min(count - 1, static_cast<size_t>(dot - slash - 1));
 
 	strncpy(dest, slash + 1, bytes_to_copy);
 	dest[bytes_to_copy] = '\0';
