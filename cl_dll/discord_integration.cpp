@@ -100,15 +100,16 @@ namespace discord_integration
 			EngineClientCmd(command.data());
 		}
 
-		// void handle_spectateGame(const char* spectate_secret)
-		// {
-                // 
-		// }
-                // 
-		// void handle_joinRequest(const DiscordJoinRequest* request)
-		// {
-                // 
-		// }
+		void handle_spectateGame(const char* spectate_secret)
+		{
+			// TODO
+			handle_joinGame(spectate_secret);
+		}
+
+		void handle_joinRequest(const DiscordJoinRequest* request)
+		{
+			Discord_Respond(request->userId, DISCORD_REPLY_YES);
+		}
 
 		void update()
 		{
@@ -140,6 +141,7 @@ namespace discord_integration
 			// Declare them outside of the following block, so they are in scope for Discord_UpdatePresence().
 			char map_name[64];
 			net_status_t netstatus{};
+			std::string spectate_secret;
 			std::string party_id;
 
 			if (current_state != state::NOT_PLAYING)
@@ -166,6 +168,9 @@ namespace discord_integration
 				auto address = gEngfuncs.pNetAPI->AdrToString(&netstatus.remote_address);
 				presence.joinSecret = address;
 
+				spectate_secret = address + " "s;
+				presence.spectateSecret = spectate_secret.c_str();
+
 				party_id = address + "_"s; // HACK: secrets can't match party id.
 				presence.partyId = party_id.c_str();
 				presence.partySize = current_player_count;
@@ -185,8 +190,8 @@ namespace discord_integration
 		handlers.errored = handle_errored;
 		handlers.disconnected = handle_disconnected;
 		handlers.joinGame = handle_joinGame;
-		// handlers.spectateGame = handle_spectateGame;
-		// handlers.joinRequest = handle_joinRequest;
+		handlers.spectateGame = handle_spectateGame;
+		handlers.joinRequest = handle_joinRequest;
 		Discord_Initialize(CLIENT_ID, &handlers, 1, STEAM_APP_ID);
 
 		current_state = state::NOT_PLAYING;
