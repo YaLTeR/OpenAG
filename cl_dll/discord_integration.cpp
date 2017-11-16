@@ -51,7 +51,7 @@ namespace discord_integration
 			"urethane"s,
 			"vengeance"s,
 			"zjumps"s,
-			"ztrickss"s
+			"ztricks"s
 		};
 
 		// For tracking if we're in-game.
