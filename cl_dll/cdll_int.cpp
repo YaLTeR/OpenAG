@@ -55,6 +55,7 @@ TeamFortressViewport *gViewPort = NULL;
 CSysModule *g_hParticleManModule = NULL;
 IParticleMan *g_pParticleMan = NULL;
 
+#include "discord_integration.h"
 #include "update_checker.h"
 
 void CL_LoadParticleMan( void );
@@ -156,6 +157,7 @@ int CL_DLLEXPORT Initialize( cl_enginefunc_t *pEnginefuncs, int iVersion )
 	memcpy(&gEngfuncs, pEnginefuncs, sizeof(cl_enginefunc_t));
 
 	update_checker::check_for_updates();
+	discord_integration::initialize();
 
 	EV_HookEvents();
 	CL_LoadParticleMan();
@@ -242,6 +244,8 @@ int CL_DLLEXPORT HUD_UpdateClientData(client_data_t *pcldata, float flTime )
 
 	IN_Commands();
 
+	discord_integration::on_update_client_data();
+
 	return gHUD.UpdateClientData(pcldata, flTime );
 }
 
@@ -275,6 +279,8 @@ void CL_DLLEXPORT HUD_Frame( double time )
 	ServersThink( time );
 
 	GetClientVoiceMgr()->Frame(time);
+
+	discord_integration::on_frame();
 }
 
 

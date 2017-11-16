@@ -1144,7 +1144,7 @@ void CHudSpectator::SetModes(int iNewMainMode, int iNewInsetMode)
 
 	// inset mode is handled only clients side
 	m_pip->value = iNewInsetMode;
-	
+
 	if ( iNewMainMode < OBS_CHASE_LOCKED || iNewMainMode > OBS_MAP_CHASE )
 	{
 		gEngfuncs.Con_Printf("Invalid spectator mode.\n");

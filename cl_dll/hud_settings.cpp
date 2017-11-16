@@ -2,6 +2,8 @@
 #include "cl_util.h"
 #include "parsemsg.h"
 
+#include "discord_integration.h"
+
 DECLARE_MESSAGE(m_Settings, Settings);
 
 int CHudSettings::Init()
@@ -125,6 +127,8 @@ int CHudSettings::MsgFunc_Settings(const char* name, int size, void* buf)
 	m_iFlags |= HUD_ACTIVE;
 
 	// gEngfuncs.Con_Printf("Settings:\n\ts1 = `%s`\n\ttime_limit = %hhd\n\tfrag_limit=%hhd\n\tfrag_limit_present = %s\n\tweapon_stay = %s\n\ts2 = `%s`\n\ts3 = `%s`\n\ts4 = `%s`\n\ts5 = `%s`\n", s1, time_limit, frag_limit, frag_limit_present ? "true" : "false", weapon_stay ? "true" : "false", s2, s3, s4, s5);
+
+	discord_integration::set_gamemode(gamemode);
 
 	return 1;
 }
