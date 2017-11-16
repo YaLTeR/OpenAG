@@ -58,6 +58,7 @@
 #include "shake.h"
 #include "screenfade.h"
 
+#include "discord_integration.h"
 #include "forcemodel.h"
 
 void IN_SetVisibleMouse(bool visible);
@@ -2453,6 +2454,8 @@ int TeamFortressViewport::MsgFunc_ScoreInfo( const char *pszName, int iSize, voi
 			 g_PlayerExtraInfo[cl].teamnumber = 0;
 
 		UpdateOnPlayerInfo();
+
+		discord_integration::on_player_count_update();
 	}
 
 	return 1;

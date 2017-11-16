@@ -42,4 +42,9 @@ namespace discord_integration
 	 * Call this in HUD_Frame.
 	 */
 	void on_frame();
+
+	/**
+	 * Call this when a player joins or leaves.
+	 */
+	void on_player_count_update();
 }

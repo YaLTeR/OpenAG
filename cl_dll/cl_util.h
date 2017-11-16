@@ -183,6 +183,37 @@ static size_t get_map_name(char* dest, size_t count)
 	return bytes_to_copy;
 }
 
+static void sanitize_address(std::string& address)
+{
+	for (size_t i = 0; i < address.size(); ++i) {
+		char c = address[i];
+		if ((c >= '0' && c <= '9') || c == '.' || c == ':')
+			continue;
+
+		// Invalid character.
+		address = address.substr(0, i);
+		break;
+	}
+}
+
+static size_t get_player_count()
+{
+	size_t player_count = 0;
+
+	for (int i = 0; i < MAX_PLAYERS; ++i) {
+		// Make sure the information is up to date.
+		gEngfuncs.pfnGetPlayerInfo(i + 1, &g_PlayerInfoList[i + 1]);
+
+		// This player slot is empty.
+		if (g_PlayerInfoList[i + 1].name == nullptr)
+			continue;
+
+		++player_count;
+	}
+
+	return player_count;
+}
+
 inline 	client_textmessage_t	*TextMessageGet( const char *pName ) { return gEngfuncs.pfnTextMessageGet( pName ); }
 inline 	int						TextMessageDrawChar( int x, int y, int number, int r, int g, int b ) 
 { 

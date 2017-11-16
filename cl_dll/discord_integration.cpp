@@ -7,6 +7,7 @@
 #include "hud.h"
 #include "cl_util.h"
 #include "vgui_TeamFortressViewport.h"
+#include "net_api.h"
 #include "discord_integration.h"
 
 using namespace std::literals;
@@ -63,6 +64,15 @@ namespace discord_integration
 		// The current gamemode.
 		std::string current_gamemode;
 
+		// Current player count.
+		int current_player_count;
+
+		// Current max player count.
+		int current_max_player_count;
+
+		// Time of the last update.
+		float last_update_time;
+
 		void handle_ready()
 		{
 			gEngfuncs.Con_Printf("Connected to Discord.\n");
@@ -78,11 +88,17 @@ namespace discord_integration
 			gEngfuncs.Con_Printf("Disconnected from Discord (%d): %s\n", error_code, message);
 		}
 
-		// void handle_joinGame(const char* join_secret)
-		// {
-                // 
-		// }
-                // 
+		void handle_joinGame(const char* join_secret)
+		{
+			std::string address(join_secret);
+			sanitize_address(address);
+
+			if (address.empty())
+				return;
+
+			EngineClientCmd(("connect "s + address + "\n"s).data());
+		}
+
 		// void handle_spectateGame(const char* spectate_secret)
 		// {
                 // 
@@ -120,6 +136,11 @@ namespace discord_integration
 
 			presence.largeImageKey = "default";
 
+			// Declare them outside of the following block, so they are in scope for Discord_UpdatePresence().
+			char map_name[64];
+			net_status_t netstatus{};
+			std::string party_id;
+
 			if (current_state != state::NOT_PLAYING)
 			{
 				if (!current_gamemode.empty())
@@ -128,7 +149,6 @@ namespace discord_integration
 				if (gViewPort->m_szServerName[0])
 					presence.details = gViewPort->m_szServerName;
 
-				char map_name[64];
 				const auto length = get_map_name(map_name, ARRAYSIZE(map_name));
 
 				if (map_name[0])
@@ -140,6 +160,17 @@ namespace discord_integration
 
 					presence.largeImageText = map_name;
 				}
+
+				gEngfuncs.pNetAPI->Status(&netstatus);
+				auto address = gEngfuncs.pNetAPI->AdrToString(&netstatus.remote_address);
+				presence.joinSecret = address;
+
+				party_id = address + "_"s; // HACK: secrets can't match party id.
+				presence.partyId = party_id.c_str();
+				presence.partySize = current_player_count;
+				presence.partyMax = current_max_player_count;
+
+				gEngfuncs.Con_Printf("Player count: %d\n", presence.partySize);
 			}
 
 			presence.state = state.c_str();
@@ -163,6 +194,8 @@ namespace discord_integration
 		update();
 
 		Discord_RunCallbacks();
+
+		last_update_time = gEngfuncs.GetClientTime();
 	}
 
 	void shutdown()
@@ -177,7 +210,14 @@ namespace discord_integration
 			current_state = new_state;
 
 			if (new_state == state::NOT_PLAYING)
+			{
 				current_gamemode.clear();
+			}
+			else
+			{
+				current_player_count = get_player_count();
+				current_max_player_count = gEngfuncs.GetMaxClients();
+			}
 
 			update();
 		}
@@ -206,6 +246,27 @@ namespace discord_integration
 
 		updated_client_data = false;
 
+		const auto current_time = gEngfuncs.GetClientTime();
+		if (last_update_time < current_time || last_update_time - current_time > 5)
+		{
+			last_update_time = current_time;
+			on_player_count_update();
+		}
+
 		Discord_RunCallbacks();
+	}
+
+	void on_player_count_update()
+	{
+		if (current_state != state::NOT_PLAYING) {
+			auto player_count = get_player_count();
+			auto max_player_count = gEngfuncs.GetMaxClients();
+
+			if (current_player_count != player_count || current_max_player_count != max_player_count) {
+				current_player_count = player_count;
+				current_max_player_count = max_player_count;
+				update();
+			}
+		}
 	}
 }
