@@ -1,8 +1,8 @@
+#define _USE_MATH_DEFINES
 #include "util_vector.h"
 #include "hudgl.h"
 
-#define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 #include <vector>
 
 #ifdef _WIN32
