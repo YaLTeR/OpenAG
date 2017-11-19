@@ -1,4 +1,6 @@
 #include <cstdint>
+#include <cstring>
+#include <memory>
 #include <string>
 #include <unordered_set>
 
@@ -97,7 +99,10 @@ namespace discord_integration
 				return;
 
 			auto command = "connect "s + address + "\n"s;
-			EngineClientCmd(command.data());
+
+			std::unique_ptr<char[]> temp(new char[command.size() + 1]);
+			std::memcpy(temp.get(), command.data(), command.size() + 1);
+			EngineClientCmd(temp.get());
 		}
 
 		void handle_spectateGame(const char* spectate_secret)
