@@ -1,5 +1,7 @@
 ﻿OpenAG
 ======================
+[![Build Status](https://travis-ci.org/YaLTeR/OpenAG.svg?branch=master)](https://travis-ci.org/YaLTeR/OpenAG)
+
 OpenAG is an open-source client of the Half-Life promod Adrenaline Gamer, completely rewritten from scratch on latest Half-Life SDK. It adds new features, bugfixes and other tweaks over the original mod, while maintaining the ability to play on all currently existing servers.
 
 # Building
@@ -12,7 +14,7 @@ OpenAG is an open-source client of the Half-Life promod Adrenaline Gamer, comple
 6. `cmake --build . --config Release`
 
 ## Linux
-1. Get a 32-bit/multilib **gcc** or **clang** build environment set up, as well as CMake.
+1. Get a 32-bit/multilib **gcc** (6 and above) or **clang** (3.9 and above) build environment set up, as well as CMake.
 2. `git submodule update --init`
 3. `mkdir build`
 4. `cd build`
