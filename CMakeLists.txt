@@ -20,6 +20,7 @@ endif(MSVC)
 
 # Add discord-rpc
 set(BUILD_EXAMPLES OFF)
+set(CLANG_FORMAT_SUFFIX "-dummy")
 add_subdirectory(external/discord-rpc)
 
 # Collect the source files

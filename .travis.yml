@@ -14,11 +14,8 @@ addons:
       - ninja-build
 
 env:
-  global:
-    - CLANG_FORMAT_SUFFIX="-dummy"
-  matrix:
-    - CONFIGURATION=Debug
-    - CONFIGURATION=Release
+  - CONFIGURATION=Debug
+  - CONFIGURATION=Release
 
 compiler:
   - clang
