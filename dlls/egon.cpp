@@ -281,7 +281,7 @@ void CEgon::Fire( const Vector &vecOrigSrc, const Vector &vecDir )
 
 #endif
 
-	float timedist;
+	float timedist = 0.0f;
 
 	switch ( m_fireMode )
 	{

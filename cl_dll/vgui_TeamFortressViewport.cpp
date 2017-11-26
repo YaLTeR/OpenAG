@@ -99,7 +99,7 @@ int iTeamColors[5][3] =
 
 
 // Used for Class specific buttons
-char *sTFClasses[] =
+const char *sTFClasses[] =
 {
 	"",
 	"SCOUT",
@@ -114,7 +114,7 @@ char *sTFClasses[] =
 	"CIVILIAN",
 };
 
-char *sLocalisedClasses[] = 
+const char *sLocalisedClasses[] = 
 {
 	"#Civilian",
 	"#Scout",
@@ -130,7 +130,7 @@ char *sLocalisedClasses[] =
 	"#Civilian",
 };
 
-char *sTFClassSelection[] = 
+const char *sTFClassSelection[] = 
 {
 	"civilian",
 	"scout",
@@ -690,7 +690,7 @@ class CException;
 // Purpose: Read the Command Menu structure from the txt file and create the menu.
 //			Returns Index of menu in m_pCommandMenus
 //-----------------------------------------------------------------------------
-int TeamFortressViewport::CreateCommandMenu( char * menuFile, int direction, int yOffset, bool flatDesign, float flButtonSizeX, float flButtonSizeY, int xOffset )
+int TeamFortressViewport::CreateCommandMenu( const char * menuFile, int direction, int yOffset, bool flatDesign, float flButtonSizeX, float flButtonSizeY, int xOffset )
 {
 	// COMMAND MENU
 	// Create the root of this new Command Menu
@@ -1547,7 +1547,7 @@ void TeamFortressViewport::UpdateSpectatorPanel()
 	{
 		char bottomText[128];
 		char helpString2[128];
-		char tempString[128];
+		// char tempString[128];
 		char * name;
 		char *pBottomText = NULL;
 		int player = 0;
@@ -1726,14 +1726,14 @@ void TeamFortressViewport::SetCurrentMenu( CMenuPanel *pMenu )
 CMenuPanel* TeamFortressViewport::CreateTextWindow( int iTextToShow )
 {
 	char sz[256];
-	char *cText;
+	char *cText = nullptr;
 	char *pfile = NULL;
 	static const int MAX_TITLE_LENGTH = 64;
 	char cTitle[MAX_TITLE_LENGTH];
 
 	if ( iTextToShow == SHOW_MOTD )
 	{
-		if (!m_szServerName || !m_szServerName[0])
+		if (!m_szServerName[0])
 			strcpy( cTitle, "Half-Life" );
 		else
 			strncpy( cTitle, m_szServerName, sizeof(cTitle) );
@@ -1743,7 +1743,7 @@ CMenuPanel* TeamFortressViewport::CreateTextWindow( int iTextToShow )
 	else if ( iTextToShow == SHOW_MAPBRIEFING )
 	{
 		// Get the current mapname, and open it's map briefing text
-		if (m_sMapName && m_sMapName[0])
+		if (m_sMapName[0])
 		{
 			strcpy( sz, "maps/");
 			strcat( sz, m_sMapName );

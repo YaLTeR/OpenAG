@@ -118,8 +118,15 @@ void VGui_Startup()
 
 void VGui_Shutdown()
 {
+#ifdef POSIX
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdelete-non-virtual-dtor"
+#endif
 	delete gViewPort;
 	gViewPort = NULL;
+#ifdef POSIX
+#pragma GCC diagnostic pop
+#endif
 }
 
 

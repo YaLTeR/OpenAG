@@ -36,6 +36,10 @@ int CHudTimeout::Draw(float time)
 	case TimeoutStatus::IN_PROGRESS:
 		sprintf(str, "Timeout, starting in %hhu seconds.", seconds);
 		break;
+
+	default:
+		// Unreachable.
+		assert(false);
 	}
 
 	int r, g, b;

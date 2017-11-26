@@ -55,7 +55,7 @@ int CHudCountdown::Draw(float time)
 	return 0;
 }
 
-static char* sound_names[] = {
+static const char* sound_names[] = {
 	"barney/ba_bring.wav",
 	"fvox/one.wav",
 	"fvox/two.wav",

@@ -83,11 +83,18 @@ CSchemeManager::CScheme::CScheme()
 
 CSchemeManager::CScheme::~CScheme()
 {
+#ifdef POSIX
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdelete-non-virtual-dtor"
+#endif
 	// only delete our font pointer if we own it
 	if ( ownFontPointer )
 	{
 		delete font;
 	}
+#ifdef POSIX
+#pragma GCC diagnostic pop
+#endif
 }
 
 //-----------------------------------------------------------------------------

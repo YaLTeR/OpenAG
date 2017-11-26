@@ -152,6 +152,10 @@ CVoiceStatus::~CVoiceStatus()
 {
 	g_pInternalVoiceStatus = NULL;
 	
+#ifdef POSIX
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdelete-non-virtual-dtor"
+#endif
 	for(int i=0; i < MAX_VOICE_SPEAKERS; i++)
 	{
 		delete m_Labels[i].m_pLabel;
@@ -166,6 +170,9 @@ CVoiceStatus::~CVoiceStatus()
 
 	delete m_pLocalLabel;
 	m_pLocalLabel = NULL;
+#ifdef POSIX
+#pragma GCC diagnostic pop
+#endif
 
 	FreeBitmaps();
 
@@ -202,7 +209,7 @@ int CVoiceStatus::Init(
 	g_pInternalVoiceStatus = this;
 
 	m_BlinkTimer = 0;
-	m_VoiceHeadModel = NULL;
+	m_VoiceHeadModel = 0;
 	memset(m_Labels, 0, sizeof(m_Labels));
 	
 	for(int i=0; i < MAX_VOICE_SPEAKERS; i++)
@@ -554,7 +561,7 @@ void CVoiceStatus::UpdateServerState(bool bForce)
 
 		// Ok, the server needs to be updated.
 		char numStr[512];
-		sprintf(numStr, " %x", banMask);
+		sprintf(numStr, " %lx", banMask);
 		strcat(str, numStr);
 	}
 
@@ -648,10 +655,10 @@ void CVoiceStatus::HandleVoiceMaskMsg(int iSize, void *pbuf)
 			char str[256];
 			gEngfuncs.pfnConsolePrint("CVoiceStatus::HandleVoiceMaskMsg\n");
 			
-			sprintf(str, "    - m_AudiblePlayers[%d] = %lu\n", dw, m_AudiblePlayers.GetDWord(dw));
+			sprintf(str, "    - m_AudiblePlayers[%lu] = %u\n", dw, m_AudiblePlayers.GetDWord(dw));
 			gEngfuncs.pfnConsolePrint(str);
 			
-			sprintf(str, "    - m_ServerBannedPlayers[%d] = %lu\n", dw, m_ServerBannedPlayers.GetDWord(dw));
+			sprintf(str, "    - m_ServerBannedPlayers[%lu] = %u\n", dw, m_ServerBannedPlayers.GetDWord(dw));
 			gEngfuncs.pfnConsolePrint(str);
 		}
 	}
@@ -786,6 +793,10 @@ void CVoiceStatus::RepositionLabels()
 
 void CVoiceStatus::FreeBitmaps()
 {
+#ifdef POSIX
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdelete-non-virtual-dtor"
+#endif
 	// Delete all the images we have loaded.
 	delete m_pLocalBitmap;
 	m_pLocalBitmap = NULL;
@@ -813,6 +824,9 @@ void CVoiceStatus::FreeBitmaps()
 
 	delete m_pScoreboardBanned;
 	m_pScoreboardBanned = NULL;
+#ifdef POSIX
+#pragma GCC diagnostic pop
+#endif
 
 	// Clear references to the images in panels.
 	for(int i=0; i < VOICE_MAX_PLAYERS; i++)

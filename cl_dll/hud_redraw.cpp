@@ -265,7 +265,7 @@ void CHud::UpdateDefaultHUDColor()
 	}
 }
 
-int CHud :: DrawHudString(int xpos, int ypos, int iMaxX, char *szIt, int r, int g, int b )
+int CHud :: DrawHudString(int xpos, int ypos, int iMaxX, const char *szIt, int r, int g, int b )
 {
 	return xpos + gEngfuncs.pfnDrawString( xpos, ypos, szIt, r, g, b);
 }
@@ -279,7 +279,7 @@ int CHud :: DrawHudNumberString( int xpos, int ypos, int iMinX, int iNumber, int
 }
 
 // draws a string from right to left (right-aligned)
-int CHud :: DrawHudStringReverse( int xpos, int ypos, int iMinX, char *szString, int r, int g, int b )
+int CHud :: DrawHudStringReverse( int xpos, int ypos, int iMinX, const char *szString, int r, int g, int b )
 {
 	return xpos - gEngfuncs.pfnDrawStringReverse( xpos, ypos, szString, r, g, b);
 }
@@ -418,20 +418,20 @@ int CHud::GetNumWidth( int iNumber, int iFlags )
 
 }	
 
-int CHud::DrawHudStringCentered(int x, int y, char* string, int r, int g, int b)
+int CHud::DrawHudStringCentered(int x, int y, const char* string, int r, int g, int b)
 {
 	auto width = GetHudStringWidth(string);
 	return x + gEngfuncs.pfnDrawString(x - width / 2, y, string, r, g, b);
 }
 
-int CHud::DrawHudStringRightAligned(int x, int y, char* string, int r, int g, int b)
+int CHud::DrawHudStringRightAligned(int x, int y, const char* string, int r, int g, int b)
 {
 	auto width = GetHudStringWidth(string);
 	gEngfuncs.pfnDrawString(x - width, y, string, r, g, b);
 	return x;
 }
 
-int CHud::GetHudStringWidth(char* string)
+int CHud::GetHudStringWidth(const char* string)
 {
 	return gEngfuncs.pfnDrawString(0, 0, string, 0, 0, 0);
 }

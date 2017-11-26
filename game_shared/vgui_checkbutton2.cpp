@@ -19,11 +19,11 @@ using namespace vgui;
 
 
 CCheckButton2::CCheckButton2() :
-	m_Label(""),
-	m_pChecked(NULL),
-	m_pUnchecked(NULL),
 	m_pHandler(NULL),
-	m_CheckboxPanel(NULL)
+	m_Label(""),
+	m_CheckboxPanel(NULL),
+	m_pChecked(NULL),
+	m_pUnchecked(NULL)
 {
 	m_bOwnImages = false;
 	m_bChecked = false;
@@ -74,11 +74,18 @@ void CCheckButton2::SetImages(Image *pChecked, Image *pUnchecked)
 
 void CCheckButton2::DeleteImages()
 {
+#ifdef POSIX
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdelete-non-virtual-dtor"
+#endif
 	if(m_bOwnImages)
 	{
 		delete m_pChecked;
 		delete m_pUnchecked;
 	}
+#ifdef POSIX
+#pragma GCC diagnostic pop
+#endif
 
 	m_pChecked = NULL;
 	m_pUnchecked = NULL;

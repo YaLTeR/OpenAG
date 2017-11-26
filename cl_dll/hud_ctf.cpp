@@ -89,7 +89,7 @@ int CHudCTF::MsgFunc_CTF(const char* name, int size, void* buf)
 	return 1;
 }
 
-static char* sound_names[] = {
+static const char* sound_names[] = {
 	"ctf/youhaveflag.wav",
 	"ctf/teamhaveflag.wav",
 	"ctf/enemyhaveflag.wav",

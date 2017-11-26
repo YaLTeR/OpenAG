@@ -415,7 +415,7 @@ public:
 	int Init( void );
 	static char *LocaliseTextString( const char *msg, char *dst_buffer, int buffer_size );
 	static char *BufferedLocaliseTextString( const char *msg );
-	char *LookupString( const char *msg_name, int *msg_dest = NULL );
+	const char *LookupString( const char *msg_name, int *msg_dest = NULL );
 	int MsgFunc_TextMsg(const char *pszName, int iSize, void *pbuf);
 };
 
@@ -477,8 +477,8 @@ public:
 	
 	//had to make these public so CHud could access them (to enable concussion icon)
 	//could use a friend declaration instead...
-	void EnableIcon( char *pszIconName, unsigned char red, unsigned char green, unsigned char blue );
-	void DisableIcon( char *pszIconName );
+	void EnableIcon( const char *pszIconName, unsigned char red, unsigned char green, unsigned char blue );
+	void DisableIcon( const char *pszIconName );
 
 private:
 
@@ -594,14 +594,14 @@ public:
 	int DrawHudNumber(int x, int y, int iFlags, int iNumber, int r, int g, int b);
 	int DrawHudNumber(int x, int y, int number, int r, int g, int b);
 	int DrawHudNumberCentered(int x, int y, int number, int r, int g, int b);
-	int DrawHudString(int x, int y, int iMaxX, char *szString, int r, int g, int b );
-	int DrawHudStringReverse( int xpos, int ypos, int iMinX, char *szString, int r, int g, int b );
+	int DrawHudString(int x, int y, int iMaxX, const char *szString, int r, int g, int b );
+	int DrawHudStringReverse( int xpos, int ypos, int iMinX, const char *szString, int r, int g, int b );
 	int DrawHudNumberString( int xpos, int ypos, int iMinX, int iNumber, int r, int g, int b );
 	int GetNumWidth(int iNumber, int iFlags);
 
-	int DrawHudStringCentered(int x, int y, char* string, int r, int g, int b);
-	int DrawHudStringRightAligned(int x, int y, char* string, int r, int g, int b);
-	int GetHudStringWidth(char* string);
+	int DrawHudStringCentered(int x, int y, const char* string, int r, int g, int b);
+	int DrawHudStringRightAligned(int x, int y, const char* string, int r, int g, int b);
+	int GetHudStringWidth(const char* string);
 	int DrawHudStringWithColorTags(int x, int y, char* string, int r, int g, int b);
 	int DrawHudStringCenteredWithColorTags(int x, int y, char* string, int r, int g, int b);
 	int GetHudStringWidthWithColorTags(const char* string);
@@ -680,7 +680,7 @@ public:
 	int Redraw( float flTime, int intermission );
 	int UpdateClientData( client_data_t *cdata, float time );
 
-	CHud() : m_iSpriteCount(0), m_pHudList(NULL), m_iDefaultHUDColor(RGB_YELLOWISH) {}
+	CHud() : m_pHudList(NULL), m_iSpriteCount(0), m_iDefaultHUDColor(RGB_YELLOWISH) {}
 	~CHud();			// destructor, frees allocated memory
 
 	// user messages

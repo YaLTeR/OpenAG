@@ -46,8 +46,15 @@ public:
 
 	~CTextImage2()
 	{
+#ifdef POSIX
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdelete-non-virtual-dtor"
+#endif
 		delete _image[0];
 		delete _image[1];
+#ifdef POSIX
+#pragma GCC diagnostic pop
+#endif
 	}
 
 	TextImage *GetImage(int image)
@@ -117,7 +124,14 @@ public:
 
 	~CLabelHeader()
 	{
+#ifdef POSIX
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdelete-non-virtual-dtor"
+#endif
 		delete _dualImage;
+#ifdef POSIX
+#pragma GCC diagnostic pop
+#endif
 	}
 
 	void setRow(int row)

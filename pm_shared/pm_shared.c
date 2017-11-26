@@ -16,6 +16,7 @@
 #include <assert.h>
 #include "mathlib.h"
 #include "const.h"
+#include "com_model.h"
 #include "usercmd.h"
 #include "pm_defs.h"
 #include "pm_shared.h"
@@ -41,36 +42,11 @@
 
 static int pm_shared_initialized = 0;
 
+#ifdef _MSC_VER
 #pragma warning( disable : 4305 )
-
-typedef enum {mod_brush, mod_sprite, mod_alias, mod_studio} modtype_t;
+#endif
 
 playermove_t *pmove = NULL;
-
-typedef struct
-{
-	int			planenum;
-	short		children[2];	// negative numbers are contents
-} dclipnode_t;
-
-typedef struct mplane_s
-{
-	vec3_t	normal;			// surface normal
-	float	dist;			// closest appoach to origin
-	byte	type;			// for texture axis selection and fast side tests
-	byte	signbits;		// signx + signy<<1 + signz<<1
-	byte	pad[2];
-} mplane_t;
-
-typedef struct hull_s
-{
-	dclipnode_t	*clipnodes;
-	mplane_t	*planes;
-	int			firstclipnode;
-	int			lastclipnode;
-	vec3_t		clip_mins;
-	vec3_t		clip_maxs;
-} hull_t;
 
 // Ducking time
 #define TIME_TO_DUCK		0.4
@@ -122,7 +98,9 @@ typedef struct hull_s
 #define PLAYER_DUCKING_MULTIPLIER 0.333
 
 // double to float warning
+#ifdef _MSC_VER
 #pragma warning(disable : 4244)
+#endif
 #define max(a, b)  (((a) > (b)) ? (a) : (b))
 #define min(a, b)  (((a) < (b)) ? (a) : (b))
 // up / down

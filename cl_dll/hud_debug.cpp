@@ -86,7 +86,7 @@ int CHudDebug::Draw(float time)
 	int y = 50;
 
 	gHUD.DrawHudString(0, y, 0, fmt("time: %.8f", time), r, g, b);
-	gHUD.DrawHudStringWithColorTags(0, y += gHUD.m_scrinfo.iCharHeight, "g_iUser2:", r, g, b);
+	gHUD.DrawHudString(0, y += gHUD.m_scrinfo.iCharHeight, 0, "g_iUser2:", r, g, b);
 
 	if (g_iUser2) {
 		const auto ent = gEngfuncs.GetEntityByIndex(g_iUser2);

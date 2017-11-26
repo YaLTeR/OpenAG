@@ -27,7 +27,9 @@
 #include "screenfade.h"
 
 
+#ifdef _MSC_VER
 #pragma warning(disable: 4244)
+#endif
 
 extern "C" int		iJumpSpectator;
 extern "C" float	vJumpOrigin[3];
@@ -232,7 +234,7 @@ void UTIL_StringToVector( float * pVector, const char *pString )
 	}
 }
 
-int UTIL_FindEntityInMap(char * name, float * origin, float * angle)
+int UTIL_FindEntityInMap(const char * name, float * origin, float * angle)
 {
 	int				n,found = 0;
 	char			keyname[256];
