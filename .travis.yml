@@ -9,6 +9,7 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-6
+      - g++-6-multilib
       - ninja-build
 
 env:
