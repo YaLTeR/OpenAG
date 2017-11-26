@@ -10,12 +10,15 @@ addons:
     packages:
       - g++-6
       - g++-6-multilib
+      - linux-libc-dev:i386
       - ninja-build
-      - rapidjson-dev
 
 env:
-  - CONFIGURATION=Debug
-  - CONFIGURATION=Release
+  global:
+    - CLANG_FORMAT_SUFFIX="-dummy"
+  matrix:
+    - CONFIGURATION=Debug
+    - CONFIGURATION=Release
 
 compiler:
   - clang
