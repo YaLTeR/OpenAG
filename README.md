@@ -4,16 +4,20 @@ OpenAG is an open-source client of the Half-Life promod Adrenaline Gamer, comple
 
 # Building
 ## Windows
-1. Get Visual Studio 2017.
-2. Open `projects\vs2010\projects.sln`.
-3. At the top select the **Release** configuration.
-4. Right click on the **hl_cdll** project in the Solution Explorer and click Build.
+1. Get Visual Studio 2017 and CMake.
+2. `git submodule update --init`
+3. `mkdir build`
+4. `cd build`
+5. `cmake ..`
+6. `cmake --build . --config Release`
 
 ## Linux
-1. Get a 32-bit/multilib **clang** build environment set up.
-2. Go into the `linux` folder and type `make`.
-
-If, after making changes to the code and recompiling, the game crashes on launch, try doing `make clean` followed by `make`. This is a frequent issue.
+1. Get a 32-bit/multilib **gcc** or **clang** build environment set up, as well as CMake.
+2. `git submodule update --init`
+3. `mkdir build`
+4. `cd build`
+5. `cmake ..`
+6. `cmake --build . --config Release`
 
 Half Life 1 SDK LICENSE
 ======================
