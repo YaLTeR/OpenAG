@@ -49,7 +49,12 @@ target_include_directories(client PRIVATE
 # Set up some additional compile flags and definitions
 if(MSVC)
 	target_compile_options(client PRIVATE
-		# High warning level and treat warnings as errors
+		# Disable some warnings which would take too much effort to fix
+		/wd4018 # Signed/unsigned mismatch
+		/wd4838 # Conversion from double to float
+		/wd4996 # The POSIX name for this item is deprecated
+
+		# Treat warnings as errors
 		/WX)
 else(MSVC)
 	target_compile_options(client PRIVATE
