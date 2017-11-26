@@ -1,0 +1,29 @@
+language: cpp
+dist: trusty
+sudo: false
+os: linux
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-6
+      - ninja-build
+
+env:
+  - CONFIGURATION=Debug
+  - CONFIGURATION=Release
+
+compiler:
+  - clang
+  - gcc
+
+before_install:
+  - if [ "${CC}" = "gcc" ]; then export CC=gcc-6 CXX=g++-6; fi
+
+script:
+  - mkdir build
+  - cd build
+  - cmake -G Ninja -DCMAKE_BUILD_TYPE="${CONFIGURATION}" ..
+  - ninja
