@@ -11,6 +11,7 @@ addons:
       - g++-6
       - g++-6-multilib
       - ninja-build
+      - rapidjson-dev
 
 env:
   - CONFIGURATION=Debug
