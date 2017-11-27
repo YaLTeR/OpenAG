@@ -30,3 +30,22 @@ macro(msvc_fix_xp_build)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:threadSafeInit-")
 	endif(CMAKE_GENERATOR_TOOLSET MATCHES "_xp")
 endmacro(msvc_fix_xp_build)
+
+macro(msvc_enable_lto)
+	# Add /GL (Whole Program Optimization)
+	set(FLAGS_VARIABLES
+		CMAKE_C_FLAGS_MINSIZEREL
+		CMAKE_C_FLAGS_RELEASE
+		CMAKE_C_FLAGS_RELWITHDEBINFO
+		CMAKE_CXX_FLAGS_MINSIZEREL
+		CMAKE_CXX_FLAGS_RELEASE
+		CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+
+	foreach(FLAGS_VARIABLE ${FLAGS_VARIABLES})
+		set(${FLAGS_VARIABLE} "${${FLAGS_VARIABLE}} /GL")
+	endforeach(FLAGS_VARIABLE)
+
+	# Add /LTCG and /LTCG:incremental (Link Time Code Generation)
+	set(CMAKE_STATIC_LINKER_FLAGS "${CMAKE_STATIC_LINKER_FLAGS} /LTCG")
+	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /LTCG:incremental")
+endmacro(msvc_enable_lto)

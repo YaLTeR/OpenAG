@@ -16,6 +16,7 @@ endif(NOT MSVC)
 if(MSVC)
 	msvc_set_static_runtime()
 	msvc_fix_xp_build()
+	msvc_enable_lto()
 endif(MSVC)
 
 # Add discord-rpc
