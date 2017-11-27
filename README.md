@@ -1,6 +1,7 @@
 ﻿OpenAG
 ======================
 [![Build Status](https://travis-ci.org/YaLTeR/OpenAG.svg?branch=master)](https://travis-ci.org/YaLTeR/OpenAG)
+[![Build status](https://ci.appveyor.com/api/projects/status/o758yugwuavrt9qi?svg=true)](https://ci.appveyor.com/project/YaLTeR/openag)
 
 OpenAG is an open-source client of the Half-Life promod Adrenaline Gamer, completely rewritten from scratch on latest Half-Life SDK. It adds new features, bugfixes and other tweaks over the original mod, while maintaining the ability to play on all currently existing servers.
 
