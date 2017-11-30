@@ -22,10 +22,10 @@ compiler:
   - gcc
 
 before_install:
-  - if [ "${CC}" = "gcc" ]; then export CC=gcc-6 CXX=g++-6; fi
+  - if [ "${CC}" = "gcc" ]; then export CC=gcc-6 CXX=g++-6 CMAKE_AR=gcc-6-ar; else export CMAKE_AR=ar; fi
 
 script:
   - mkdir build
   - cd build
-  - cmake -G Ninja -DCMAKE_BUILD_TYPE="${CONFIGURATION}" ..
+  - cmake -G Ninja -DCMAKE_BUILD_TYPE="${CONFIGURATION}" -DCMAKE_AR="${CMAKE_AR}" ..
   - ninja
