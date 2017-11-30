@@ -57,20 +57,158 @@ namespace discord_integration
 			"ztricks"s
 		};
 
+		// Text names of game states
+		const std::string STATE_NAMES[] = {
+			"Not Playing"s,
+			"Playing"s,
+			"In a Match"s,
+			"Spectating"s
+		};
+
 		// For tracking if we're in-game.
 		bool updated_client_data = false;
 
-		// The current state.
-		state current_state;
+		// Class that handles tracking state changes.
+		class DiscordState {
+		public:
+			DiscordState()
+				: cur_state(game_state::NOT_PLAYING)
+				, gamemode()
+				, player_count(0)
+				, player_limit(0)
+				, dirty(true)
+			{
+				update_presence();
+			};
 
-		// The current gamemode.
-		std::string current_gamemode;
+			inline void set_game_state(game_state new_game_state)
+			{
+				if (cur_state != new_game_state)
+				{
+					cur_state = new_game_state;
 
-		// Current player count.
-		int current_player_count;
+					if (new_game_state == game_state::NOT_PLAYING)
+					{
+						gamemode.clear();
+					}
+					else
+					{
+                        refresh_player_stats();
+					}
 
-		// Current max player count.
-		int current_max_player_count;
+					dirty = true;
+				}
+			}
+
+			inline game_state get_game_state() const
+			{
+				return cur_state;
+			}
+
+			inline void set_gamemode(std::string new_gamemode)
+			{
+				if (gamemode != new_gamemode)
+				{
+					gamemode = std::move(new_gamemode);
+					dirty = true;
+				}
+			}
+
+			inline void set_player_count(int new_player_count)
+			{
+				if (player_count != new_player_count)
+				{
+					player_count = new_player_count;
+					dirty = true;
+				}
+			}
+
+			inline void set_player_limit(int new_player_limit)
+			{
+				if (player_limit != new_player_limit)
+				{
+					player_limit = new_player_limit;
+					dirty = true;
+				}
+			}
+
+			inline void refresh_player_stats()
+			{
+				set_player_count(get_player_count());
+				set_player_limit(gEngfuncs.GetMaxClients());
+			}
+
+            inline void update_presence_if_dirty()
+            {
+	            if (dirty)
+		            update_presence();
+            }
+
+		protected:
+			void update_presence()
+			{
+				dirty = false;
+
+				DiscordRichPresence presence{};
+
+				std::string state = STATE_NAMES[static_cast<size_t>(cur_state)];
+
+				// Default icon.
+				presence.largeImageKey = "default";
+
+				// Declare these outside of the following block, so they are in scope for Discord_UpdatePresence().
+				char map_name[64];
+				std::string spectate_secret;
+				std::string party_id;
+
+				if (cur_state != game_state::NOT_PLAYING)
+				{
+					// Get the gamemode.
+					if (!gamemode.empty())
+						state += " | "s + gamemode;
+
+					// Get the server name.
+					if (gViewPort->m_szServerName[0])
+						presence.details = gViewPort->m_szServerName;
+
+					// Get the map name and icon.
+					const auto length = get_map_name(map_name, ARRAYSIZE(map_name));
+					if (map_name[0])
+					{
+						if (maps_with_thumbnails.find(map_name) != maps_with_thumbnails.cend())
+							presence.largeImageKey = map_name;
+
+						presence.largeImageText = map_name;
+					}
+
+					// Get the server address.
+					net_status_t netstatus{};
+					gEngfuncs.pNetAPI->Status(&netstatus);
+					auto address = gEngfuncs.pNetAPI->AdrToString(&netstatus.remote_address);
+					presence.joinSecret = address;
+
+					spectate_secret = address + " "s; // HACK: secrets can't be the same.
+					presence.spectateSecret = spectate_secret.c_str();
+
+					party_id = address + "_"s; // HACK: secrets can't match party id.
+					presence.partyId = party_id.c_str();
+					presence.partySize = player_count;
+					presence.partyMax = player_limit;
+				}
+
+				presence.state = state.c_str();
+
+				Discord_UpdatePresence(&presence);
+			}
+
+			game_state cur_state;
+			std::string gamemode;
+			int player_count;
+			int player_limit;
+
+			// Flag indicating there are some changes not sent to Discord yet.
+            bool dirty;
+		} discord_state;
 
 		// Time of the last update.
 		float last_update_time;
@@ -115,77 +253,6 @@ namespace discord_integration
 		{
 			Discord_Respond(request->userId, DISCORD_REPLY_YES);
 		}
-
-		void update()
-		{
-			DiscordRichPresence presence{};
-
-			std::string state;
-
-			switch (current_state)
-			{
-			case state::NOT_PLAYING:
-				state = "Not Playing"s;
-				break;
-
-			case state::PLAYING:
-				state = "Playing"s;
-				break;
-
-			case state::IN_A_MATCH:
-				state = "In a Match"s;
-				break;
-
-			case state::SPECTATING:
-				state = "Spectating"s;
-				break;
-			}
-
-			presence.largeImageKey = "default";
-
-			// Declare them outside of the following block, so they are in scope for Discord_UpdatePresence().
-			char map_name[64];
-			net_status_t netstatus{};
-			std::string spectate_secret;
-			std::string party_id;
-
-			if (current_state != state::NOT_PLAYING)
-			{
-				if (!current_gamemode.empty())
-					state += " | "s + current_gamemode;
-
-				if (gViewPort->m_szServerName[0])
-					presence.details = gViewPort->m_szServerName;
-
-				const auto length = get_map_name(map_name, ARRAYSIZE(map_name));
-
-				if (map_name[0])
-				{
-					if (maps_with_thumbnails.find(map_name) != maps_with_thumbnails.cend())
-						presence.largeImageKey = map_name;
-					else
-						presence.largeImageKey = "default";
-
-					presence.largeImageText = map_name;
-				}
-
-				gEngfuncs.pNetAPI->Status(&netstatus);
-				auto address = gEngfuncs.pNetAPI->AdrToString(&netstatus.remote_address);
-				presence.joinSecret = address;
-
-				spectate_secret = address + " "s;
-				presence.spectateSecret = spectate_secret.c_str();
-
-				party_id = address + "_"s; // HACK: secrets can't match party id.
-				presence.partyId = party_id.c_str();
-				presence.partySize = current_player_count;
-				presence.partyMax = current_max_player_count;
-			}
-
-			presence.state = state.c_str();
-
-			Discord_UpdatePresence(&presence);
-		}
 	}
 
 	void initialize()
@@ -199,8 +266,7 @@ namespace discord_integration
 		handlers.joinRequest = handle_joinRequest;
 		Discord_Initialize(CLIENT_ID, &handlers, 1, STEAM_APP_ID);
 
-		current_state = state::NOT_PLAYING;
-		update();
+		discord_state = DiscordState();
 
 		Discord_RunCallbacks();
 
@@ -212,33 +278,14 @@ namespace discord_integration
 		Discord_Shutdown();
 	}
 
-	void set_state(state new_state)
+	void set_state(game_state new_state)
 	{
-		if (current_state != new_state)
-		{
-			current_state = new_state;
-
-			if (new_state == state::NOT_PLAYING)
-			{
-				current_gamemode.clear();
-			}
-			else
-			{
-				current_player_count = get_player_count();
-				current_max_player_count = gEngfuncs.GetMaxClients();
-			}
-
-			update();
-		}
+		discord_state.set_game_state(new_state);
 	}
 
-	void set_gamemode(const char* new_gamemode)
+	void set_gamemode(std::string new_gamemode)
 	{
-		if (current_gamemode != new_gamemode)
-		{
-			current_gamemode = new_gamemode;
-			update();
-		}
+		discord_state.set_gamemode(std::move(new_gamemode));
 	}
 
 	void on_update_client_data()
@@ -248,18 +295,22 @@ namespace discord_integration
 
 	void on_frame()
 	{
+		// Check if we're still in-game.
 		if (!updated_client_data)
-			set_state(state::NOT_PLAYING);
-		else if (current_state == state::NOT_PLAYING)
-			set_state(state::PLAYING);
+			discord_state.set_game_state(game_state::NOT_PLAYING);
+		else if (discord_state.get_game_state() == game_state::NOT_PLAYING)
+			// Only set this if we weren't playing, otherwise we might overwrite some other state.
+			set_state(game_state::PLAYING);
 
 		updated_client_data = false;
 
+		// Check player counts for updates every now and then.
 		const auto current_time = gEngfuncs.GetClientTime();
 		if (last_update_time < current_time || last_update_time - current_time > 5)
 		{
 			last_update_time = current_time;
 			on_player_count_update();
+			discord_state.update_presence_if_dirty();
 		}
 
 		Discord_RunCallbacks();
@@ -267,15 +318,6 @@ namespace discord_integration
 
 	void on_player_count_update()
 	{
-		if (current_state != state::NOT_PLAYING) {
-			auto player_count = get_player_count();
-			auto max_player_count = gEngfuncs.GetMaxClients();
-
-			if (current_player_count != player_count || current_max_player_count != max_player_count) {
-				current_player_count = player_count;
-				current_max_player_count = max_player_count;
-				update();
-			}
-		}
+		discord_state.refresh_player_stats();
 	}
 }

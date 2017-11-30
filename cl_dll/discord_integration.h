@@ -5,9 +5,9 @@ namespace discord_integration
 	/**
 	 * Possible game states.
 	 */
-	enum class state
+	enum class game_state
 	{
-		NOT_PLAYING,
+		NOT_PLAYING = 0,
 		PLAYING,
 		IN_A_MATCH,
 		SPECTATING,
@@ -26,12 +26,12 @@ namespace discord_integration
 	/**
 	 * Sets the Discord state.
 	 */
-	void set_state(state new_state);
+	void set_state(game_state new_state);
 
 	/**
 	 * Sets the current gamemode.
 	 */
-	void set_gamemode(const char* new_gamemode);
+	void set_gamemode(std::string new_gamemode);
 
 	/**
 	 * Call this in HUD_UpdateClientData.
