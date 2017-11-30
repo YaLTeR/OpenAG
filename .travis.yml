@@ -22,7 +22,7 @@ compiler:
   - gcc
 
 before_install:
-  - if [ "${CC}" = "gcc" ]; then export CC=gcc-6 CXX=g++-6 CMAKE_AR=gcc-6-ar; else export CMAKE_AR=ar; fi
+  - if [ "${CC}" = "gcc" ]; then export CC=gcc-6 CXX=g++-6 CMAKE_AR=gcc-ar-6; else export CMAKE_AR=ar; fi
 
 script:
   - mkdir build
