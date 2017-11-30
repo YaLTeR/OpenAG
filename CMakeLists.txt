@@ -6,17 +6,16 @@ include("CMake/helpers.cmake")
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# We're building a 32-bit library
-if(NOT MSVC)
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
-endif(NOT MSVC)
-
-# Setup some MSVC-related things
+# Setup some compiler-related things
 if(MSVC)
 	msvc_set_static_runtime()
 	msvc_fix_xp_build()
 	msvc_enable_lto()
+else(MSVC)
+	# Ensure 32-bit and enable LTO
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32 -flto")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32 -flto")
+	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -flto")
 endif(MSVC)
 
 # Add discord-rpc

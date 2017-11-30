@@ -27,6 +27,7 @@
 #include "net_api.h"
 
 #include "entity_types.h"
+#include "com_model.h"
 
 #ifndef M_PI
 #define M_PI		3.14159265358979323846	// matches value in gcc v2 math.h
@@ -598,23 +599,6 @@ void Bench_SpotPosition( vec3_t dot, vec3_t target )
 
 	gHUD.m_Benchmark.SetScore( delta.Length() );
 }
-
-typedef struct model_s
-{
-	char		name[64];
-	qboolean	needload;		// bmodels and sprites don't cache normally
-
-	int			type;
-	int			numframes;
-	int			synctype;
-	
-	int			flags;
-
-//
-// volume occupied by the model
-//		
-	vec3_t		mins, maxs;
-} model_t;
 
 static vec3_t g_dotorg;
 vec3_t g_aimorg;
