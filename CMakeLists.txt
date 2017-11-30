@@ -12,10 +12,17 @@ if(MSVC)
 	msvc_fix_xp_build()
 	msvc_enable_lto()
 else(MSVC)
-	# Ensure 32-bit and enable LTO
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32 -flto")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32 -flto")
-	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -flto")
+	# Ensure 32-bit
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
+
+	# LTO doesn't always work out of the box, so hide it behind an option
+	option(ENABLE_LTO "Enable Link-Time Optimizations" OFF)
+	if(ENABLE_LTO)
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -flto")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -flto")
+		set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -flto")
+	endif(ENABLE_LTO)
 endif(MSVC)
 
 # Add discord-rpc
