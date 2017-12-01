@@ -208,7 +208,10 @@ namespace discord_integration
 
 			// Flag indicating there are some changes not sent to Discord yet.
             bool dirty;
-		} discord_state;
+		};
+
+		// Pointer so the constructor doesn't run too early.
+		std::unique_ptr<DiscordState> discord_state;
 
 		// Time of the last update.
 		float last_update_time;
@@ -266,7 +269,7 @@ namespace discord_integration
 		handlers.joinRequest = handle_joinRequest;
 		Discord_Initialize(CLIENT_ID, &handlers, 1, STEAM_APP_ID);
 
-		discord_state = DiscordState();
+		discord_state = std::make_unique<DiscordState>();
 
 		Discord_RunCallbacks();
 
@@ -275,17 +278,18 @@ namespace discord_integration
 
 	void shutdown()
 	{
+        discord_state.reset();
 		Discord_Shutdown();
 	}
 
 	void set_state(game_state new_state)
 	{
-		discord_state.set_game_state(new_state);
+		discord_state->set_game_state(new_state);
 	}
 
 	void set_gamemode(std::string new_gamemode)
 	{
-		discord_state.set_gamemode(std::move(new_gamemode));
+		discord_state->set_gamemode(std::move(new_gamemode));
 	}
 
 	void on_update_client_data()
@@ -297,8 +301,8 @@ namespace discord_integration
 	{
 		// Check if we're still in-game.
 		if (!updated_client_data)
-			discord_state.set_game_state(game_state::NOT_PLAYING);
-		else if (discord_state.get_game_state() == game_state::NOT_PLAYING)
+			discord_state->set_game_state(game_state::NOT_PLAYING);
+		else if (discord_state->get_game_state() == game_state::NOT_PLAYING)
 			// Only set this if we weren't playing, otherwise we might overwrite some other state.
 			set_state(game_state::PLAYING);
 
@@ -310,7 +314,7 @@ namespace discord_integration
 		{
 			last_update_time = current_time;
 			on_player_count_update();
-			discord_state.update_presence_if_dirty();
+			discord_state->update_presence_if_dirty();
 		}
 
 		Discord_RunCallbacks();
@@ -318,6 +322,6 @@ namespace discord_integration
 
 	void on_player_count_update()
 	{
-		discord_state.refresh_player_stats();
+		discord_state->refresh_player_stats();
 	}
 }
