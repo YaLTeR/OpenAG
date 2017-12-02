@@ -16,6 +16,7 @@ int CHudCrosshairs::Init()
 	cl_cross_outline =       CVAR_CREATE("cl_cross_outline", "0", FCVAR_ARCHIVE);
 	cl_cross_circle_radius = CVAR_CREATE("cl_cross_circle_radius", "0", FCVAR_ARCHIVE);
 	cl_cross_dot_size =      CVAR_CREATE("cl_cross_dot_size", "0", FCVAR_ARCHIVE);
+	cl_cross_dot_color =     CVAR_CREATE("cl_cross_dot_color", "", FCVAR_ARCHIVE);
 	cl_cross_top_line =      CVAR_CREATE("cl_cross_top_line", "1", FCVAR_ARCHIVE);
 	cl_cross_bottom_line =   CVAR_CREATE("cl_cross_bottom_line", "1", FCVAR_ARCHIVE);
 	cl_cross_left_line =     CVAR_CREATE("cl_cross_left_line", "1", FCVAR_ARCHIVE);
@@ -144,6 +145,10 @@ int CHudCrosshairs::Draw(float time)
 
 	// Draw the dot.
 	if (cl_cross_dot_size->value > 0.0f) {
+		unsigned char r, g, b;
+		if (sscanf(cl_cross_dot_color->string, "%hhu %hhu %hhu", &r, &g, &b) == 3)
+			gl.color(r, g, b, alpha);
+
 		auto size = cl_cross_dot_size->value;
 		auto offset = Vector2D(size / 2.0f, size / 2.0f);
 
