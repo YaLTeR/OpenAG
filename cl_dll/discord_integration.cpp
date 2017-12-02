@@ -10,7 +10,6 @@
 #include "hud.h"
 #include "cl_util.h"
 #include "vgui_TeamFortressViewport.h"
-#include "net_api.h"
 #include "discord_integration.h"
 
 using namespace std::literals;
@@ -194,6 +193,7 @@ namespace discord_integration
 
 				// Declare these outside of the following block, so they are in scope for Discord_UpdatePresence().
 				char map_name[64];
+				std::string address;
 				std::string spectate_secret;
 				std::string party_id;
 
@@ -208,7 +208,7 @@ namespace discord_integration
 						presence.details = gViewPort->m_szServerName;
 
 					// Get the map name and icon.
-					const auto length = get_map_name(map_name, ARRAYSIZE(map_name));
+					get_map_name(map_name, ARRAYSIZE(map_name));
 					if (map_name[0])
 					{
 						if (maps_with_thumbnails.find(map_name) != maps_with_thumbnails.cend())
@@ -218,18 +218,13 @@ namespace discord_integration
 					}
 
 					// Get the server address.
-					net_status_t netstatus{};
-					gEngfuncs.pNetAPI->Status(&netstatus);
-					auto address = gEngfuncs.pNetAPI->AdrToString(&netstatus.remote_address);
-					presence.joinSecret = address;
+					address = get_server_address();
+					presence.joinSecret = address.c_str();
 
-					spectate_secret = address + " "s; // HACK: secrets can't be the same.
+					spectate_secret = address + " "s + map_name;
 					presence.spectateSecret = spectate_secret.c_str();
 
-					party_id = address + "_"s;
-					if (map_name[0])
-						party_id += map_name;
-
+					party_id = address + "_"s + map_name;
 					presence.partyId = party_id.c_str();
 					presence.partySize = player_count;
 					presence.partyMax = player_limit;
@@ -264,6 +259,9 @@ namespace discord_integration
 		// Time of the last update.
 		double last_update_time;
 
+		// Spectate secret to filter when to send "spectate" on connection.
+		std::string spectate_secret;
+
 		void handle_ready()
 		{
 			gEngfuncs.Con_Printf("Connected to Discord.\n");
@@ -294,10 +292,16 @@ namespace discord_integration
 			EngineClientCmd(temp.get());
 		}
 
-		void handle_spectateGame(const char* spectate_secret)
+		void handle_spectateGame(const char* discord_spectate_secret)
 		{
-			// TODO
-			handle_joinGame(spectate_secret);
+			spectate_secret = discord_spectate_secret;
+
+			const auto last_space = spectate_secret.rfind(' ');
+			if (last_space != spectate_secret.npos)
+			{
+				const auto join_secret = spectate_secret.substr(0, last_space);
+				handle_joinGame(join_secret.c_str());
+			}
 		}
 
 		void handle_joinRequest(const DiscordJoinRequest* request)
@@ -362,10 +366,26 @@ namespace discord_integration
 	{
 		// Check if we're still in-game.
 		if (!updated_client_data)
+		{
 			discord_state->set_game_state(game_state::NOT_PLAYING);
+		}
 		else if (discord_state->get_game_state() == game_state::NOT_PLAYING)
+		{
 			// Only set this if we weren't playing, otherwise we might overwrite some other state.
 			discord_state->set_game_state(game_state::PLAYING);
+
+			// Send "spectate" if we joined the correct server.
+			if (!spectate_secret.empty())
+			{
+				char map_name[64];
+				get_map_name(map_name, ARRAYSIZE(map_name));
+				const auto secret = get_server_address() + " "s + map_name;
+				if (spectate_secret == secret)
+					gEngfuncs.pfnClientCmd("spectate");
+
+				spectate_secret.clear();
+			}
+		}
 
 		updated_client_data = false;
 

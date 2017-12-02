@@ -17,6 +17,7 @@
 //
 
 #include "cvardef.h"
+#include "net_api.h"
 
 #ifndef TRUE
 #define TRUE 1
@@ -181,6 +182,13 @@ static size_t get_map_name(char* dest, size_t count)
 	dest[bytes_to_copy] = '\0';
 
 	return bytes_to_copy;
+}
+
+static std::string get_server_address()
+{
+	net_status_t netstatus{};
+	gEngfuncs.pNetAPI->Status(&netstatus);
+	return gEngfuncs.pNetAPI->AdrToString(&netstatus.remote_address);
 }
 
 static void sanitize_address(std::string& address)
