@@ -259,9 +259,6 @@ namespace discord_integration
 		// Time of the last update.
 		double last_update_time;
 
-		// Spectate secret to filter when to send "spectate" on connection.
-		std::string spectate_secret;
-
 		void handle_ready()
 		{
 			gEngfuncs.Con_Printf("Connected to Discord.\n");
@@ -292,18 +289,6 @@ namespace discord_integration
 			EngineClientCmd(temp.get());
 		}
 
-		void handle_spectateGame(const char* discord_spectate_secret)
-		{
-			spectate_secret = discord_spectate_secret;
-
-			const auto last_space = spectate_secret.rfind(' ');
-			if (last_space != spectate_secret.npos)
-			{
-				const auto join_secret = spectate_secret.substr(0, last_space);
-				handle_joinGame(join_secret.c_str());
-			}
-		}
-
 		void handle_joinRequest(const DiscordJoinRequest* request)
 		{
 			Discord_Respond(request->userId, DISCORD_REPLY_YES);
@@ -317,7 +302,6 @@ namespace discord_integration
 		handlers.errored = handle_errored;
 		handlers.disconnected = handle_disconnected;
 		handlers.joinGame = handle_joinGame;
-		handlers.spectateGame = handle_spectateGame;
 		handlers.joinRequest = handle_joinRequest;
 		Discord_Initialize(CLIENT_ID, &handlers, 1, STEAM_APP_ID);
 
@@ -366,26 +350,10 @@ namespace discord_integration
 	{
 		// Check if we're still in-game.
 		if (!updated_client_data)
-		{
 			discord_state->set_game_state(game_state::NOT_PLAYING);
-		}
 		else if (discord_state->get_game_state() == game_state::NOT_PLAYING)
-		{
 			// Only set this if we weren't playing, otherwise we might overwrite some other state.
 			discord_state->set_game_state(game_state::PLAYING);
-
-			// Send "spectate" if we joined the correct server.
-			if (!spectate_secret.empty())
-			{
-				char map_name[64];
-				get_map_name(map_name, ARRAYSIZE(map_name));
-				const auto secret = get_server_address() + " "s + map_name;
-				if (spectate_secret == secret)
-					gEngfuncs.pfnClientCmd("spectate");
-
-				spectate_secret.clear();
-			}
-		}
 
 		updated_client_data = false;
 
