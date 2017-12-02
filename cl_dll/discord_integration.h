@@ -27,6 +27,11 @@ namespace discord_integration
 	 */
 	void set_match_is_on(bool match_is_on);
 
+	/*
+	 * Sets the match time data.
+	 */
+	void set_time_data(int seconds_total, int seconds_passed);
+
 	/**
 	 * Call this in HUD_UpdateClientData.
 	 */

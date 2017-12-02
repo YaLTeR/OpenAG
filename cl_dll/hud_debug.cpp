@@ -71,7 +71,7 @@ int CHudDebug::Init()
 }
 
 int CHudDebug::VidInit()
-{	
+{
 	return 1;
 }
 
@@ -86,21 +86,8 @@ int CHudDebug::Draw(float time)
 	int y = 50;
 
 	gHUD.DrawHudString(0, y, 0, fmt("time: %.8f", time), r, g, b);
-	gHUD.DrawHudString(0, y += gHUD.m_scrinfo.iCharHeight, 0, "g_iUser2:", r, g, b);
-
-	if (g_iUser2) {
-		const auto ent = gEngfuncs.GetEntityByIndex(g_iUser2);
-		if (ent) {
-			gHUD.DrawHudString(0, y += gHUD.m_scrinfo.iCharHeight, 0, fmt("origin: %.8f %.8f %.8f\n", ent->origin[0], ent->origin[1], ent->origin[2]), r, g, b);
-			gHUD.DrawHudString(0, y += gHUD.m_scrinfo.iCharHeight, 0, fmt("ph origin: %.8f %.8f %.8f\n", ent->ph[ent->current_position].origin[0], ent->ph[ent->current_position].origin[1], ent->ph[ent->current_position].origin[2]), r, g, b);
-			gHUD.DrawHudString(0, y += gHUD.m_scrinfo.iCharHeight, 0, fmt("ph animtime: %.8f\n", ent->ph[ent->current_position].animtime), r, g, b);
-
-			auto dif = ent->curstate.msg_time - ent->prevstate.msg_time;
-			gHUD.DrawHudString(0, y += gHUD.m_scrinfo.iCharHeight, 0, fmt("time dif: %.8f\n", dif), r, g, b);
-
-			DumpEntityData(ent, time);
-		}
-	}
+	gHUD.DrawHudString(0, y += gHUD.m_scrinfo.iCharHeight, 0, fmt("GetClientTime: %.8f", gEngfuncs.GetClientTime()), r, g, b);
+	gHUD.DrawHudString(0, y += gHUD.m_scrinfo.iCharHeight, 0, fmt("GetClientOldTime: %.8f", gEngfuncs.hudGetClientOldTime()), r, g, b);
 
 	for (const auto& str : split(additional_data, '\n'))
 		gHUD.DrawHudString(0, y += gHUD.m_scrinfo.iCharHeight, 0, const_cast<char*>(str.c_str()), r, g, b);

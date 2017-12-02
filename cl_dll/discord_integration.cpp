@@ -1,3 +1,4 @@
+#include <chrono>
 #include <cstdint>
 #include <cstring>
 #include <memory>
@@ -83,6 +84,8 @@ namespace discord_integration
 				, gamemode()
 				, player_count(0)
 				, player_limit(0)
+				, seconds_total(0)
+				, start_timestamp(0)
 				, match_is_on(false)
 				, dirty(true)
 			{
@@ -99,6 +102,7 @@ namespace discord_integration
 					{
 						gamemode.clear();
 						match_is_on = false;
+						seconds_total = 0;
 					}
 					else
 					{
@@ -146,6 +150,18 @@ namespace discord_integration
 				if (match_is_on != new_match_is_on)
 				{
 					match_is_on = new_match_is_on;
+					dirty = true;
+				}
+			}
+
+			inline void set_time_data(int new_seconds_total, int seconds_passed)
+			{
+				if (seconds_total != new_seconds_total)
+				{
+					seconds_total = new_seconds_total;
+					const auto current_timestamp = std::chrono::duration_cast<std::chrono::seconds>(
+						std::chrono::system_clock::now().time_since_epoch()).count();
+					start_timestamp = current_timestamp - seconds_passed;
 					dirty = true;
 				}
 			}
@@ -210,10 +226,19 @@ namespace discord_integration
 					spectate_secret = address + " "s; // HACK: secrets can't be the same.
 					presence.spectateSecret = spectate_secret.c_str();
 
-					party_id = address + "_"s; // HACK: secrets can't match party id.
+					party_id = address + "_"s;
+					if (map_name[0])
+						party_id += map_name;
+
 					presence.partyId = party_id.c_str();
 					presence.partySize = player_count;
 					presence.partyMax = player_limit;
+
+					if (seconds_total != 0)
+					{
+						presence.startTimestamp = start_timestamp;
+						presence.endTimestamp = start_timestamp + seconds_total;
+					}
 				}
 
 				presence.state = state.c_str();
@@ -225,6 +250,8 @@ namespace discord_integration
 			std::string gamemode;
 			int player_count;
 			int player_limit;
+			int seconds_total;
+			int64_t start_timestamp;
 			bool match_is_on;
 
 			// Flag indicating there are some changes not sent to Discord yet.
@@ -319,6 +346,11 @@ namespace discord_integration
 	void set_match_is_on(bool match_is_on)
 	{
 		discord_state->set_match_is_on(match_is_on);
+	}
+
+	void set_time_data(int seconds_total, int seconds_passed)
+	{
+		discord_state->set_time_data(seconds_total, seconds_passed);
 	}
 
 	void on_update_client_data()
