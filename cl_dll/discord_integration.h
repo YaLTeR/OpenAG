@@ -3,17 +3,6 @@
 namespace discord_integration
 {
 	/**
-	 * Possible game states.
-	 */
-	enum class game_state
-	{
-		NOT_PLAYING = 0,
-		PLAYING,
-		IN_A_MATCH,
-		SPECTATING,
-	};
-
-	/**
 	 * Initializes the Discord integration. Call this once on game start.
 	 */
 	void initialize();
@@ -26,12 +15,17 @@ namespace discord_integration
 	/**
 	 * Sets the Discord state.
 	 */
-	void set_state(game_state new_state);
+	void set_spectating(bool spectating);
 
 	/**
 	 * Sets the current gamemode.
 	 */
-	void set_gamemode(std::string new_gamemode);
+	void set_gamemode(std::string gamemode);
+
+	/**
+	 * Sets if a match is currently on.
+	 */
+	void set_match_is_on(bool match_is_on);
 
 	/**
 	 * Call this in HUD_UpdateClientData.

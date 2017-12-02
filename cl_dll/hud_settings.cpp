@@ -92,6 +92,8 @@ int CHudSettings::Draw(float time)
 		);
 	}
 
+	discord_integration::set_match_is_on(match_is_on);
+
 	return 0;
 }
 

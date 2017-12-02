@@ -61,12 +61,19 @@ namespace discord_integration
 		const std::string STATE_NAMES[] = {
 			"Not Playing"s,
 			"Playing"s,
-			"In a Match"s,
 			"Spectating"s
 		};
 
 		// For tracking if we're in-game.
 		bool updated_client_data = false;
+
+		// Possible game states.
+		enum class game_state
+		{
+			NOT_PLAYING = 0,
+			PLAYING,
+			SPECTATING,
+		};
 
 		// Class that handles tracking state changes.
 		class DiscordState {
@@ -76,6 +83,7 @@ namespace discord_integration
 				, gamemode()
 				, player_count(0)
 				, player_limit(0)
+				, match_is_on(false)
 				, dirty(true)
 			{
 				update_presence();
@@ -90,10 +98,11 @@ namespace discord_integration
 					if (new_game_state == game_state::NOT_PLAYING)
 					{
 						gamemode.clear();
+						match_is_on = false;
 					}
 					else
 					{
-                        refresh_player_stats();
+						refresh_player_stats();
 					}
 
 					dirty = true;
@@ -132,17 +141,26 @@ namespace discord_integration
 				}
 			}
 
+			inline void set_match_is_on(bool new_match_is_on)
+			{
+				if (match_is_on != new_match_is_on)
+				{
+					match_is_on = new_match_is_on;
+					dirty = true;
+				}
+			}
+
 			inline void refresh_player_stats()
 			{
 				set_player_count(get_player_count());
 				set_player_limit(gEngfuncs.GetMaxClients());
 			}
 
-            inline void update_presence_if_dirty()
-            {
-	            if (dirty)
-		            update_presence();
-            }
+			inline void update_presence_if_dirty()
+			{
+				if (dirty)
+					update_presence();
+			}
 
 		protected:
 			void update_presence()
@@ -152,6 +170,8 @@ namespace discord_integration
 				DiscordRichPresence presence{};
 
 				std::string state = STATE_NAMES[static_cast<size_t>(cur_state)];
+				if (cur_state == game_state::PLAYING && match_is_on)
+					state = "In a Match"s;
 
 				// Default icon.
 				presence.largeImageKey = "default";
@@ -205,9 +225,10 @@ namespace discord_integration
 			std::string gamemode;
 			int player_count;
 			int player_limit;
+			bool match_is_on;
 
 			// Flag indicating there are some changes not sent to Discord yet.
-            bool dirty;
+			bool dirty;
 		};
 
 		// Pointer so the constructor doesn't run too early.
@@ -278,18 +299,26 @@ namespace discord_integration
 
 	void shutdown()
 	{
-        discord_state.reset();
+		discord_state.reset();
 		Discord_Shutdown();
 	}
 
-	void set_state(game_state new_state)
+	void set_spectating(bool spectating)
 	{
-		discord_state->set_game_state(new_state);
+		if (spectating)
+			discord_state->set_game_state(game_state::SPECTATING);
+		else
+			discord_state->set_game_state(game_state::PLAYING);
 	}
 
-	void set_gamemode(std::string new_gamemode)
+	void set_gamemode(std::string gamemode)
 	{
-		discord_state->set_gamemode(std::move(new_gamemode));
+		discord_state->set_gamemode(std::move(gamemode));
+	}
+
+	void set_match_is_on(bool match_is_on)
+	{
+		discord_state->set_match_is_on(match_is_on);
 	}
 
 	void on_update_client_data()
@@ -304,7 +333,7 @@ namespace discord_integration
 			discord_state->set_game_state(game_state::NOT_PLAYING);
 		else if (discord_state->get_game_state() == game_state::NOT_PLAYING)
 			// Only set this if we weren't playing, otherwise we might overwrite some other state.
-			set_state(game_state::PLAYING);
+			discord_state->set_game_state(game_state::PLAYING);
 
 		updated_client_data = false;
 
