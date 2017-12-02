@@ -262,7 +262,7 @@ namespace discord_integration
 		std::unique_ptr<DiscordState> discord_state;
 
 		// Time of the last update.
-		float last_update_time;
+		double last_update_time;
 
 		void handle_ready()
 		{
@@ -321,7 +321,7 @@ namespace discord_integration
 
 		Discord_RunCallbacks();
 
-		last_update_time = gEngfuncs.GetClientTime();
+		last_update_time = gEngfuncs.GetAbsoluteTime();
 	}
 
 	void shutdown()
@@ -370,7 +370,7 @@ namespace discord_integration
 		updated_client_data = false;
 
 		// Check player counts for updates every now and then.
-		const auto current_time = gEngfuncs.GetClientTime();
+		const auto current_time = gEngfuncs.GetAbsoluteTime();
 		if (last_update_time < current_time || last_update_time - current_time > 5)
 		{
 			last_update_time = current_time;
