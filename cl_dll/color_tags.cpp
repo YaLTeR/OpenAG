@@ -59,7 +59,7 @@ namespace color_tags {
 	                                                int g,
 	                                                int b)> function) {
 		bool custom_color = false;
-		int r, g, b;
+		int r = 0, g = 0, b = 0;
 		char *temp = string;
 
 		while ((temp = strchr(temp, '^'))) {
