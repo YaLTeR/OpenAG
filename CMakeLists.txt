@@ -6,7 +6,7 @@ include("CMake/helpers.cmake")
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Setup some compiler-related things
+# Set up some compiler-related things
 if(MSVC)
 	msvc_set_static_runtime()
 	msvc_fix_xp_build()
@@ -25,6 +25,20 @@ else(MSVC)
 	endif(ENABLE_LTO)
 endif(MSVC)
 
+# Set up current_version.h
+find_package(Git)
+if(GIT_FOUND)
+	message(STATUS "Found git at ${GIT_EXECUTABLE}")
+	execute_process(COMMAND "${GIT_EXECUTABLE}" show -s --format=%ct
+			OUTPUT_VARIABLE CURRENT_VERSION
+			OUTPUT_STRIP_TRAILING_WHITESPACE)
+	set(CURRENT_VERSION "${CURRENT_VERSION}ull")
+else(GIT_FOUND)
+	set(CURRENT_VERSION UINT64_MAX)
+endif(GIT_FOUND)
+
+configure_file(cl_dll/current_version.h.in current_version.h)
+
 # Add discord-rpc
 set(BUILD_EXAMPLES OFF)
 set(CLANG_FORMAT_SUFFIX "-dummy")
@@ -39,11 +53,13 @@ add_subdirectory(pm_shared)
 add_subdirectory(public)
 
 get_property(SOURCE_FILES GLOBAL PROPERTY SOURCE_FILES)
+set(SOURCE_FILES ${SOURCE_FILES} "${CMAKE_BINARY_DIR}/current_version.h")
 
-set(CMAKE_SHARED_LIBRARY_PREFIX "")
+set(CMAKE_SHARED_LIBRARY_PREFIX  "")
 
 add_library(client SHARED ${SOURCE_FILES})
 target_include_directories(client PRIVATE
+	${CMAKE_BINARY_DIR}
 	common
 	dlls
 	engine

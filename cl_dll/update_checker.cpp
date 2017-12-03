@@ -23,8 +23,7 @@ namespace update_checker
 
 	// Replace this with the latest commit timestamp.
 	// git show -s --format=%ct
-	 #define CURRENT_VERSION 1505075639ull
-	//#define CURRENT_VERSION UINT64_MAX
+	#include "current_version.h"
 
 	namespace
 	{
