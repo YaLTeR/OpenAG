@@ -463,7 +463,7 @@ void CVoiceStatus::UpdateSpeakerStatus( int entindex, qboolean bTalking )
 						gEngfuncs.pfnGetPlayerInfo( entindex, &info );
 
 						char name[512];
-						strip_color_tags(name, info.name, ARRAYSIZE(name));
+						color_tags::strip_color_tags(name, info.name, ARRAYSIZE(name));
 
 						int color[3];
 						m_pHelper->GetPlayerTextColor( entindex, color );

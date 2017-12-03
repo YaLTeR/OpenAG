@@ -820,7 +820,7 @@ void ScorePanel::FillGrid()
 						if (!name || name[0] == '\0')
 							name = pl_info->name;
 
-						sprintf(sz, "%s", strip_color_tags_thread_unsafe(name));
+						sprintf(sz, "%s", color_tags::strip_color_tags_thread_unsafe(name));
 					}
 
 					break;

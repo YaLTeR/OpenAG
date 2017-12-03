@@ -1511,7 +1511,7 @@ void TeamFortressViewport::UpdatePlayerMenu(int menuIndex)
 		//if ( g_PlayerExtraInfo[i].teamname[0] == 0 )
 		//	continue; // skip over players who are not in a team
 
-		SpectButton *pButton = new SpectButton(1 , strip_color_tags_thread_unsafe(g_PlayerInfoList[pEnt->index].name),
+		SpectButton *pButton = new SpectButton(1 , color_tags::strip_color_tags_thread_unsafe(g_PlayerInfoList[pEnt->index].name),
 							 XRES(MAIN_LABEL_X), PANEL_HEIGHT+(i-1)*CMENU_SIZE_X, XRES(MAIN_LABEL_WIDTH), BUTTON_SIZE_Y /2 );
 
 		pButton->setBoundKey( (char)255  );
@@ -1587,7 +1587,7 @@ void TeamFortressViewport::UpdateSpectatorPanel()
 		// create player & health string
 		if ( player && name )
 		{
-			strip_color_tags(bottomText, name, ARRAYSIZE(bottomText));
+			color_tags::strip_color_tags(bottomText, name, ARRAYSIZE(bottomText));
 			//bottomText[ sizeof(bottomText) - 1 ] = 0; // Not needed because strip_color_tags does it.
 			pBottomText = bottomText;
 		}

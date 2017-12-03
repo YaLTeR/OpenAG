@@ -248,7 +248,7 @@ typedef void						(*pfnEngSrc_pfnPlaySoundByIndex_t )	( int iSound, float volume
 typedef void						(*pfnEngSrc_pfnAngleVectors_t )		( const float * vecAngles, float * forward, float * right, float * up );
 typedef struct client_textmessage_s*(*pfnEngSrc_pfnTextMessageGet_t )		( const char *pName );
 typedef int							(*pfnEngSrc_pfnDrawCharacter_t )		( int x, int y, int number, int r, int g, int b );
-typedef int							(*pfnEngSrc_pfnDrawConsoleString_t )	( int x, int y, char *string );
+typedef int							(*pfnEngSrc_pfnDrawConsoleString_t )	( int x, int y, const char *string );
 typedef void						(*pfnEngSrc_pfnDrawSetTextColor_t )	( float r, float g, float b );
 typedef void						(*pfnEngSrc_pfnDrawConsoleStringLen_t )(  const char *string, int *length, int *height );
 typedef void						(*pfnEngSrc_pfnConsolePrint_t )		( const char *string );

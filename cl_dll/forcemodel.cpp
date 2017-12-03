@@ -137,7 +137,7 @@ namespace force_model
 			}
 
 			auto name = gEngfuncs.Cmd_Argv(1);
-			bool name_contains_color_tags = contains_color_tags(name);
+			bool name_contains_color_tags = color_tags::contains_color_tags(name);
 
 			int matched_player_index = -1; // -1 means didn't match anyone.
 
@@ -178,7 +178,7 @@ namespace force_model
 				if (name_contains_color_tags)
 					name_to_match_against = g_PlayerInfoList[i + 1].name;
 				else
-					name_to_match_against = strip_color_tags_thread_unsafe(g_PlayerInfoList[i + 1].name);
+					name_to_match_against = color_tags::strip_color_tags_thread_unsafe(g_PlayerInfoList[i + 1].name);
 
 				if (strstr(name_to_match_against, name) != nullptr) {
 					// Got a match by the name. Add it to the match list.
@@ -196,7 +196,7 @@ namespace force_model
 						if (name_contains_color_tags)
 							name_to_print = g_PlayerInfoList[index + 1].name;
 						else
-							name_to_print = strip_color_tags_thread_unsafe(g_PlayerInfoList[index + 1].name);
+							name_to_print = color_tags::strip_color_tags_thread_unsafe(g_PlayerInfoList[index + 1].name);
 
 						gEngfuncs.Con_Printf(
 							"- %s (#%d; %s)\n",
@@ -284,7 +284,7 @@ namespace force_model
 			}
 
 			auto name = gEngfuncs.Cmd_Argv(1);
-			bool name_contains_color_tags = contains_color_tags(name);
+			bool name_contains_color_tags = color_tags::contains_color_tags(name);
 
 			auto matched_element = steam_id_model_overrides.cend();
 
@@ -325,7 +325,7 @@ namespace force_model
 							if (name_contains_color_tags)
 								name_to_match_against = g_PlayerInfoList[j + 1].name;
 							else
-								name_to_match_against = strip_color_tags_thread_unsafe(g_PlayerInfoList[j + 1].name);
+								name_to_match_against = color_tags::strip_color_tags_thread_unsafe(g_PlayerInfoList[j + 1].name);
 
 							if (strstr(name_to_match_against, name) != nullptr) {
 								// Got a match by the name. Add it to the match list.
@@ -353,7 +353,7 @@ namespace force_model
 						if (name_contains_color_tags)
 							name_to_print = g_PlayerInfoList[index + 1].name;
 						else
-							name_to_print = strip_color_tags_thread_unsafe(g_PlayerInfoList[index + 1].name);
+							name_to_print = color_tags::strip_color_tags_thread_unsafe(g_PlayerInfoList[index + 1].name);
 
 						gEngfuncs.Con_Printf(
 							"- %s (#%d; %s)\n",

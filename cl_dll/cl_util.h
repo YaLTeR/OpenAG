@@ -18,6 +18,7 @@
 
 #include "cvardef.h"
 #include "net_api.h"
+#include "color_tags.h"
 
 #ifndef TRUE
 #define TRUE 1
@@ -106,52 +107,6 @@ char (&ArraySizeHelper(T (&)[N]))[N];
 #define max(a, b)  (((a) > (b)) ? (a) : (b))
 #define min(a, b)  (((a) < (b)) ? (a) : (b))
 //#define fabs(x)	   ((x) > 0 ? (x) : 0 - (x))
-
-/*
- * Copies at most count characters (including the terminating null character)
- * from src to dest, omitting the color tags. The resulting array is always
- * null-terminated.
- */
-static void strip_color_tags(char* dest, const char* src, size_t count)
-{
-	if (count == 0)
-		return;
-
-	for (; *src != '\0' && count > 1; ++src) {
-		if (src[0] == '^' && src[1] >= '0' && src[1] <= '9') {
-			++src;
-			continue;
-		} else {
-			*dest++ = *src;
-			--count;
-		}
-	}
-
-	*dest = '\0';
-}
-
-static char* strip_color_tags_thread_unsafe(const char* string)
-{
-	static char buf[2048];
-
-	strip_color_tags(buf, string, ARRAYSIZE(buf));
-
-	return buf;
-}
-
-/*
- * Returns true if the given string contains any color tags.
- * A color tag is something that's stripped by strip_color_tags.
- */
-static bool contains_color_tags(const char* string)
-{
-	for (; *string != '\0'; ++string) {
-		if (string[0] == '^' && string[1] >= '0' && string[1] <= '9')
-			return true;
-	}
-
-	return false;
-}
 
 static size_t count_digits(int n)
 {
@@ -247,12 +202,12 @@ inline int ConsoleStringLen( char *string )
 
 inline void ConsolePrint( const char *string )
 {
-	gEngfuncs.pfnConsolePrint( strip_color_tags_thread_unsafe(string) );
+	gEngfuncs.pfnConsolePrint( color_tags::strip_color_tags_thread_unsafe(string) );
 }
 
 inline void CenterPrint( const char *string )
 {
-	gEngfuncs.pfnCenterPrint( strip_color_tags_thread_unsafe(string) );
+	gEngfuncs.pfnCenterPrint( color_tags::strip_color_tags_thread_unsafe(string) );
 }
 
 
