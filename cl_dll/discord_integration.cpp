@@ -193,7 +193,6 @@ namespace discord_integration
 
 				// Declare these outside of the following block, so they are in scope for Discord_UpdatePresence().
 				char map_name[64];
-				std::string spectate_secret;
 				std::string party_id;
 
 				if (cur_state != game_state::NOT_PLAYING)
@@ -219,9 +218,6 @@ namespace discord_integration
 					// Get the server address.
 					const auto address = get_server_address();
 					presence.joinSecret = address;
-
-					spectate_secret = address + " "s + map_name;
-					presence.spectateSecret = spectate_secret.c_str();
 
 					party_id = address + "_"s + map_name;
 					presence.partyId = party_id.c_str();
