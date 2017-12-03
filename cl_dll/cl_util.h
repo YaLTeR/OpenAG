@@ -184,7 +184,7 @@ static size_t get_map_name(char* dest, size_t count)
 	return bytes_to_copy;
 }
 
-static std::string get_server_address()
+static char* get_server_address()
 {
 	net_status_t netstatus{};
 	gEngfuncs.pNetAPI->Status(&netstatus);
