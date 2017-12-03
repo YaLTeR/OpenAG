@@ -52,7 +52,12 @@ namespace color_tags {
 		return false;
 	}
 
-	void for_each_colored_substr(char* string, std::function<void(const char*, bool, int, int, int)> function) {
+	void for_each_colored_substr(char* string,
+	                             std::function<void(const char* string,
+	                                                bool custom_color,
+	                                                int r,
+	                                                int g,
+	                                                int b)> function) {
 		bool custom_color = false;
 		int r, g, b;
 		char *temp = string;

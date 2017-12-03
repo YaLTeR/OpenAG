@@ -26,5 +26,10 @@ namespace color_tags {
 	 * The arguments are substring, whether there's a color set, and the color in R, G, B.
 	 * If the color is unset, values of R, G, B are undefined.
 	 */
-	void for_each_colored_substr(char* string, std::function<void(const char*, bool, int, int, int)> function);
+	void for_each_colored_substr(char* string,
+	                             std::function<void(const char* string,
+	                                                bool custom_color,
+	                                                int r,
+	                                                int g,
+	                                                int b)> function);
 }
