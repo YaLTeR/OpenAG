@@ -95,6 +95,10 @@ int CHudSettings::Draw(float time)
 	return 0;
 }
 
+const char* CHudSettings::GetGamemode() const {
+	return gamemode;
+}
+
 int CHudSettings::MsgFunc_Settings(const char* name, int size, void* buf)
 {
 	BEGIN_READ(buf, size);
