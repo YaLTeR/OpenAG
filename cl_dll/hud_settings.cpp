@@ -92,8 +92,6 @@ int CHudSettings::Draw(float time)
 		);
 	}
 
-	discord_integration::set_match_is_on(match_is_on);
-
 	return 0;
 }
 
@@ -131,6 +129,7 @@ int CHudSettings::MsgFunc_Settings(const char* name, int size, void* buf)
 	// gEngfuncs.Con_Printf("Settings:\n\ts1 = `%s`\n\ttime_limit = %hhd\n\tfrag_limit=%hhd\n\tfrag_limit_present = %s\n\tweapon_stay = %s\n\ts2 = `%s`\n\ts3 = `%s`\n\ts4 = `%s`\n\ts5 = `%s`\n", s1, time_limit, frag_limit, frag_limit_present ? "true" : "false", weapon_stay ? "true" : "false", s2, s3, s4, s5);
 
 	discord_integration::set_gamemode(gamemode);
+	discord_integration::set_match_is_on(match_is_on);
 
 	return 1;
 }
