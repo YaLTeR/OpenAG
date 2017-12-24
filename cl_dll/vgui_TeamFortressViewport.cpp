@@ -60,6 +60,7 @@
 
 #include "discord_integration.h"
 #include "forcemodel.h"
+#include "gameui.h"
 
 void IN_SetVisibleMouse(bool visible);
 class CCommandMenu;
@@ -2059,7 +2060,7 @@ void TeamFortressViewport::UpdateOnPlayerInfo()
 void TeamFortressViewport::UpdateCursorState()
 {
 	// Need cursor if any VGUI window is up
-	if ( m_pSpectatorPanel->m_menuVisible || m_pCurrentMenu || m_pTeamMenu->isVisible() || m_pServerBrowser->isVisible() || GetClientVoiceMgr()->IsInSquelchMode() )
+	if ( m_pSpectatorPanel->m_menuVisible || m_pCurrentMenu || m_pTeamMenu->isVisible() || m_pServerBrowser->isVisible() || GetClientVoiceMgr()->IsInSquelchMode() || (g_pGameUI && g_pGameUI->IsGameUIVisible()) )
 	{
 		IN_SetVisibleMouse(true);
 		App::getInstance()->setCursorOveride( App::getInstance()->getScheme()->getCursor(Scheme::scu_arrow) );

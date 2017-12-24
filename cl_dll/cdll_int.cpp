@@ -55,11 +55,17 @@ TeamFortressViewport *gViewPort = NULL;
 CSysModule *g_hParticleManModule = NULL;
 IParticleMan *g_pParticleMan = NULL;
 
+#include "gameui.h"
+CSysModule *g_hGameUIModule = nullptr;
+IGameUI *g_pGameUI = nullptr;
+
 #include "discord_integration.h"
 #include "update_checker.h"
 
 void CL_LoadParticleMan( void );
 void CL_UnloadParticleMan( void );
+void CL_LoadGameUI();
+void CL_UnloadGameUI();
 
 void InitInput (void);
 void EV_HookEvents( void );
@@ -161,6 +167,7 @@ int CL_DLLEXPORT Initialize( cl_enginefunc_t *pEnginefuncs, int iVersion )
 
 	EV_HookEvents();
 	CL_LoadParticleMan();
+	CL_LoadGameUI();
 
 	// get tracker interface, if any
 	return 1;
@@ -352,6 +359,39 @@ void CL_LoadParticleMan( void )
 		 // Add custom particle classes here BEFORE calling anything else or you will die.
 		 g_pParticleMan->AddCustomParticleClassSize ( sizeof ( CBaseParticle ) );
 	}
+}
+
+void CL_UnloadGameUI(void)
+{
+	Sys_UnloadModule(g_hGameUIModule);
+
+	g_pGameUI = nullptr;
+	g_hGameUIModule = nullptr;
+}
+
+void CL_LoadGameUI(void)
+{
+	char dir[512];
+
+	if (gEngfuncs.COM_ExpandFilename(GAMEUI_DLLNAME, dir, ARRAYSIZE(dir)) == FALSE)
+	{
+		g_pGameUI = nullptr;
+		g_hGameUIModule = nullptr;
+		return;
+	}
+
+	g_hGameUIModule = Sys_LoadModule(dir);
+	CreateInterfaceFn gameUIFactory = Sys_GetFactory(g_hGameUIModule);
+
+	if (gameUIFactory == nullptr)
+	{
+		g_pGameUI = nullptr;
+		g_hGameUIModule = nullptr;
+		return;
+	}
+
+	g_pGameUI = static_cast<IGameUI*>(gameUIFactory(GAMEUI_INTERFACE, nullptr));
+	// printf("g_pGameUI: %p\n", g_pGameUI);
 }
 
 cldll_func_dst_t *g_pcldstAddrs;
