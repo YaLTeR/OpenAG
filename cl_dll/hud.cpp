@@ -465,6 +465,8 @@ void CHud :: Init( void )
 	// Implemented server-side, needs to be registered client-side.
 	CVAR_CREATE( "cl_autowepswitch", "1", FCVAR_ARCHIVE | FCVAR_USERINFO | FCVAR_CLIENTDLL );
 
+	// This has to be called cl_righthand (there's some stuff compiled into the engine),
+	// and also from my tests it has to be 0 for normal and 1 for left-handed.
 	cl_righthand = CVAR_CREATE( "cl_righthand", "0", FCVAR_ARCHIVE );
 
 	m_iLogo = 0;
