@@ -151,6 +151,7 @@ private:
 	int	m_HUD_bucket0;
 	int m_HUD_selection;
 
+	cvar_t* hud_weapon;
 };
 
 //

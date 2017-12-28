@@ -290,6 +290,8 @@ int CHudAmmo::Init(void)
 	CVAR_CREATE( "hud_drawhistory_time", HISTORY_DRAW_TIME, 0 );
 	CVAR_CREATE( "hud_fastswitch", "0", FCVAR_ARCHIVE );		// controls whether or not weapons can be selected in one keypress
 
+	hud_weapon = CVAR_CREATE("hud_weapon", 0, FCVAR_ARCHIVE);
+
 	m_iFlags |= HUD_ACTIVE; //!!!
 
 	gWR.Init();
@@ -873,6 +875,26 @@ int CHudAmmo::Draw(float flTime)
 
 	// Does this weapon have a clip?
 	y = ScreenHeight - gHUD.m_iFontHeight - gHUD.m_iFontHeight/2;
+
+	if (hud_weapon->value != 0.0f)
+	{
+		int r, g, b;
+
+		if (gWR.HasAmmo(m_pWeapon))
+		{
+			UnpackRGB(r, g, b, gHUD.m_iDefaultHUDColor);
+			ScaleColors(r, g, b, 192);
+		}
+		else
+		{
+			UnpackRGB(r, g, b, RGB_REDISH);
+			ScaleColors(r, g, b, 128);
+		}
+
+		SPR_Set(m_pWeapon->hInactive, r, g, b);
+		int offset = (m_pWeapon->rcInactive.bottom - m_pWeapon->rcInactive.top) / 8;
+		SPR_DrawAdditive(0, ScreenWidth / 1.73, y - offset, &m_pWeapon->rcInactive);
+	}
 
 	// Does weapon have any ammo at all?
 	if (m_pWeapon->iAmmoType > 0)
