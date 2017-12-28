@@ -182,6 +182,21 @@ int __MsgFunc_CRC32(const char* name, int size, void* buf)
 	return 1;
 }
 
+int __MsgFunc_PlaySound(const char* name, int size, void* buf)
+{
+	BEGIN_READ(buf, size);
+	const auto player = READ_BYTE();
+
+	vec3_t origin;
+	for (size_t i = 0; i < 3; ++i)
+		origin[i] = READ_COORD();
+
+	const auto sound = READ_STRING();
+	gEngfuncs.pfnPlaySoundByName(sound, 1);
+
+	return 1;
+}
+
 // TFFree Command Menu
 void __CmdFunc_OpenCommandMenu(void)
 {
@@ -441,6 +456,7 @@ void CHud :: Init( void )
 	HOOK_MESSAGE( WhString );
 	HOOK_MESSAGE( SpikeCheck );
 	HOOK_MESSAGE( CRC32 );
+	HOOK_MESSAGE( PlaySound );
 
 	CVAR_CREATE( "hud_classautokill", "1", FCVAR_ARCHIVE | FCVAR_USERINFO );		// controls whether or not to suicide immediately on TF class switch
 	CVAR_CREATE( "hud_takesshots", "0", FCVAR_ARCHIVE );		// controls whether or not to automatically take screenshots at the end of a round
