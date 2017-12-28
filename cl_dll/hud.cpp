@@ -134,6 +134,54 @@ int __MsgFunc_Gametype(const char *pszName, int iSize, void *pbuf)
 	return gHUD.MsgFunc_Gametype( pszName, iSize, pbuf );
 }
 
+int __MsgFunc_AllowSpec(const char *pszName, int iSize, void *pbuf)
+{
+	if (gViewPort)
+		return gViewPort->MsgFunc_AllowSpec( pszName, iSize, pbuf );
+	return 0;
+}
+
+int __MsgFunc_CheatCheck(const char* name, int size, void* buf)
+{
+	BEGIN_READ(buf, size);
+	const auto pure = READ_BYTE();
+
+	// Stub: no cheat checks in OpenAG.
+
+	return 1;
+}
+
+int __MsgFunc_WhString(const char* name, int size, void* buf)
+{
+	BEGIN_READ(buf, size);
+	const auto string = READ_STRING();
+
+	// Stub: no cheat checks in OpenAG.
+
+	return 1;
+}
+
+int __MsgFunc_SpikeCheck(const char* name, int size, void* buf)
+{
+	BEGIN_READ(buf, size);
+	const auto model = READ_STRING();
+
+	// Stub: no cheat checks in OpenAG.
+
+	return 1;
+}
+
+int __MsgFunc_CRC32(const char* name, int size, void* buf)
+{
+	BEGIN_READ(buf, size);
+	const auto checksum = READ_LONG();
+	const auto filename = READ_STRING();
+
+	// Stub: no cheat checks in OpenAG.
+
+	return 1;
+}
+
 // TFFree Command Menu
 void __CmdFunc_OpenCommandMenu(void)
 {
@@ -341,13 +389,6 @@ int __MsgFunc_ResetFade(const char *pszName, int iSize, void *pbuf)
 	return 0;
 }
 
-int __MsgFunc_AllowSpec(const char *pszName, int iSize, void *pbuf)
-{
-	if (gViewPort)
-		return gViewPort->MsgFunc_AllowSpec( pszName, iSize, pbuf );
-	return 0;
-}
-
 // This is called every time the DLL is loaded
 void CHud :: Init( void )
 {
@@ -395,6 +436,11 @@ void CHud :: Init( void )
 
 	// VGUI Menus
 	HOOK_MESSAGE( VGUIMenu );
+
+	HOOK_MESSAGE( CheatCheck );
+	HOOK_MESSAGE( WhString );
+	HOOK_MESSAGE( SpikeCheck );
+	HOOK_MESSAGE( CRC32 );
 
 	CVAR_CREATE( "hud_classautokill", "1", FCVAR_ARCHIVE | FCVAR_USERINFO );		// controls whether or not to suicide immediately on TF class switch
 	CVAR_CREATE( "hud_takesshots", "0", FCVAR_ARCHIVE );		// controls whether or not to automatically take screenshots at the end of a round
