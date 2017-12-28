@@ -479,9 +479,8 @@ namespace force_model
 		else
 			team_model_overrides_cache[player_index] = nullptr;
 
-		// GetLocalPlayer() returns an undefined pointer the first time, fortunately
-		// m_Teamplay hasn't been set by then yet.
-		if (!gHUD.m_Teamplay)
+		// GetLocalPlayer() returns an undefined pointer if we aren't in-game.
+		if (!gHUD.m_Teamplay || !gEngfuncs.pfnGetLevelName()[0])
 		{
 			teammate_enemy_model_overrides_cache[player_index] = enemy_model_override;
 			return;
