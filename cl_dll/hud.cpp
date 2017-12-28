@@ -513,6 +513,7 @@ void CHud :: Init( void )
 	m_Debug.Init();
 	m_Location.Init();
 	m_NextMap.Init();
+	m_PlayerId.Init();
 	m_Scores.Init();
 	m_Settings.Init();
 	m_Speedometer.Init();
@@ -676,6 +677,7 @@ void CHud :: VidInit( void )
 	m_Debug.VidInit();
 	m_Location.VidInit();
 	m_NextMap.VidInit();
+	m_PlayerId.VidInit();
 	m_Scores.VidInit();
 	m_Settings.VidInit();
 	m_Speedometer.VidInit();
