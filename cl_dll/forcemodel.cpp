@@ -49,6 +49,21 @@ namespace force_model
 		// Cache for fast lookup.
 		model_t* steam_id_model_overrides_cache[MAX_PLAYERS];
 
+		// Overrides for the teammates and enemies.
+		model_t* teammate_model_override;
+		model_t* enemy_model_override;
+
+		// Cache for fast lookup.
+		model_t* teammate_enemy_model_overrides_cache[MAX_PLAYERS];
+
+		model_t* load_model(const char* name)
+		{
+			char model_path[4096];
+			std::snprintf(model_path, ARRAYSIZE(model_path), "models/player/%s/%s.mdl", name, name);
+
+			return IEngineStudio.Mod_ForName(model_path, 0);
+		}
+
 		void callback_cl_forceteammodel()
 		{
 			if (gEngfuncs.Cmd_Argc() != 3) {
@@ -57,11 +72,7 @@ namespace force_model
 			}
 
 			auto model_name = gEngfuncs.Cmd_Argv(2);
-
-			char model_path[4096];
-			std::snprintf(model_path, ARRAYSIZE(model_path), "models/player/%s/%s.mdl", model_name, model_name);
-
-			auto model = IEngineStudio.Mod_ForName(model_path, 0);
+			auto model = load_model(model_name);
 			if (!model) {
 				gEngfuncs.Con_Printf("This model could not be loaded.\n");
 				return;
@@ -126,11 +137,7 @@ namespace force_model
 			}
 
 			auto model_name = gEngfuncs.Cmd_Argv(2);
-
-			char model_path[4096];
-			std::snprintf(model_path, ARRAYSIZE(model_path), "models/player/%s/%s.mdl", model_name, model_name);
-
-			auto model = IEngineStudio.Mod_ForName(model_path, 0);
+			auto model = load_model(model_name);
 			if (!model) {
 				gEngfuncs.Con_Printf("This model could not be loaded.\n");
 				return;
@@ -380,6 +387,66 @@ namespace force_model
 				gEngfuncs.Con_Printf("There is no such override.\n");
 			}
 		}
+
+		void callback_cl_forceteammatemodel()
+		{
+			if (gEngfuncs.Cmd_Argc() != 2) {
+				gEngfuncs.Con_Printf("cl_forceteammatemodel <model name>\n");
+
+				if (teammate_model_override)
+					gEngfuncs.Con_Printf("Current override: %s\n", teammate_model_override->name);
+
+				return;
+			}
+
+			auto model_name = gEngfuncs.Cmd_Argv(1);
+			if (model_name[0])
+			{
+				auto model = load_model(model_name);
+				if (!model) {
+					gEngfuncs.Con_Printf("This model could not be loaded.\n");
+					return;
+				}
+
+				teammate_model_override = model;
+			}
+			else
+			{
+				teammate_model_override = nullptr;
+			}
+
+			update_player_teams();
+		}
+
+		void callback_cl_forceenemymodel()
+		{
+			if (gEngfuncs.Cmd_Argc() != 2) {
+				gEngfuncs.Con_Printf("cl_forceenemymodel <model name>\n");
+
+				if (enemy_model_override)
+					gEngfuncs.Con_Printf("Current override: %s\n", enemy_model_override->name);
+
+				return;
+			}
+
+			auto model_name = gEngfuncs.Cmd_Argv(1);
+			if (model_name[0])
+			{
+				auto model = load_model(model_name);
+				if (!model) {
+					gEngfuncs.Con_Printf("This model could not be loaded.\n");
+					return;
+				}
+
+				enemy_model_override = model;
+			}
+			else
+			{
+				enemy_model_override = nullptr;
+			}
+
+			update_player_teams();
+		}
 	}
 
 	void hook_commands()
@@ -391,6 +458,9 @@ namespace force_model
 		gEngfuncs.pfnAddCommand("cl_forcemodel", callback_cl_forcemodel);
 		gEngfuncs.pfnAddCommand("cl_forcemodel_list", callback_cl_forcemodel_list);
 		gEngfuncs.pfnAddCommand("cl_forcemodel_remove", callback_cl_forcemodel_remove);
+
+		gEngfuncs.pfnAddCommand("cl_forceteammatemodel", callback_cl_forceteammatemodel);
+		gEngfuncs.pfnAddCommand("cl_forceenemymodel", callback_cl_forceenemymodel);
 	}
 
 	void update_player_team(int player_index)
@@ -408,6 +478,20 @@ namespace force_model
 			team_model_overrides_cache[player_index] = it->model;
 		else
 			team_model_overrides_cache[player_index] = nullptr;
+
+		// GetLocalPlayer() returns an undefined pointer the first time, fortunately
+		// m_Teamplay hasn't been set by then yet.
+		if (!gHUD.m_Teamplay)
+		{
+			teammate_enemy_model_overrides_cache[player_index] = enemy_model_override;
+			return;
+		}
+
+		const auto local_player_index = gEngfuncs.GetLocalPlayer()->index;
+		if (!strcmp(g_PlayerExtraInfo[local_player_index].teamname, g_PlayerExtraInfo[player_index + 1].teamname))
+			teammate_enemy_model_overrides_cache[player_index] = teammate_model_override;
+		else
+			teammate_enemy_model_overrides_cache[player_index] = enemy_model_override;
 	}
 
 	void update_player_teams()
@@ -443,6 +527,10 @@ namespace force_model
 		if (model)
 			return model;
 
-		return team_model_overrides_cache[player_index];
+		model = team_model_overrides_cache[player_index];
+		if (model)
+			return model;
+
+		return teammate_enemy_model_overrides_cache[player_index];
 	}
 }

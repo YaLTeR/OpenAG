@@ -2512,7 +2512,11 @@ int TeamFortressViewport::MsgFunc_TeamInfo( const char *pszName, int iSize, void
 		// set the players team
 		strncpy( g_PlayerExtraInfo[cl].teamname, READ_STRING(), MAX_TEAM_NAME );
 
-		force_model::update_player_team(cl - 1);
+		// If we changed the team, update everyone to update the teammate/enemy status.
+		if (cl == gEngfuncs.GetLocalPlayer()->index)
+			force_model::update_player_teams();
+		else
+			force_model::update_player_team(cl - 1);
 	}
 
 	// rebuild the list of teams
