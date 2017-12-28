@@ -49,6 +49,8 @@ add_sources(
 	hud_location.cpp
 	hud_location.h
 	hud_msg.cpp
+	hud_nextmap.cpp
+	hud_nextmap.h
 	hud_redraw.cpp
 	hud_scores.cpp
 	hud_scores.h
