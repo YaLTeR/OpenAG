@@ -87,6 +87,7 @@ extern client_sprite_t *GetSpriteList(client_sprite_t *pList, const char *psz, i
 
 extern cvar_t *sensitivity;
 cvar_t *cl_lw = NULL;
+cvar_t *cl_righthand = nullptr;
 
 void ShutdownInput (void);
 
@@ -463,6 +464,8 @@ void CHud :: Init( void )
 
 	// Implemented server-side, needs to be registered client-side.
 	CVAR_CREATE( "cl_autowepswitch", "1", FCVAR_ARCHIVE | FCVAR_USERINFO | FCVAR_CLIENTDLL );
+
+	cl_righthand = CVAR_CREATE( "cl_righthand", "0", FCVAR_ARCHIVE );
 
 	m_iLogo = 0;
 	m_iFOV = 0;

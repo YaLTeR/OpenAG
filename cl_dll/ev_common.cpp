@@ -174,7 +174,8 @@ void EV_GetDefaultShellInfo( event_args_t *args, float *origin, float *velocity,
 		}
 	}
 
-	fR = gEngfuncs.pfnRandomFloat( 50, 70 );
+	extern cvar_t* cl_righthand;
+	fR = (cl_righthand->value != 0 ? -1 : 1) * gEngfuncs.pfnRandomFloat( 50, 70 );
 	fU = gEngfuncs.pfnRandomFloat( 100, 150 );
 
 	for ( i = 0; i < 3; i++ )
