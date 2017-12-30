@@ -19,22 +19,12 @@ namespace force_model
 	{
 		struct model_override
 		{
-			char* who;
+			std::string who;
 			model_t* model;
 
-			model_override(const char* who_, model_t* model)
-				: model(model)
-			{
-				auto len = strlen(who_);
-
-				who = new char[len + 1];
-				std::memcpy(who, who_, len + 1);
-			}
-
-			~model_override()
-			{
-				delete[] who;
-			}
+			model_override(const char* who, model_t* model)
+				: who(who), model(model)
+			{}
 		};
 
 		// Overrides by the team name.
@@ -84,7 +74,7 @@ namespace force_model
 				team_model_overrides.begin(),
 				team_model_overrides.end(),
 				[=](const model_override& entry) {
-					return !strcmp(entry.who, team_name);
+					return !strcmp(entry.who.c_str(), team_name);
 				});
 
 			if (it != team_model_overrides.end())
@@ -104,7 +94,7 @@ namespace force_model
 
 			for (unsigned i = 0; i < team_model_overrides.size(); ++i) {
 				const auto& entry = team_model_overrides[i];
-				gEngfuncs.Con_Printf("%u. %s -> %s\n", i + 1, entry.who, entry.model->name);
+				gEngfuncs.Con_Printf("%u. %s -> %s\n", i + 1, entry.who.c_str(), entry.model->name);
 			}
 		}
 
@@ -119,7 +109,7 @@ namespace force_model
 				team_model_overrides.begin(),
 				team_model_overrides.end(),
 				[=](const model_override& entry) {
-					return !strcmp(entry.who, gEngfuncs.Cmd_Argv(1));
+					return !strcmp(entry.who.c_str(), gEngfuncs.Cmd_Argv(1));
 				});
 
 			if (it != team_model_overrides.end()) {
@@ -227,7 +217,7 @@ namespace force_model
 					steam_id_model_overrides.begin(),
 					steam_id_model_overrides.end(),
 					[=](const model_override& entry) {
-						return !strcmp(entry.who, matched_steam_id);
+						return !strcmp(entry.who.c_str(), matched_steam_id);
 					});
 
 				if (it != steam_id_model_overrides.end())
@@ -255,7 +245,7 @@ namespace force_model
 				const char* name;
 				int uid = -1;
 				for (size_t j = 0; j < MAX_PLAYERS; ++j) {
-					if (!strcmp(steam_id::get_steam_id(j).c_str(), entry.who)) {
+					if (!strcmp(steam_id::get_steam_id(j).c_str(), entry.who.c_str())) {
 						// Make sure the information is up to date.
 						gEngfuncs.pfnGetPlayerInfo(j + 1, &g_PlayerInfoList[j + 1]);
 
@@ -269,12 +259,12 @@ namespace force_model
 				}
 
 				if (uid == -1) {
-					gEngfuncs.Con_Printf("%u. %s -> %s\n", i + 1, entry.who, entry.model->name);
+					gEngfuncs.Con_Printf("%u. %s -> %s\n", i + 1, entry.who.c_str(), entry.model->name);
 				} else {
 					gEngfuncs.Con_Printf(
 						"%u. %s (#%d; `%s`) -> %s\n",
 						i + 1,
-						entry.who,
+						entry.who.c_str(),
 						uid,
 						name,
 						entry.model->name
@@ -306,13 +296,13 @@ namespace force_model
 
 			for (auto it = steam_id_model_overrides.cbegin(); it != steam_id_model_overrides.cend(); ++it) {
 				// Try to match by Steam ID.
-				if (!strcmp(it->who, name)) {
+				if (!strcmp(it->who.c_str(), name)) {
 					matched_element = it;
 					break;
 				}
 
 				for (size_t j = 0; j < MAX_PLAYERS; ++j) {
-					if (!strcmp(steam_id::get_steam_id(j).c_str(), it->who)) {
+					if (!strcmp(steam_id::get_steam_id(j).c_str(), it->who.c_str())) {
 						// Make sure the information is up to date.
 						gEngfuncs.pfnGetPlayerInfo(j + 1, &g_PlayerInfoList[j + 1]);
 
@@ -471,7 +461,7 @@ namespace force_model
 			team_model_overrides.cbegin(),
 			team_model_overrides.cend(),
 			[=](const model_override& entry) {
-				return !strcmp(entry.who, team_name);
+				return !strcmp(entry.who.c_str(), team_name);
 			});
 
 		if (it != team_model_overrides.cend())
@@ -505,7 +495,7 @@ namespace force_model
 			steam_id_model_overrides.cbegin(),
 			steam_id_model_overrides.cend(),
 			[=](const model_override& entry) {
-				return !strcmp(entry.who, steam_id::get_steam_id(player_index).c_str());
+				return !strcmp(entry.who.c_str(), steam_id::get_steam_id(player_index).c_str());
 			});
 
 		if (it != steam_id_model_overrides.cend())
