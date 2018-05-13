@@ -7,20 +7,21 @@ int CHudCrosshairs::Init()
 {
 	m_iFlags = HUD_ACTIVE;
 
-	cl_cross =               CVAR_CREATE("cl_cross", "0", FCVAR_ARCHIVE);
-	cl_cross_color =         CVAR_CREATE("cl_cross_color", "0 255 0", FCVAR_ARCHIVE);
-	cl_cross_alpha =         CVAR_CREATE("cl_cross_alpha", "200", FCVAR_ARCHIVE);
-	cl_cross_thickness =     CVAR_CREATE("cl_cross_thickness", "2", FCVAR_ARCHIVE);
-	cl_cross_size =          CVAR_CREATE("cl_cross_size", "10", FCVAR_ARCHIVE);
-	cl_cross_gap =           CVAR_CREATE("cl_cross_gap", "3", FCVAR_ARCHIVE);
-	cl_cross_outline =       CVAR_CREATE("cl_cross_outline", "0", FCVAR_ARCHIVE);
-	cl_cross_circle_radius = CVAR_CREATE("cl_cross_circle_radius", "0", FCVAR_ARCHIVE);
-	cl_cross_dot_size =      CVAR_CREATE("cl_cross_dot_size", "0", FCVAR_ARCHIVE);
-	cl_cross_dot_color =     CVAR_CREATE("cl_cross_dot_color", "", FCVAR_ARCHIVE);
-	cl_cross_top_line =      CVAR_CREATE("cl_cross_top_line", "1", FCVAR_ARCHIVE);
-	cl_cross_bottom_line =   CVAR_CREATE("cl_cross_bottom_line", "1", FCVAR_ARCHIVE);
-	cl_cross_left_line =     CVAR_CREATE("cl_cross_left_line", "1", FCVAR_ARCHIVE);
-	cl_cross_right_line =    CVAR_CREATE("cl_cross_right_line", "1", FCVAR_ARCHIVE);
+	cl_cross =                  CVAR_CREATE("cl_cross", "0", FCVAR_ARCHIVE);
+	cl_cross_color =            CVAR_CREATE("cl_cross_color", "0 255 0", FCVAR_ARCHIVE);
+	cl_cross_alpha =            CVAR_CREATE("cl_cross_alpha", "200", FCVAR_ARCHIVE);
+	cl_cross_thickness =        CVAR_CREATE("cl_cross_thickness", "2", FCVAR_ARCHIVE);
+	cl_cross_size =             CVAR_CREATE("cl_cross_size", "10", FCVAR_ARCHIVE);
+	cl_cross_gap =              CVAR_CREATE("cl_cross_gap", "3", FCVAR_ARCHIVE);
+	cl_cross_outline =          CVAR_CREATE("cl_cross_outline", "0", FCVAR_ARCHIVE);
+	cl_cross_circle_radius =    CVAR_CREATE("cl_cross_circle_radius", "0", FCVAR_ARCHIVE);
+	cl_cross_circle_thickness = CVAR_CREATE("cl_cross_circle_thickness", "1", FCVAR_ARCHIVE);
+	cl_cross_dot_size =         CVAR_CREATE("cl_cross_dot_size", "0", FCVAR_ARCHIVE);
+	cl_cross_dot_color =        CVAR_CREATE("cl_cross_dot_color", "", FCVAR_ARCHIVE);
+	cl_cross_top_line =         CVAR_CREATE("cl_cross_top_line", "1", FCVAR_ARCHIVE);
+	cl_cross_bottom_line =      CVAR_CREATE("cl_cross_bottom_line", "1", FCVAR_ARCHIVE);
+	cl_cross_left_line =        CVAR_CREATE("cl_cross_left_line", "1", FCVAR_ARCHIVE);
+	cl_cross_right_line =       CVAR_CREATE("cl_cross_right_line", "1", FCVAR_ARCHIVE);
 
 	gHUD.AddHudElem(this);
 	return 0;
@@ -108,6 +109,19 @@ int CHudCrosshairs::Draw(float time)
 			gl.line(Vector2D(center.x - offset.x, center.y - offset.y + half_width), Vector2D(center.x - offset.x, center.y + offset.y - half_width));
 			gl.line(Vector2D(center.x - offset.x - half_width, center.y + offset.y), Vector2D(center.x + offset.x + half_width, center.y + offset.y));
 		}
+
+		// Circle
+		if (cl_cross_circle_radius->value && cl_cross_circle_thickness->value > 0.0f) {
+			gl.line_width(cl_cross_circle_thickness->value + cl_cross_outline->value);
+
+			auto radius = cl_cross_circle_radius->value;
+			if (old_circle_radius != radius) {
+				// Recompute the circle points.
+				circle_points = HudGL::compute_circle(radius);
+				old_circle_radius = radius;
+			}
+			gl.circle(center, circle_points);
+		}
 	}
 
 	gl.color(r, g, b, alpha);
@@ -130,8 +144,8 @@ int CHudCrosshairs::Draw(float time)
 	}
 
 	// Draw the circle.
-	if (cl_cross_circle_radius->value > 0.0f) {
-		gl.line_width(1.0f);
+	if (cl_cross_circle_radius->value && cl_cross_circle_thickness->value > 0.0f) {
+		gl.line_width(cl_cross_circle_thickness->value);
 
 		auto radius = cl_cross_circle_radius->value;
 		if (old_circle_radius != radius) {
