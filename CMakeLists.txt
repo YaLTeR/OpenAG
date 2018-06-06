@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.3)
 project(OpenAG)
 
 include("CMake/helpers.cmake")
@@ -109,7 +109,8 @@ else(MSVC)
 			-Wno-new-returns-null)
 	else(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 		target_compile_options(client PRIVATE
-			-Wno-unused-but-set-variable)
+			-Wno-unused-but-set-variable
+			$<$<COMPILE_LANGUAGE:CXX>:-Wno-class-memaccess>)
 	endif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 
 	target_compile_definitions(client PRIVATE
