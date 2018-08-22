@@ -1,7 +1,22 @@
 language: cpp
 dist: trusty
 sudo: false
-os: linux
+os:
+  - linux
+  - osx
+
+env:
+  - CONFIGURATION=Debug
+  - CONFIGURATION=Release
+
+compiler:
+  - clang
+  - gcc
+
+matrix:
+  exclude:
+    - os: osx
+      compiler: gcc
 
 addons:
   apt:
@@ -13,15 +28,8 @@ addons:
       - linux-libc-dev:i386
       - ninja-build
 
-env:
-  - CONFIGURATION=Debug
-  - CONFIGURATION=Release
-
-compiler:
-  - clang
-  - gcc
-
 before_install:
+  - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then brew install ninja; fi
   - if [ "${CC}" = "gcc" ]; then export CC=gcc-6 CXX=g++-6; fi
 
 script:
