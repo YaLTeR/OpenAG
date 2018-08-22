@@ -45,7 +45,13 @@ namespace update_checker
 
 		void get_curl_pointers()
 		{
-			auto so = dlopen("libcurl.so.4", RTLD_LAZY);
+			#ifdef __APPLE__
+			constexpr auto libcurl_name = "libcurl.4.dylib";
+			#else
+			constexpr auto libcurl_name = "libcurl.so.4";
+			#endif
+
+			auto so = dlopen(libcurl_name, RTLD_LAZY);
 			if (so) {
 				#define GET(ptr, name) \
 					ptr = reinterpret_cast<decltype(ptr)>(dlsym(so, name))
