@@ -76,6 +76,10 @@ target_include_directories(client PRIVATE
 	public
 	utils/vgui/include)
 
+if(UNIX)
+	target_include_directories(client SYSTEM PRIVATE /usr/include/malloc)
+endif(UNIX)
+
 # Set up some additional compile flags and definitions
 if(MSVC)
 	target_compile_options(client PRIVATE
@@ -155,10 +159,20 @@ elseif(UNIX)
 		-DDISABLE_JUMP_ORIGIN
 		-DDISABLE_VEC_ORIGIN)
 
-	# I wasn't able to do this in any other way.
-	# Things like imported targets result in linking with relative path.
-	set_property(TARGET client PROPERTY LINK_FLAGS
-		"-L${CMAKE_SOURCE_DIR}/linux/release -l:vgui.so")
+	if(APPLE)
+		find_library(MAC_CARGON Carbon)
+		find_library(MAC_OPENGL OpenGL)
+		target_link_libraries(client
+			${MAC_CARBON}
+			${MAC_OPENGL}
+			${CMAKE_SOURCE_DIR}/linux/libSDL2-2.0.0.dylib
+			${CMAKE_SOURCE_DIR}/linux/release/vgui.dylib)
+	else(APPLE)
+		# I wasn't able to do this in any other way.
+		# Things like imported targets result in linking with relative path.
+		set_property(TARGET client PROPERTY LINK_FLAGS
+			"-L${CMAKE_SOURCE_DIR}/linux/release -l:vgui.so")
+	endif(APPLE)
 endif(WIN32)
 
 target_compile_definitions(client PRIVATE
