@@ -76,9 +76,9 @@ target_include_directories(client PRIVATE
 	public
 	utils/vgui/include)
 
-if(UNIX)
+if(APPLE)
 	target_include_directories(client SYSTEM PRIVATE /usr/include/malloc)
-endif(UNIX)
+endif(APPLE)
 
 # Set up some additional compile flags and definitions
 if(MSVC)
