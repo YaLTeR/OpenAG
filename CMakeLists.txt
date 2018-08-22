@@ -160,7 +160,7 @@ elseif(UNIX)
 		-DDISABLE_VEC_ORIGIN)
 
 	if(APPLE)
-		find_library(MAC_CARGON Carbon)
+		find_library(MAC_CARBON Carbon)
 		find_library(MAC_OPENGL OpenGL)
 		target_link_libraries(client
 			${MAC_CARBON}
