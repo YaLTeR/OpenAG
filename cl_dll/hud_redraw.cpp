@@ -100,8 +100,9 @@ int CHud :: Redraw( float flTime, int intermission )
 	m_flTime = flTime;
 	m_flTimeDelta = (double)m_flTime - m_fOldTime;
 	static float m_flShotTime = 0;
-	
-	// Clock was reset, reset delta
+    static float m_flStopTime = 0;
+
+    // Clock was reset, reset delta
 	if ( m_flTimeDelta < 0 )
 		m_flTimeDelta = 0;
 
@@ -127,6 +128,9 @@ int CHud :: Redraw( float flTime, int intermission )
 			// Take a screenshot if the client's got the cvar set
 			if ( CVAR_GET_FLOAT( "hud_takesshots" ) != 0 )
 				m_flShotTime = flTime + 1.0;	// Take a screenshot in a second
+
+            if ( CVAR_GET_FLOAT( "cl_autorecord_stop") != 0 && CVAR_GET_FLOAT( "cl_autorecord") != 0)
+                m_flStopTime = flTime + 3.0; // Stop demo recording in three seconds
 		}
 	}
 
@@ -135,6 +139,12 @@ int CHud :: Redraw( float flTime, int intermission )
 		gEngfuncs.pfnClientCmd("snapshot\n");
 		m_flShotTime = 0;
 	}
+
+    if (m_flStopTime && m_flStopTime < flTime)
+    {
+        gEngfuncs.pfnClientCmd("stop");
+        m_flStopTime = 0;
+    }
 
 	m_iIntermission = intermission;
 
