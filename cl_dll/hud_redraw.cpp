@@ -102,7 +102,7 @@ int CHud :: Redraw( float flTime, int intermission )
 	static float m_flShotTime = 0;
 	static float m_flStopTime = 0;
 
-    // Clock was reset, reset delta
+	// Clock was reset, reset delta
 	if ( m_flTimeDelta < 0 )
 		m_flTimeDelta = 0;
 

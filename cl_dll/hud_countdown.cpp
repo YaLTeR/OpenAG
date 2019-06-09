@@ -21,7 +21,7 @@ int CHudCountdown::Init()
 	cl_autorecord = CVAR_CREATE("cl_autorecord", "0", FCVAR_ARCHIVE);
 	cl_autorecord_stop = CVAR_CREATE("cl_autorecord_stop", "1", FCVAR_ARCHIVE);
 
-    gHUD.AddHudElem(this);
+	gHUD.AddHudElem(this);
 	return 0;
 }
 
