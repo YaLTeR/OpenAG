@@ -129,7 +129,7 @@ int CHud :: Redraw( float flTime, int intermission )
 			if ( CVAR_GET_FLOAT( "hud_takesshots" ) != 0 )
 				m_flShotTime = flTime + 1.0;	// Take a screenshot in a second
 
-			if ( CVAR_GET_FLOAT( "cl_autorecord_stop") != 0 && CVAR_GET_FLOAT( "cl_autorecord") != 0)
+			if ( cl_autostop->value > 0.0f )
 				m_flStopTime = flTime + 3.0; // Stop demo recording in three seconds
 		}
 	}
