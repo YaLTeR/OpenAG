@@ -19,7 +19,7 @@ int CHudCountdown::Init()
 	name2[ARRAYSIZE(name2) - 1] = '\0';
 
 	cl_autorecord = CVAR_CREATE("cl_autorecord", "0", FCVAR_ARCHIVE);
-    cl_autorecord_stop = CVAR_CREATE("cl_autorecord_stop", "1", FCVAR_ARCHIVE);
+	cl_autorecord_stop = CVAR_CREATE("cl_autorecord_stop", "1", FCVAR_ARCHIVE);
 
     gHUD.AddHudElem(this);
 	return 0;
