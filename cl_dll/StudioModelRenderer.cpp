@@ -963,6 +963,15 @@ void CStudioModelRenderer::StudioSetupBones ( void )
 
 		if (pbones[i].parent == -1) 
 		{
+			extern cvar_t* cl_righthand;
+			if (m_pCurrentEntity == gEngfuncs.GetViewModel()
+				&& IEngineStudio.IsHardware()
+				&& cl_righthand->value != 0.0f)
+			{
+				for (size_t j = 0; j < 4; ++j)
+					bonematrix[1][j] *= -1.0;
+			}
+
 			if ( IEngineStudio.IsHardware() )
 			{
 				ConcatTransforms ((*m_protationmatrix), bonematrix, (*m_pbonetransform)[i]);

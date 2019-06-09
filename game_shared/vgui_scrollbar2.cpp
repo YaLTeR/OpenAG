@@ -65,7 +65,7 @@ private:
 	LineBorder m_Border;
 
 public:
-	ScrollBarButton(const char *filename, int x, int y, int wide, int tall) : m_Border(Color(60, 60, 60, 0)), Button("", x, y, wide, tall)
+	ScrollBarButton(const char *filename, int x, int y, int wide, int tall) : Button("", x, y, wide, tall), m_Border(Color(60, 60, 60, 0))
 	{
 		Image *image = vgui_LoadTGA(filename);
 		if (image)

@@ -9,6 +9,8 @@ class CHudCountdown : public CHudBase
 	char name1[32];
 	char name2[32];
 
+	cvar_t* cl_autorecord;
+
 public:
 	virtual int Init();
 	virtual int VidInit();

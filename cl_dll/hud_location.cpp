@@ -18,6 +18,9 @@ void CHudLocation::parse_locations(const char* mapname)
 
 	std::ifstream i(std::string(gamedir) + "/locs/" + mapname + ".loc");
 	if (!i)
+		i = std::ifstream(std::string(gamedir) + "_downloads/locs/" + mapname + ".loc");
+
+	if (!i)
 		return;
 
 	enum {

@@ -1,6 +1,7 @@
 #include "hud.h"
 #include "cl_util.h"
 #include "parsemsg.h"
+#include "discord_integration.h"
 
 DECLARE_MESSAGE(m_Timer, Timer);
 
@@ -91,6 +92,8 @@ int CHudTimer::MsgFunc_Timer(const char* name, int size, void* buf)
 	draw_until = gHUD.m_flTime + 5.0f;
 
 	m_iFlags |= HUD_ACTIVE;
+
+	discord_integration::set_time_data(seconds_total, seconds_passed);
 
 	//gEngfuncs.Con_Printf("Timer: seconds_total = %d; seconds_passed = %d.\n", seconds_total, seconds_passed);
 

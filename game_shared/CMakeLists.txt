@@ -1,0 +1,13 @@
+add_sources(
+	vgui_checkbutton2.cpp
+	vgui_grid.cpp
+	vgui_helpers.cpp
+	vgui_listbox.cpp
+	vgui_loadtga.cpp
+	vgui_scrollbar2.cpp
+	vgui_scrollbar2.h
+	vgui_slider2.cpp
+	vgui_slider2.h
+	voice_banmgr.cpp
+	voice_banmgr.h
+	voice_status.h)

@@ -209,8 +209,8 @@ void CTeamMenuPanel::Update( void )
 
 					iTotal++;
 					if (iTotal > 1)
-						strncat( szPlayerList, ", ", sizeof(szPlayerList) - strlen(szPlayerList) );
-					strncat( szPlayerList, g_PlayerInfoList[j].name, sizeof(szPlayerList) - strlen(szPlayerList) );
+						strncat( szPlayerList, ", ", sizeof(szPlayerList) - strlen(szPlayerList) - 1 );
+					strncat( szPlayerList, g_PlayerInfoList[j].name, sizeof(szPlayerList) - strlen(szPlayerList) - 1 );
 					szPlayerList[ sizeof(szPlayerList) - 1 ] = '\0';
 				}
 
@@ -222,7 +222,7 @@ void CTeamMenuPanel::Update( void )
 						sprintf(szText, "%s: %d Player (%d points)", gViewPort->GetTeamName(i), iTotal, g_TeamInfo[i].frags );
 					else
 						sprintf(szText, "%s: %d Players (%d points)", gViewPort->GetTeamName(i), iTotal, g_TeamInfo[i].frags );
-					strncat( szText, szPlayerList, sizeof(szText) - strlen(szText) );
+					strncat( szText, szPlayerList, sizeof(szText) - strlen(szText) - 1 );
 					szText[ sizeof(szText) - 1 ] = '\0';
 
 					m_pTeamInfoPanel[i]->setText( szText );

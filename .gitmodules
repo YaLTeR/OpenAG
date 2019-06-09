@@ -1,0 +1,4 @@
+[submodule "external/discord-rpc"]
+	path = external/discord-rpc
+	url = https://github.com/YaLTeR/discord-rpc.git
+	branch = xp

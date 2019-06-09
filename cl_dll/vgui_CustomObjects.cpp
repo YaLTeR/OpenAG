@@ -35,7 +35,7 @@
 #include "vgui_loadtga.h"
 
 // Arrow filenames
-char *sArrowFilenames[] =
+const char *sArrowFilenames[] =
 {
 	"arrowup",
 	"arrowdn", 
@@ -374,8 +374,15 @@ int CImageLabel::getImageTall( void )
 
 void CImageLabel::LoadImage(const char * pImageName)
 {
+#ifdef POSIX
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdelete-non-virtual-dtor"
+#endif
 	if ( m_pTGA )
 		delete m_pTGA;
+#ifdef POSIX
+#pragma GCC diagnostic pop
+#endif
 
 	// Load the Image
 	m_pTGA = LoadTGAForRes(pImageName);

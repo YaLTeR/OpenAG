@@ -103,62 +103,62 @@ cvar_t	v_ipitch_level		= {"v_ipitch_level", "0.3", 0, 0.3};
 float	v_idlescale;  // used by TFC for concussion grenade effect
 
 //=============================================================================
-/*
-void V_NormalizeAngles( float *angles )
-{
-	int i;
-	// Normalize angles
-	for ( i = 0; i < 3; i++ )
-	{
-		if ( angles[i] > 180.0 )
-		{
-			angles[i] -= 360.0;
-		}
-		else if ( angles[i] < -180.0 )
-		{
-			angles[i] += 360.0;
-		}
-	}
-}
-
-/*
-===================
-V_InterpolateAngles
-
-Interpolate Euler angles.
-FIXME:  Use Quaternions to avoid discontinuities
-Frac is 0.0 to 1.0 ( i.e., should probably be clamped, but doesn't have to be )
-===================
-
-void V_InterpolateAngles( float *start, float *end, float *output, float frac )
-{
-	int i;
-	float ang1, ang2;
-	float d;
-	
-	V_NormalizeAngles( start );
-	V_NormalizeAngles( end );
-
-	for ( i = 0 ; i < 3 ; i++ )
-	{
-		ang1 = start[i];
-		ang2 = end[i];
-
-		d = ang2 - ang1;
-		if ( d > 180 )
-		{
-			d -= 360;
-		}
-		else if ( d < -180 )
-		{	
-			d += 360;
-		}
-
-		output[i] = ang1 + d * frac;
-	}
-
-	V_NormalizeAngles( output );
-} */
+// void V_NormalizeAngles( float *angles )
+// {
+//         int i;
+//         // Normalize angles
+//         for ( i = 0; i < 3; i++ )
+//         {
+//                 if ( angles[i] > 180.0 )
+//                 {
+//                         angles[i] -= 360.0;
+//                 }
+//                 else if ( angles[i] < -180.0 )
+//                 {
+//                         angles[i] += 360.0;
+//                 }
+//         }
+// }
+// 
+// [>
+// ===================
+// V_InterpolateAngles
+// 
+// Interpolate Euler angles.
+// FIXME:  Use Quaternions to avoid discontinuities
+// Frac is 0.0 to 1.0 ( i.e., should probably be clamped, but doesn't have to be )
+// ===================
+// */
+// 
+// void V_InterpolateAngles( float *start, float *end, float *output, float frac )
+// {
+//         int i;
+//         float ang1, ang2;
+//         float d;
+//         
+//         V_NormalizeAngles( start );
+//         V_NormalizeAngles( end );
+// 
+//         for ( i = 0 ; i < 3 ; i++ )
+//         {
+//                 ang1 = start[i];
+//                 ang2 = end[i];
+// 
+//                 d = ang2 - ang1;
+//                 if ( d > 180 )
+//                 {
+//                         d -= 360;
+//                 }
+//                 else if ( d < -180 )
+//                 {	
+//                         d += 360;
+//                 }
+// 
+//                 output[i] = ang1 + d * frac;
+//         }
+// 
+//         V_NormalizeAngles( output );
+// }
 
 // Quakeworld bob code, this fixes jitters in the mutliplayer since the clock (pparams->time) isn't quite linear
 float V_CalcBob ( struct ref_params_s *pparams )
@@ -1387,7 +1387,7 @@ void V_GetMapChasePosition(int target, float * cl_angles, float * origin, float 
 int V_FindViewModelByWeaponModel(int weaponindex)
 {
 
-	static char * modelmap[][2] =	{
+	static const char * modelmap[][2] =	{
 
 # ifdef _TFC	// TFC models override HL models
 		{ "models/p_mini.mdl",			"models/v_tfac.mdl"			},

@@ -155,7 +155,7 @@ int CHudMenu :: Draw( float flTime )
 	}
 
 	// center it
-	int y = (ScreenHeight/2) - ((nlc/2)*12) - 40; // make sure it is above the say text
+	int y = (ScreenHeight/2) - ((nlc/2)*gHUD.m_scrinfo.iCharHeight) - 40; // make sure it is above the say text
 
 	menu_r		= 255;
 	menu_g		= 255;
@@ -175,7 +175,7 @@ int CHudMenu :: Draw( float flTime )
 		{
 			menu_ralign	 = FALSE;
 			menu_x		 = 20;
-			y			+= (12);
+			y			+= gHUD.m_scrinfo.iCharHeight;
 			
 			sptr++;
 		}

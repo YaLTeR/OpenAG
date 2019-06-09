@@ -58,7 +58,9 @@
 #include "shake.h"
 #include "screenfade.h"
 
+#include "discord_integration.h"
 #include "forcemodel.h"
+#include "gameui.h"
 
 void IN_SetVisibleMouse(bool visible);
 class CCommandMenu;
@@ -98,7 +100,7 @@ int iTeamColors[5][3] =
 
 
 // Used for Class specific buttons
-char *sTFClasses[] =
+const char *sTFClasses[] =
 {
 	"",
 	"SCOUT",
@@ -113,7 +115,7 @@ char *sTFClasses[] =
 	"CIVILIAN",
 };
 
-char *sLocalisedClasses[] = 
+const char *sLocalisedClasses[] = 
 {
 	"#Civilian",
 	"#Scout",
@@ -129,7 +131,7 @@ char *sLocalisedClasses[] =
 	"#Civilian",
 };
 
-char *sTFClassSelection[] = 
+const char *sTFClassSelection[] = 
 {
 	"civilian",
 	"scout",
@@ -689,7 +691,7 @@ class CException;
 // Purpose: Read the Command Menu structure from the txt file and create the menu.
 //			Returns Index of menu in m_pCommandMenus
 //-----------------------------------------------------------------------------
-int TeamFortressViewport::CreateCommandMenu( char * menuFile, int direction, int yOffset, bool flatDesign, float flButtonSizeX, float flButtonSizeY, int xOffset )
+int TeamFortressViewport::CreateCommandMenu( const char * menuFile, int direction, int yOffset, bool flatDesign, float flButtonSizeX, float flButtonSizeY, int xOffset )
 {
 	// COMMAND MENU
 	// Create the root of this new Command Menu
@@ -1510,7 +1512,7 @@ void TeamFortressViewport::UpdatePlayerMenu(int menuIndex)
 		//if ( g_PlayerExtraInfo[i].teamname[0] == 0 )
 		//	continue; // skip over players who are not in a team
 
-		SpectButton *pButton = new SpectButton(1 , strip_color_tags_thread_unsafe(g_PlayerInfoList[pEnt->index].name),
+		SpectButton *pButton = new SpectButton(1 , color_tags::strip_color_tags_thread_unsafe(g_PlayerInfoList[pEnt->index].name),
 							 XRES(MAIN_LABEL_X), PANEL_HEIGHT+(i-1)*CMENU_SIZE_X, XRES(MAIN_LABEL_WIDTH), BUTTON_SIZE_Y /2 );
 
 		pButton->setBoundKey( (char)255  );
@@ -1546,7 +1548,7 @@ void TeamFortressViewport::UpdateSpectatorPanel()
 	{
 		char bottomText[128];
 		char helpString2[128];
-		char tempString[128];
+		// char tempString[128];
 		char * name;
 		char *pBottomText = NULL;
 		int player = 0;
@@ -1586,7 +1588,7 @@ void TeamFortressViewport::UpdateSpectatorPanel()
 		// create player & health string
 		if ( player && name )
 		{
-			strip_color_tags(bottomText, name, ARRAYSIZE(bottomText));
+			color_tags::strip_color_tags(bottomText, name, ARRAYSIZE(bottomText));
 			//bottomText[ sizeof(bottomText) - 1 ] = 0; // Not needed because strip_color_tags does it.
 			pBottomText = bottomText;
 		}
@@ -1725,14 +1727,14 @@ void TeamFortressViewport::SetCurrentMenu( CMenuPanel *pMenu )
 CMenuPanel* TeamFortressViewport::CreateTextWindow( int iTextToShow )
 {
 	char sz[256];
-	char *cText;
+	char *cText = nullptr;
 	char *pfile = NULL;
 	static const int MAX_TITLE_LENGTH = 64;
 	char cTitle[MAX_TITLE_LENGTH];
 
 	if ( iTextToShow == SHOW_MOTD )
 	{
-		if (!m_szServerName || !m_szServerName[0])
+		if (!m_szServerName[0])
 			strcpy( cTitle, "Half-Life" );
 		else
 			strncpy( cTitle, m_szServerName, sizeof(cTitle) );
@@ -1742,7 +1744,7 @@ CMenuPanel* TeamFortressViewport::CreateTextWindow( int iTextToShow )
 	else if ( iTextToShow == SHOW_MAPBRIEFING )
 	{
 		// Get the current mapname, and open it's map briefing text
-		if (m_sMapName && m_sMapName[0])
+		if (m_sMapName[0])
 		{
 			strcpy( sz, "maps/");
 			strcat( sz, m_sMapName );
@@ -2058,7 +2060,7 @@ void TeamFortressViewport::UpdateOnPlayerInfo()
 void TeamFortressViewport::UpdateCursorState()
 {
 	// Need cursor if any VGUI window is up
-	if ( m_pSpectatorPanel->m_menuVisible || m_pCurrentMenu || m_pTeamMenu->isVisible() || m_pServerBrowser->isVisible() || GetClientVoiceMgr()->IsInSquelchMode() )
+	if ( m_pSpectatorPanel->m_menuVisible || m_pCurrentMenu || m_pTeamMenu->isVisible() || m_pServerBrowser->isVisible() || GetClientVoiceMgr()->IsInSquelchMode() || (g_pGameUI && g_pGameUI->IsGameUIVisible()) )
 	{
 		IN_SetVisibleMouse(true);
 		App::getInstance()->setCursorOveride( App::getInstance()->getScheme()->getCursor(Scheme::scu_arrow) );
@@ -2453,6 +2455,8 @@ int TeamFortressViewport::MsgFunc_ScoreInfo( const char *pszName, int iSize, voi
 			 g_PlayerExtraInfo[cl].teamnumber = 0;
 
 		UpdateOnPlayerInfo();
+
+		discord_integration::on_player_count_update();
 	}
 
 	return 1;
@@ -2508,7 +2512,11 @@ int TeamFortressViewport::MsgFunc_TeamInfo( const char *pszName, int iSize, void
 		// set the players team
 		strncpy( g_PlayerExtraInfo[cl].teamname, READ_STRING(), MAX_TEAM_NAME );
 
-		force_model::update_player_team(cl - 1);
+		// If we changed the team, update everyone to update the teammate/enemy status.
+		if (cl == gEngfuncs.GetLocalPlayer()->index)
+			force_model::update_player_teams();
+		else
+			force_model::update_player_team(cl - 1);
 	}
 
 	// rebuild the list of teams

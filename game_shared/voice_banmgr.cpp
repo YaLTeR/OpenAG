@@ -52,8 +52,7 @@ bool CVoiceBanMgr::Init(char const *pGameDir)
 	if(fp)
 	{
 		int version;
-		fread(&version, 1, sizeof(version), fp);
-		if(version == BANMGR_FILEVERSION)
+		if (fread(&version, 1, sizeof(version), fp) == sizeof(version) && version == BANMGR_FILEVERSION)
 		{
 			fseek(fp, 0, SEEK_END);
 			int nIDs = (ftell(fp) - sizeof(version)) / 16;
@@ -62,7 +61,8 @@ bool CVoiceBanMgr::Init(char const *pGameDir)
 			for(int i=0; i < nIDs; i++)
 			{
 				char playerID[16];
-				fread(playerID, 1, 16, fp);
+				if (fread(playerID, 1, 16, fp) != 16)
+					break;
 				AddBannedPlayer(playerID);
 			}			
 		}

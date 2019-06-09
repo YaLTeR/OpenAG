@@ -27,7 +27,9 @@
 #include "screenfade.h"
 
 
+#ifdef _MSC_VER
 #pragma warning(disable: 4244)
+#endif
 
 extern "C" int		iJumpSpectator;
 extern "C" float	vJumpOrigin[3];
@@ -232,7 +234,7 @@ void UTIL_StringToVector( float * pVector, const char *pString )
 	}
 }
 
-int UTIL_FindEntityInMap(char * name, float * origin, float * angle)
+int UTIL_FindEntityInMap(const char * name, float * origin, float * angle)
 {
 	int				n,found = 0;
 	char			keyname[256];
@@ -1144,7 +1146,7 @@ void CHudSpectator::SetModes(int iNewMainMode, int iNewInsetMode)
 
 	// inset mode is handled only clients side
 	m_pip->value = iNewInsetMode;
-	
+
 	if ( iNewMainMode < OBS_CHASE_LOCKED || iNewMainMode > OBS_MAP_CHASE )
 	{
 		gEngfuncs.Con_Printf("Invalid spectator mode.\n");

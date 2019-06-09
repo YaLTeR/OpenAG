@@ -17,6 +17,8 @@
 //
 
 #include "cvardef.h"
+#include "net_api.h"
+#include "color_tags.h"
 
 #ifndef TRUE
 #define TRUE 1
@@ -42,9 +44,9 @@
 								gHUD.y.UserCmd_##x( ); \
 							}
 
-inline float CVAR_GET_FLOAT( const char *x ) {	return gEngfuncs.pfnGetCvarFloat( (char*)x ); }
-inline char* CVAR_GET_STRING( const char *x ) {	return gEngfuncs.pfnGetCvarString( (char*)x ); }
-inline struct cvar_s *CVAR_CREATE( const char *cv, const char *val, const int flags ) {	return gEngfuncs.pfnRegisterVariable( (char*)cv, (char*)val, flags ); }
+inline float CVAR_GET_FLOAT( const char *x ) {	return gEngfuncs.pfnGetCvarFloat( x ); }
+inline char* CVAR_GET_STRING( const char *x ) {	return gEngfuncs.pfnGetCvarString( x ); }
+inline struct cvar_s *CVAR_CREATE( const char *cv, const char *val, const int flags ) {	return gEngfuncs.pfnRegisterVariable( cv, val, flags ); }
 
 #define SPR_Load (*gEngfuncs.pfnSPR_Load)
 #define SPR_Set (*gEngfuncs.pfnSPR_Set)
@@ -102,51 +104,9 @@ template<typename T, size_t N>
 char (&ArraySizeHelper(T (&)[N]))[N];
 #define ARRAYSIZE(x) sizeof(ArraySizeHelper(x))
 
-/*
- * Copies at most count characters (including the terminating null character)
- * from src to dest, omitting the color tags. The resulting array is always
- * null-terminated.
- */
-static void strip_color_tags(char* dest, const char* src, size_t count)
-{
-	if (count == 0)
-		return;
-
-	for (; *src != '\0' && count > 1; ++src) {
-		if (src[0] == '^' && src[1] >= '0' && src[1] <= '9') {
-			++src;
-			continue;
-		} else {
-			*dest++ = *src;
-			--count;
-		}
-	}
-
-	*dest = '\0';
-}
-
-static char* strip_color_tags_thread_unsafe(const char* string)
-{
-	static char buf[2048];
-
-	strip_color_tags(buf, string, ARRAYSIZE(buf));
-
-	return buf;
-}
-
-/*
- * Returns true if the given string contains any color tags.
- * A color tag is something that's stripped by strip_color_tags.
- */
-static bool contains_color_tags(const char* string)
-{
-	for (; *string != '\0'; ++string) {
-		if (string[0] == '^' && string[1] >= '0' && string[1] <= '9')
-			return true;
-	}
-
-	return false;
-}
+#define max(a, b)  (((a) > (b)) ? (a) : (b))
+#define min(a, b)  (((a) < (b)) ? (a) : (b))
+//#define fabs(x)	   ((x) > 0 ? (x) : 0 - (x))
 
 static size_t count_digits(int n)
 {
@@ -157,6 +117,64 @@ static size_t count_digits(int n)
 	} while ((n /= 10) != 0);
 
 	return result;
+}
+
+static size_t get_map_name(char* dest, size_t count)
+{
+	auto map_path = gEngfuncs.pfnGetLevelName();
+
+	const char* slash = strrchr(map_path, '/');
+	if (!slash)
+		slash = map_path - 1;
+
+	const char* dot = strrchr(map_path, '.');
+	if (!dot)
+		dot = map_path + strlen(map_path);
+
+	size_t bytes_to_copy = min(count - 1, static_cast<size_t>(dot - slash - 1));
+
+	strncpy(dest, slash + 1, bytes_to_copy);
+	dest[bytes_to_copy] = '\0';
+
+	return bytes_to_copy;
+}
+
+static char* get_server_address()
+{
+	net_status_t netstatus{};
+	gEngfuncs.pNetAPI->Status(&netstatus);
+	return gEngfuncs.pNetAPI->AdrToString(&netstatus.remote_address);
+}
+
+static void sanitize_address(std::string& address)
+{
+	for (size_t i = 0; i < address.size(); ++i) {
+		char c = address[i];
+		if ((c >= '0' && c <= '9') || c == '.' || c == ':')
+			continue;
+
+		// Invalid character.
+		address = address.substr(0, i);
+		break;
+	}
+}
+
+static size_t get_player_count()
+{
+	size_t player_count = 0;
+
+	for (int i = 0; i < MAX_PLAYERS; ++i) {
+		// Make sure the information is up to date.
+		gEngfuncs.pfnGetPlayerInfo(i + 1, &g_PlayerInfoList[i + 1]);
+
+		// This player slot is empty.
+		if (g_PlayerInfoList[i + 1].name == nullptr)
+			continue;
+
+		++player_count;
+	}
+
+	return player_count;
 }
 
 inline 	client_textmessage_t	*TextMessageGet( const char *pName ) { return gEngfuncs.pfnTextMessageGet( pName ); }
@@ -184,12 +202,12 @@ inline int ConsoleStringLen( char *string )
 
 inline void ConsolePrint( const char *string )
 {
-	gEngfuncs.pfnConsolePrint( strip_color_tags_thread_unsafe(string) );
+	gEngfuncs.pfnConsolePrint( color_tags::strip_color_tags_thread_unsafe(string) );
 }
 
 inline void CenterPrint( const char *string )
 {
-	gEngfuncs.pfnCenterPrint( strip_color_tags_thread_unsafe(string) );
+	gEngfuncs.pfnCenterPrint( color_tags::strip_color_tags_thread_unsafe(string) );
 }
 
 
@@ -227,12 +245,8 @@ inline int safe_sprintf( char *dst, int len_dst, const char *format, ...)
 }
 
 // sound functions
-inline void PlaySound( char *szSound, float vol ) { gEngfuncs.pfnPlaySoundByName( szSound, vol ); }
+inline void PlaySound( const char *szSound, float vol ) { gEngfuncs.pfnPlaySoundByName( szSound, vol ); }
 inline void PlaySound( int iSound, float vol ) { gEngfuncs.pfnPlaySoundByIndex( iSound, vol ); }
-
-#define max(a, b)  (((a) > (b)) ? (a) : (b))
-#define min(a, b)  (((a) < (b)) ? (a) : (b))
-//#define fabs(x)	   ((x) > 0 ? (x) : 0 - (x))
 
 void ScaleColors( int &r, int &g, int &b, int a );
 
@@ -249,10 +263,12 @@ void VectorInverse ( float *v );
 
 extern vec3_t vec3_origin;
 
+#ifdef _MSC_VER
 // disable 'possible loss of data converting float to int' warning message
 #pragma warning( disable: 4244 )
 // disable 'truncation from 'const double' to 'float' warning message
 #pragma warning( disable: 4305 )
+#endif
 
 inline void UnpackRGB(int &r, int &g, int &b, unsigned long ulRGB)\
 {\

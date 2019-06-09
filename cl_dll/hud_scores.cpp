@@ -13,6 +13,10 @@
 #undef max
 #endif
 
+#ifdef min
+#undef min
+#endif
+
 extern int iNumberOfTeamColors;
 extern int iTeamColors[5][3];
 extern hud_player_info_t   g_PlayerInfoList [MAX_PLAYERS + 1];
@@ -30,6 +34,7 @@ int CHudScores::Init()
 
 	cl_scores = CVAR_CREATE("cl_scores", "0", FCVAR_ARCHIVE);
 	cl_scores_pos = CVAR_CREATE("cl_scores_pos", "20 50", FCVAR_ARCHIVE);
+	cl_scores_alpha = CVAR_CREATE("cl_scores_alpha", "20", FCVAR_ARCHIVE);
 
 	gHUD.AddHudElem(this);
 	return 0;
@@ -46,6 +51,7 @@ int CHudScores::Draw(float time)
 		return 0;
 
 	const size_t rows_to_draw = static_cast<size_t>(cl_scores->value);
+	const uint8_t alpha = static_cast<uint8_t>(std::min(255.0f, std::max(0.0f, cl_scores_alpha->value)));
 
 	int x, y;
 	if (sscanf(cl_scores_pos->string, "%d %d", &x, &y) != 2) {
@@ -123,7 +129,7 @@ int CHudScores::Draw(float time)
 		    g = iTeamColors[row->color][1],
 		    b = iTeamColors[row->color][2];
 
-		FillRGBA(x, y, PADDING + score_width + GAP + name_width + PADDING, gHUD.m_scrinfo.iCharHeight, r, g, b, 20);
+		FillRGBA(x, y, PADDING + score_width + GAP + name_width + PADDING, gHUD.m_scrinfo.iCharHeight, r, g, b, alpha);
 
 		ScaleColors(r, g, b, 135);
 

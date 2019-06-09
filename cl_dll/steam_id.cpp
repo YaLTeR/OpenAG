@@ -25,7 +25,7 @@ namespace steam_id
 		inline std::string& ltrim(std::string& s) {
 			s.erase(
 				s.begin(),
-				std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<int, int>(std::isspace)))
+				std::find_if(s.begin(), s.end(), [](auto c) { return !std::isspace(c); })
 			);
 
 			return s;
@@ -33,7 +33,7 @@ namespace steam_id
 
 		inline std::string& rtrim(std::string& s) {
 			s.erase(
-				std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(),
+				std::find_if(s.rbegin(), s.rend(), [](auto c) { return !std::isspace(c); }).base(),
 				s.end()
 			);
 
@@ -69,7 +69,7 @@ namespace steam_id
 				auto first_space = std::find_if(
 					s.cbegin(),
 					s.cend(),
-					std::ptr_fun<int, int>(std::isspace)
+					[](auto c) { return std::isspace(c); }
 				);
 
 				// Skip past incorrect lines.
@@ -83,7 +83,7 @@ namespace steam_id
 				auto real_name_start = std::find_if(
 					first_space,
 					s.cend(),
-					std::not1(std::ptr_fun<int, int>(std::isspace))
+					[](auto c) { return !std::isspace(c); }
 				);
 
 				steam_id_to_real_name[std::string(s.cbegin(), first_space)] =

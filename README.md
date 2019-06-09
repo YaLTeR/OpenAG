@@ -1,3 +1,37 @@
+﻿OpenAG
+======================
+[![Build Status](https://travis-ci.org/YaLTeR/OpenAG.svg?branch=master)](https://travis-ci.org/YaLTeR/OpenAG)
+[![Build Status](https://ci.appveyor.com/api/projects/status/o758yugwuavrt9qi?svg=true)](https://ci.appveyor.com/project/YaLTeR/openag)
+[![Chat on Discord](https://discordapp.com/api/guilds/252168904359542784/widget.png)](https://discord.gg/jCYhYNH)
+
+OpenAG is an open-source client of the Half-Life promod Adrenaline Gamer, completely rewritten from scratch on latest Half-Life SDK. It adds new features, bugfixes and other tweaks over the original mod, while maintaining the ability to play on all currently existing servers.
+
+# Building
+## Windows
+1. Get Visual Studio 2017 and CMake.
+2. `git submodule update --init`
+3. `mkdir build`
+4. `cd build`
+5. `cmake ..`
+6. `cmake --build . --config Release`
+
+## macOS
+1. Install Xcode.
+2. Install CMake via Homebrew.
+3. `git submodule update --init`
+4. `mkdir build`
+5. `cd build`
+6. `cmake ..`
+7. `cmake --build . --config Release`
+
+## Linux
+1. Get a 32-bit/multilib **gcc** (6 and above) or **clang** (3.9 and above) build environment set up, as well as CMake.
+2. `git submodule update --init`
+3. `mkdir build`
+4. `cd build`
+5. `cmake ..`
+6. `cmake --build . --config Release`
+
 Half Life 1 SDK LICENSE
 ======================
 

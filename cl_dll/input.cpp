@@ -24,6 +24,8 @@ extern "C"
 
 #include "vgui_TeamFortressViewport.h"
 
+#include "discord_integration.h"
+
 
 extern int g_iAlive;
 
@@ -1069,6 +1071,7 @@ void ShutdownInput (void)
 
 #include "interface.h"
 void CL_UnloadParticleMan( void );
+void CL_UnloadGameUI();
 
 #if defined( _TFC )
 void ClearEventList( void );
@@ -1085,4 +1088,7 @@ void CL_DLLEXPORT HUD_Shutdown( void )
 #endif
 	
 	CL_UnloadParticleMan();
+	CL_UnloadGameUI();
+
+	discord_integration::shutdown();
 }

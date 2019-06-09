@@ -6,6 +6,7 @@ class CHudSpeedometer : public CHudBase
 	uint16_t speed;
 
 	cvar_t* hud_speedometer;
+	cvar_t* hud_speedometer_below_cross;
 
 public:
 	virtual int Init();

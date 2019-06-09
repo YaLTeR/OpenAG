@@ -1,15 +1,19 @@
+#define _USE_MATH_DEFINES
 #include "util_vector.h"
 #include "hudgl.h"
 
-#define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 #include <vector>
 
 #ifdef _WIN32
 #include <Windows.h>
 #endif
 
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#else
 #include <GL/gl.h>
+#endif
 
 HudGL::HudGL() {
 	// Same steps as FillRGBA does.
@@ -70,13 +74,14 @@ void HudGL::rectangle(const Vector2D& corner_a, const Vector2D& corner_b) const 
 std::vector<Vector2D> HudGL::compute_circle(float radius) {
 	// Maximum allowed distance between the circle and the rendered line segment.
 	constexpr float MAX_ERROR = 0.1f;
-	const unsigned segment_count = std::ceil(M_PI / std::acos((radius - MAX_ERROR) / radius));
+	const unsigned segment_count =
+		static_cast<unsigned>(std::ceil(M_PI / std::acos((radius - MAX_ERROR) / radius)));
 
 	std::vector<Vector2D> points;
 	points.reserve(segment_count);
 
 	for (unsigned i = 0; i < segment_count; ++i) {
-		float angle = M_PI * 2 * i / segment_count;
+		float angle = static_cast<float>(M_PI * 2 * i / segment_count);
 		points.emplace_back(radius * std::cos(angle), radius * std::sin(angle));
 	}
 

@@ -87,6 +87,7 @@ extern client_sprite_t *GetSpriteList(client_sprite_t *pList, const char *psz, i
 
 extern cvar_t *sensitivity;
 cvar_t *cl_lw = NULL;
+cvar_t *cl_righthand = nullptr;
 
 void ShutdownInput (void);
 
@@ -134,6 +135,69 @@ int __MsgFunc_Gametype(const char *pszName, int iSize, void *pbuf)
 	return gHUD.MsgFunc_Gametype( pszName, iSize, pbuf );
 }
 
+int __MsgFunc_AllowSpec(const char *pszName, int iSize, void *pbuf)
+{
+	if (gViewPort)
+		return gViewPort->MsgFunc_AllowSpec( pszName, iSize, pbuf );
+	return 0;
+}
+
+int __MsgFunc_CheatCheck(const char* name, int size, void* buf)
+{
+	BEGIN_READ(buf, size);
+	const auto pure = READ_BYTE();
+
+	// Stub: no cheat checks in OpenAG.
+
+	return 1;
+}
+
+int __MsgFunc_WhString(const char* name, int size, void* buf)
+{
+	BEGIN_READ(buf, size);
+	const auto string = READ_STRING();
+
+	// Stub: no cheat checks in OpenAG.
+
+	return 1;
+}
+
+int __MsgFunc_SpikeCheck(const char* name, int size, void* buf)
+{
+	BEGIN_READ(buf, size);
+	const auto model = READ_STRING();
+
+	// Stub: no cheat checks in OpenAG.
+
+	return 1;
+}
+
+int __MsgFunc_CRC32(const char* name, int size, void* buf)
+{
+	BEGIN_READ(buf, size);
+	const auto checksum = READ_LONG();
+	const auto filename = READ_STRING();
+
+	// Stub: no cheat checks in OpenAG.
+
+	return 1;
+}
+
+int __MsgFunc_PlaySound(const char* name, int size, void* buf)
+{
+	BEGIN_READ(buf, size);
+	const auto player = READ_BYTE();
+
+	vec3_t origin;
+	for (size_t i = 0; i < 3; ++i)
+		origin[i] = READ_COORD();
+
+	const auto sound = READ_STRING();
+	gEngfuncs.pfnPlaySoundByName(sound, 1);
+
+	return 1;
+}
+
 // TFFree Command Menu
 void __CmdFunc_OpenCommandMenu(void)
 {
@@ -176,26 +240,6 @@ void __CmdFunc_ToggleServerBrowser( void )
 	}
 }
 
-static size_t GetMapName(char* dest, size_t count)
-{
-	auto map_path = gEngfuncs.pfnGetLevelName();
-
-	const char* slash = strrchr(map_path, '/');
-	if (!slash)
-		slash = map_path - 1;
-
-	const char* dot = strrchr(map_path, '.');
-	if (!dot)
-		dot = map_path + strlen(map_path);
-
-	size_t bytes_to_copy = min(count - 1, dot - slash - 1);
-
-	strncpy(dest, slash + 1, bytes_to_copy);
-	dest[count - 1] = '\0';
-
-	return bytes_to_copy;
-}
-
 void __CmdFunc_Agrecord()
 {
 	/*
@@ -211,7 +255,7 @@ void __CmdFunc_Agrecord()
 	auto written = std::strftime(cmd, sizeof(cmd), "record %Y%m%d_%H%M%S_", std::localtime(&curtime));
 	if (written > 0) {
 		char mapname[256];
-		auto mapname_len = GetMapName(mapname, ARRAYSIZE(mapname));
+		auto mapname_len = get_map_name(mapname, ARRAYSIZE(mapname));
 
 		/*
 		 * We want to leave at least one more byte for '\0'.
@@ -361,13 +405,6 @@ int __MsgFunc_ResetFade(const char *pszName, int iSize, void *pbuf)
 	return 0;
 }
 
-int __MsgFunc_AllowSpec(const char *pszName, int iSize, void *pbuf)
-{
-	if (gViewPort)
-		return gViewPort->MsgFunc_AllowSpec( pszName, iSize, pbuf );
-	return 0;
-}
-
 // This is called every time the DLL is loaded
 void CHud :: Init( void )
 {
@@ -416,11 +453,21 @@ void CHud :: Init( void )
 	// VGUI Menus
 	HOOK_MESSAGE( VGUIMenu );
 
+	HOOK_MESSAGE( CheatCheck );
+	HOOK_MESSAGE( WhString );
+	HOOK_MESSAGE( SpikeCheck );
+	HOOK_MESSAGE( CRC32 );
+	HOOK_MESSAGE( PlaySound );
+
 	CVAR_CREATE( "hud_classautokill", "1", FCVAR_ARCHIVE | FCVAR_USERINFO );		// controls whether or not to suicide immediately on TF class switch
 	CVAR_CREATE( "hud_takesshots", "0", FCVAR_ARCHIVE );		// controls whether or not to automatically take screenshots at the end of a round
 
 	// Implemented server-side, needs to be registered client-side.
 	CVAR_CREATE( "cl_autowepswitch", "1", FCVAR_ARCHIVE | FCVAR_USERINFO | FCVAR_CLIENTDLL );
+
+	// This has to be called cl_righthand (there's some stuff compiled into the engine),
+	// and also from my tests it has to be 0 for normal and 1 for left-handed.
+	cl_righthand = CVAR_CREATE( "cl_righthand", "0", FCVAR_ARCHIVE );
 
 	m_iLogo = 0;
 	m_iFOV = 0;
@@ -429,6 +476,7 @@ void CHud :: Init( void )
 	default_fov = CVAR_CREATE( "default_fov", "90", 0 );
 	m_pCvarStealMouse = CVAR_CREATE( "hud_capturemouse", "1", FCVAR_ARCHIVE );
 	m_pCvarDraw = CVAR_CREATE( "hud_draw", "1", FCVAR_ARCHIVE );
+	m_pCvarDrawDeathNoticesAlways = CVAR_CREATE( "cl_draw_deathnotices_always", "0", FCVAR_ARCHIVE );
 	m_pCvarColor = CVAR_CREATE( "hud_color", "", FCVAR_ARCHIVE );
 	cl_lw = gEngfuncs.pfnGetCvarPointer( "cl_lw" );
 
@@ -469,6 +517,8 @@ void CHud :: Init( void )
 	m_CTF.Init();
 	m_Debug.Init();
 	m_Location.Init();
+	m_NextMap.Init();
+	m_PlayerId.Init();
 	m_Scores.Init();
 	m_Settings.Init();
 	m_Speedometer.Init();
@@ -631,6 +681,8 @@ void CHud :: VidInit( void )
 	m_CTF.VidInit();
 	m_Debug.VidInit();
 	m_Location.VidInit();
+	m_NextMap.VidInit();
+	m_PlayerId.VidInit();
 	m_Scores.VidInit();
 	m_Settings.VidInit();
 	m_Speedometer.VidInit();

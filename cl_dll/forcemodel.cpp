@@ -19,22 +19,12 @@ namespace force_model
 	{
 		struct model_override
 		{
-			char* who;
+			std::string who;
 			model_t* model;
 
-			model_override(const char* who_, model_t* model)
-				: model(model)
-			{
-				auto len = strlen(who_);
-
-				who = new char[len + 1];
-				std::memcpy(who, who_, len + 1);
-			}
-
-			~model_override()
-			{
-				delete[] who;
-			}
+			model_override(const char* who, model_t* model)
+				: who(who), model(model)
+			{}
 		};
 
 		// Overrides by the team name.
@@ -49,6 +39,21 @@ namespace force_model
 		// Cache for fast lookup.
 		model_t* steam_id_model_overrides_cache[MAX_PLAYERS];
 
+		// Overrides for the teammates and enemies.
+		model_t* teammate_model_override;
+		model_t* enemy_model_override;
+
+		// Cache for fast lookup.
+		model_t* teammate_enemy_model_overrides_cache[MAX_PLAYERS];
+
+		model_t* load_model(const char* name)
+		{
+			char model_path[4096];
+			std::snprintf(model_path, ARRAYSIZE(model_path), "models/player/%s/%s.mdl", name, name);
+
+			return IEngineStudio.Mod_ForName(model_path, 0);
+		}
+
 		void callback_cl_forceteammodel()
 		{
 			if (gEngfuncs.Cmd_Argc() != 3) {
@@ -57,11 +62,7 @@ namespace force_model
 			}
 
 			auto model_name = gEngfuncs.Cmd_Argv(2);
-
-			char model_path[4096];
-			std::snprintf(model_path, ARRAYSIZE(model_path), "models/player/%s/%s.mdl", model_name, model_name);
-
-			auto model = IEngineStudio.Mod_ForName(model_path, 0);
+			auto model = load_model(model_name);
 			if (!model) {
 				gEngfuncs.Con_Printf("This model could not be loaded.\n");
 				return;
@@ -73,7 +74,7 @@ namespace force_model
 				team_model_overrides.begin(),
 				team_model_overrides.end(),
 				[=](const model_override& entry) {
-					return !strcmp(entry.who, team_name);
+					return !strcmp(entry.who.c_str(), team_name);
 				});
 
 			if (it != team_model_overrides.end())
@@ -93,7 +94,7 @@ namespace force_model
 
 			for (unsigned i = 0; i < team_model_overrides.size(); ++i) {
 				const auto& entry = team_model_overrides[i];
-				gEngfuncs.Con_Printf("%u. %s -> %s\n", i + 1, entry.who, entry.model->name);
+				gEngfuncs.Con_Printf("%u. %s -> %s\n", i + 1, entry.who.c_str(), entry.model->name);
 			}
 		}
 
@@ -108,7 +109,7 @@ namespace force_model
 				team_model_overrides.begin(),
 				team_model_overrides.end(),
 				[=](const model_override& entry) {
-					return !strcmp(entry.who, gEngfuncs.Cmd_Argv(1));
+					return !strcmp(entry.who.c_str(), gEngfuncs.Cmd_Argv(1));
 				});
 
 			if (it != team_model_overrides.end()) {
@@ -126,18 +127,14 @@ namespace force_model
 			}
 
 			auto model_name = gEngfuncs.Cmd_Argv(2);
-
-			char model_path[4096];
-			std::snprintf(model_path, ARRAYSIZE(model_path), "models/player/%s/%s.mdl", model_name, model_name);
-
-			auto model = IEngineStudio.Mod_ForName(model_path, 0);
+			auto model = load_model(model_name);
 			if (!model) {
 				gEngfuncs.Con_Printf("This model could not be loaded.\n");
 				return;
 			}
 
 			auto name = gEngfuncs.Cmd_Argv(1);
-			bool name_contains_color_tags = contains_color_tags(name);
+			bool name_contains_color_tags = color_tags::contains_color_tags(name);
 
 			int matched_player_index = -1; // -1 means didn't match anyone.
 
@@ -178,7 +175,7 @@ namespace force_model
 				if (name_contains_color_tags)
 					name_to_match_against = g_PlayerInfoList[i + 1].name;
 				else
-					name_to_match_against = strip_color_tags_thread_unsafe(g_PlayerInfoList[i + 1].name);
+					name_to_match_against = color_tags::strip_color_tags_thread_unsafe(g_PlayerInfoList[i + 1].name);
 
 				if (strstr(name_to_match_against, name) != nullptr) {
 					// Got a match by the name. Add it to the match list.
@@ -196,7 +193,7 @@ namespace force_model
 						if (name_contains_color_tags)
 							name_to_print = g_PlayerInfoList[index + 1].name;
 						else
-							name_to_print = strip_color_tags_thread_unsafe(g_PlayerInfoList[index + 1].name);
+							name_to_print = color_tags::strip_color_tags_thread_unsafe(g_PlayerInfoList[index + 1].name);
 
 						gEngfuncs.Con_Printf(
 							"- %s (#%d; %s)\n",
@@ -220,7 +217,7 @@ namespace force_model
 					steam_id_model_overrides.begin(),
 					steam_id_model_overrides.end(),
 					[=](const model_override& entry) {
-						return !strcmp(entry.who, matched_steam_id);
+						return !strcmp(entry.who.c_str(), matched_steam_id);
 					});
 
 				if (it != steam_id_model_overrides.end())
@@ -248,7 +245,7 @@ namespace force_model
 				const char* name;
 				int uid = -1;
 				for (size_t j = 0; j < MAX_PLAYERS; ++j) {
-					if (!strcmp(steam_id::get_steam_id(j).c_str(), entry.who)) {
+					if (!strcmp(steam_id::get_steam_id(j).c_str(), entry.who.c_str())) {
 						// Make sure the information is up to date.
 						gEngfuncs.pfnGetPlayerInfo(j + 1, &g_PlayerInfoList[j + 1]);
 
@@ -262,12 +259,12 @@ namespace force_model
 				}
 
 				if (uid == -1) {
-					gEngfuncs.Con_Printf("%u. %s -> %s\n", i + 1, entry.who, entry.model->name);
+					gEngfuncs.Con_Printf("%u. %s -> %s\n", i + 1, entry.who.c_str(), entry.model->name);
 				} else {
 					gEngfuncs.Con_Printf(
 						"%u. %s (#%d; `%s`) -> %s\n",
 						i + 1,
-						entry.who,
+						entry.who.c_str(),
 						uid,
 						name,
 						entry.model->name
@@ -284,7 +281,7 @@ namespace force_model
 			}
 
 			auto name = gEngfuncs.Cmd_Argv(1);
-			bool name_contains_color_tags = contains_color_tags(name);
+			bool name_contains_color_tags = color_tags::contains_color_tags(name);
 
 			auto matched_element = steam_id_model_overrides.cend();
 
@@ -299,13 +296,13 @@ namespace force_model
 
 			for (auto it = steam_id_model_overrides.cbegin(); it != steam_id_model_overrides.cend(); ++it) {
 				// Try to match by Steam ID.
-				if (!strcmp(it->who, name)) {
+				if (!strcmp(it->who.c_str(), name)) {
 					matched_element = it;
 					break;
 				}
 
 				for (size_t j = 0; j < MAX_PLAYERS; ++j) {
-					if (!strcmp(steam_id::get_steam_id(j).c_str(), it->who)) {
+					if (!strcmp(steam_id::get_steam_id(j).c_str(), it->who.c_str())) {
 						// Make sure the information is up to date.
 						gEngfuncs.pfnGetPlayerInfo(j + 1, &g_PlayerInfoList[j + 1]);
 
@@ -325,7 +322,7 @@ namespace force_model
 							if (name_contains_color_tags)
 								name_to_match_against = g_PlayerInfoList[j + 1].name;
 							else
-								name_to_match_against = strip_color_tags_thread_unsafe(g_PlayerInfoList[j + 1].name);
+								name_to_match_against = color_tags::strip_color_tags_thread_unsafe(g_PlayerInfoList[j + 1].name);
 
 							if (strstr(name_to_match_against, name) != nullptr) {
 								// Got a match by the name. Add it to the match list.
@@ -353,7 +350,7 @@ namespace force_model
 						if (name_contains_color_tags)
 							name_to_print = g_PlayerInfoList[index + 1].name;
 						else
-							name_to_print = strip_color_tags_thread_unsafe(g_PlayerInfoList[index + 1].name);
+							name_to_print = color_tags::strip_color_tags_thread_unsafe(g_PlayerInfoList[index + 1].name);
 
 						gEngfuncs.Con_Printf(
 							"- %s (#%d; %s)\n",
@@ -380,6 +377,66 @@ namespace force_model
 				gEngfuncs.Con_Printf("There is no such override.\n");
 			}
 		}
+
+		void callback_cl_forceteammatemodel()
+		{
+			if (gEngfuncs.Cmd_Argc() != 2) {
+				gEngfuncs.Con_Printf("cl_forceteammatemodel <model name>\n");
+
+				if (teammate_model_override)
+					gEngfuncs.Con_Printf("Current override: %s\n", teammate_model_override->name);
+
+				return;
+			}
+
+			auto model_name = gEngfuncs.Cmd_Argv(1);
+			if (model_name[0])
+			{
+				auto model = load_model(model_name);
+				if (!model) {
+					gEngfuncs.Con_Printf("This model could not be loaded.\n");
+					return;
+				}
+
+				teammate_model_override = model;
+			}
+			else
+			{
+				teammate_model_override = nullptr;
+			}
+
+			update_player_teams();
+		}
+
+		void callback_cl_forceenemymodel()
+		{
+			if (gEngfuncs.Cmd_Argc() != 2) {
+				gEngfuncs.Con_Printf("cl_forceenemymodel <model name>\n");
+
+				if (enemy_model_override)
+					gEngfuncs.Con_Printf("Current override: %s\n", enemy_model_override->name);
+
+				return;
+			}
+
+			auto model_name = gEngfuncs.Cmd_Argv(1);
+			if (model_name[0])
+			{
+				auto model = load_model(model_name);
+				if (!model) {
+					gEngfuncs.Con_Printf("This model could not be loaded.\n");
+					return;
+				}
+
+				enemy_model_override = model;
+			}
+			else
+			{
+				enemy_model_override = nullptr;
+			}
+
+			update_player_teams();
+		}
 	}
 
 	void hook_commands()
@@ -391,6 +448,9 @@ namespace force_model
 		gEngfuncs.pfnAddCommand("cl_forcemodel", callback_cl_forcemodel);
 		gEngfuncs.pfnAddCommand("cl_forcemodel_list", callback_cl_forcemodel_list);
 		gEngfuncs.pfnAddCommand("cl_forcemodel_remove", callback_cl_forcemodel_remove);
+
+		gEngfuncs.pfnAddCommand("cl_forceteammatemodel", callback_cl_forceteammatemodel);
+		gEngfuncs.pfnAddCommand("cl_forceenemymodel", callback_cl_forceenemymodel);
 	}
 
 	void update_player_team(int player_index)
@@ -401,13 +461,26 @@ namespace force_model
 			team_model_overrides.cbegin(),
 			team_model_overrides.cend(),
 			[=](const model_override& entry) {
-				return !strcmp(entry.who, team_name);
+				return !strcmp(entry.who.c_str(), team_name);
 			});
 
 		if (it != team_model_overrides.cend())
 			team_model_overrides_cache[player_index] = it->model;
 		else
 			team_model_overrides_cache[player_index] = nullptr;
+
+		// GetLocalPlayer() returns an undefined pointer if we aren't in-game.
+		if (!gHUD.m_Teamplay || !gEngfuncs.pfnGetLevelName()[0])
+		{
+			teammate_enemy_model_overrides_cache[player_index] = enemy_model_override;
+			return;
+		}
+
+		const auto local_player_index = gEngfuncs.GetLocalPlayer()->index;
+		if (!strcmp(g_PlayerExtraInfo[local_player_index].teamname, g_PlayerExtraInfo[player_index + 1].teamname))
+			teammate_enemy_model_overrides_cache[player_index] = teammate_model_override;
+		else
+			teammate_enemy_model_overrides_cache[player_index] = enemy_model_override;
 	}
 
 	void update_player_teams()
@@ -422,7 +495,7 @@ namespace force_model
 			steam_id_model_overrides.cbegin(),
 			steam_id_model_overrides.cend(),
 			[=](const model_override& entry) {
-				return !strcmp(entry.who, steam_id::get_steam_id(player_index).c_str());
+				return !strcmp(entry.who.c_str(), steam_id::get_steam_id(player_index).c_str());
 			});
 
 		if (it != steam_id_model_overrides.cend())
@@ -443,6 +516,10 @@ namespace force_model
 		if (model)
 			return model;
 
-		return team_model_overrides_cache[player_index];
+		model = team_model_overrides_cache[player_index];
+		if (model)
+			return model;
+
+		return teammate_enemy_model_overrides_cache[player_index];
 	}
 }

@@ -15,6 +15,8 @@
 #include "bench.h"
 #include "Exports.h"
 
+#include "discord_integration.h"
+
 #include "particleman.h"
 extern IParticleMan *g_pParticleMan;
 
@@ -153,6 +155,11 @@ void CL_DLLEXPORT HUD_ProcessPlayerState( struct entity_state_s *dst, const stru
 	{
 		g_iPlayerClass = dst->playerclass;
 		g_iTeamNumber = dst->team;
+
+		if (src->iuser1 != 0)
+			discord_integration::set_spectating(true);
+		else if (g_iUser1 != 0)
+			discord_integration::set_spectating(false);
 
 		g_iUser1 = src->iuser1;
 		g_iUser2 = src->iuser2;

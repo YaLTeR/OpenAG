@@ -1,0 +1,18 @@
+image: Visual Studio 2017
+
+environment:
+  matrix:
+    - CONFIGURATION: Debug
+    - CONFIGURATION: Release
+
+install:
+  - git submodule update --init --recursive
+
+build_script:
+  - mkdir build
+  - cd build
+  - cmake -T v141_xp ..
+  - cmake --build . --config %CONFIGURATION%
+
+artifacts:
+  - path: build\$(CONFIGURATION)\client.dll
