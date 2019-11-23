@@ -27,9 +27,12 @@ addons:
       - g++-6-multilib
       - linux-libc-dev:i386
       - ninja-build
+  homebrew:
+    update: true
+    packages:
+      - ninja
 
 before_install:
-  - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then brew install ninja; fi
   - if [ "${CC}" = "gcc" ]; then export CC=gcc-6 CXX=g++-6; fi
 
 script:
