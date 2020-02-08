@@ -1,0 +1,127 @@
+name: CI
+
+on:
+  push:
+    paths-ignore:
+      - '.travis.yml'
+      - 'appveyor.yml'
+      - 'filecopy.bat'
+      - 'LICENSE*'
+      - 'README.md'
+  pull_request:
+    paths-ignore:
+      - '.travis.yml'
+      - 'appveyor.yml'
+      - 'filecopy.bat'
+      - 'LICENSE*'
+      - 'README.md'
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        toolset: [v141_xp, v141, v142]
+        configuration: [Release, Debug]
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+    - name: CMake generate
+      run: |
+        mkdir build
+        cd build
+        cmake -T ${{ matrix.toolset }} -A Win32 ..
+    - name: Build
+      working-directory: build
+      run: cmake --build . -j $env:NUMBER_OF_PROCESSORS --config ${{ matrix.configuration }}
+    - uses: actions/upload-artifact@v1
+      if: matrix.toolset == 'v141_xp'
+      with:
+        name: openag-${{ runner.os }}-${{ matrix.configuration }}
+        path: build\${{ matrix.configuration }}\client.dll
+
+  build-linux-gcc:
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc-${{ matrix.gcc-ver }}
+      CXX: g++-${{ matrix.gcc-ver }}
+    strategy:
+      fail-fast: false
+      matrix:
+        gcc-ver: [6, 7, 8]
+        configuration: [Release, Debug]
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+    - name: Setup
+      run: |
+        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+        sudo apt-get update
+        sudo apt-get -y install g++-${{ matrix.gcc-ver }} g++-${{ matrix.gcc-ver }}-multilib linux-libc-dev-i386-cross mesa-common-dev ninja-build rapidjson-dev
+        mkdir build
+    - name: CMake generate
+      working-directory: build
+      run: cmake -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} ..
+    - name: Build
+      working-directory: build
+      run: ninja
+    - uses: actions/upload-artifact@v1
+      if: matrix.gcc-ver == '8'
+      with:
+        name: openag-${{ runner.os }}-${{ matrix.configuration }}
+        path: build/client.so
+
+  build-linux-clang:
+    runs-on: ubuntu-latest
+    env:
+      compiler: clang
+      CC: clang
+      CXX: clang++
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Release, Debug]
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+    - name: Setup
+      run: |
+        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+        sudo apt-get update
+        sudo apt-get -y install g++-8 g++-8-multilib linux-libc-dev-i386-cross mesa-common-dev ninja-build rapidjson-dev
+        mkdir build
+    - name: CMake generate
+      working-directory: build
+      run: cmake -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} ..
+    - name: Build
+      working-directory: build
+      run: ninja
+
+# GitHub Actions doesn't have a needed macOS/Xcode version
+  #build-macos:
+  #  runs-on: macos
+  #  strategy:
+  #    fail-fast: false
+  #    matrix:
+  #      configuration: [Release, Debug]
+  #  steps:
+  #  - uses: actions/checkout@v2
+  #    with:
+  #      submodules: recursive
+  #  - name: Prepare for build
+  #    env:
+  #      HOMEBREW_NO_ANALYTICS: 1
+  #    run: |
+  #      brew analytics off
+  #      brew update
+  #      brew install ninja
+  #      mkdir build
+  #      cd build
+  #      cmake -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} ..
+  #  - name: Build
+  #    working-directory: build
+  #    run: ninja
