@@ -1,5 +1,6 @@
 ﻿OpenAG
 ======================
+[![Build Status](https://github.com/Margen67/OpenAG/workflows/CI/badge.svg?branch=master)](https://github.com/YaLTeR/OpenAG/actions?query=branch:master)
 [![Build Status](https://travis-ci.org/YaLTeR/OpenAG.svg?branch=master)](https://travis-ci.org/YaLTeR/OpenAG)
 [![Build Status](https://ci.appveyor.com/api/projects/status/o758yugwuavrt9qi?svg=true)](https://ci.appveyor.com/project/YaLTeR/openag)
 [![Chat on Discord](https://discordapp.com/api/guilds/252168904359542784/widget.png)](https://discord.gg/jCYhYNH)

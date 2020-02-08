@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    paths-ignore:
+      - .travis.yml
+      - appveyor.yml
+      - filecopy.bat
+      - LICENSE*
+      - 'README.md'
+  pull_request:
+    paths-ignore:
+      - .travis.yml
+      - appveyor.yml
+      - filecopy.bat
+      - LICENSE*
+      - 'README.md'
+
+jobs:
+  build-windows:
+    runs-on: vs2017-win2016
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Release, Debug]
+        toolset: [v141_xp, v141]
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+    - name: Prepare for build
+      run: |
+        mkdir build
+        cd build
+        cmake -T ${{ matrix.toolset }} ..
+    - name: Build
+      working-directory: build
+      run: cmake --build . --config ${{ matrix.configuration }}
+    - name: Upload artifact
+      if: matrix.toolset == 'v141_xp'
+      uses: actions/upload-artifact@v1
+      with:
+        name: openag-${{ runner.os }}-${{ matrix.configuration }}
+        path: build\${{ matrix.configuration }}\client.dll
