@@ -167,6 +167,8 @@ elseif(UNIX)
 			${MAC_OPENGL}
 			${CMAKE_SOURCE_DIR}/linux/libSDL2-2.0.0.dylib
 			${CMAKE_SOURCE_DIR}/linux/release/vgui.dylib)
+		target_compile_definitions(client PRIVATE
+			GL_SILENCE_DEPRECATION)
 	else(APPLE)
 		# I wasn't able to do this in any other way.
 		# Things like imported targets result in linking with relative path.
