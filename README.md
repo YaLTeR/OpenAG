@@ -11,12 +11,13 @@ OpenAG is an open-source client of the Half-Life promod Adrenaline Gamer, comple
 1. Install Visual Studio 2017 from https://my.visualstudio.com/Downloads?q=Visual%20Studio%202017 (make sure you select Visual Studio 2017 Community version 15.9). In the Visual Studio Installer, select Desktop Development for C++ and not anything else.
 2. Install Git from https://git-scm.com/. Make sure you add it to PATH.
 3. Install CMake from https://cmake.org. Make sure you add it to PATH.
-4. Go to where you saved this cloned repo, right click ans select 'Git Bash Here.' In Git, type: `git submodule update --init`
-5. `mkdir build`
-6. `cd build`
-7. `cmake .. -G "Visual Studio 15 2017"`
-8. `cmake --build . --config Release`
-9. The CMake program will generate the OpenAG.sln file that you can use with Visual Studio 2017. Make sure you DO NOT build using VS2017; save the files you have changed and run the `cmake --build . --config Release` command. The built DLL will be in the Release folder.
+4. On the start window on Visual Studio, select Clone or Check out Code. Under repository location, type `https://github.com/yalter/openag`
+5. Go to where you saved this cloned repo, right click ans select 'Git Bash Here.' In Git, type: `git submodule update --init`
+6. `mkdir build`
+7. `cd build`
+8. `cmake .. -G "Visual Studio 15 2017"`
+9. `cmake --build . --config Release`
+10. The CMake program will generate the OpenAG.sln file that you can use with Visual Studio 2017. You can build the DLL with either CMake or Visual Studio 2017 (by pressing CTRL + SHIFT + B). To build with CMake, save the files you have changed in Visual Studio and run the `cmake --build . --config Release` command. The built DLL will be in the Release folder.
 
 ## macOS
 1. Install Xcode.
