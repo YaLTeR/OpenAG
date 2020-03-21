@@ -12,7 +12,7 @@ OpenAG is an open-source client of the Half-Life promod Adrenaline Gamer, comple
 2. Install Git from https://git-scm.com/. Make sure you add it to PATH.
 3. Install CMake from https://cmake.org. Make sure you add it to PATH.
 4. On the start window on Visual Studio, select Clone or Check out Code. Under repository location, type `https://github.com/yalter/openag`
-5. Go to where you saved this cloned repo, right click ans select 'Git Bash Here.' In Git, type: `git submodule update --init`
+5. Go to where you saved this cloned repo, right click and select 'Git Bash Here.' In Git, type: `git submodule update --init`
 6. `mkdir build`
 7. `cd build`
 8. `cmake .. -G "Visual Studio 15 2017"`
