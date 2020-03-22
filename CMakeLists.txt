@@ -60,6 +60,16 @@ set(BUILD_EXAMPLES OFF)
 set(CLANG_FORMAT_SUFFIX "-dummy")
 add_subdirectory(external/discord-rpc)
 
+if(MSVC)
+	target_compile_options(discord-rpc PRIVATE
+		/wd4191 # 'reinterpret_cast': unsafe conversion from 'FARPROC' to 'RegSetKeyValueW_T'
+		/wd4571 # Informational: catch(...) semantics changed since Visual C++ 7.1; structured exceptions (SEH) are no longer caught
+		/wd4623 # 'std::_UInt_is_zero': default constructor was implicitly defined as deleted
+		/wd5039 # '_Thrd_start': pointer or reference to potentially throwing function passed to extern C function under -EHc. Undefined behavior may occur if this function throws an exception.
+		/wd5045 # "Compiler will insert Spectre mitigation if /Qspectre is enabled"
+		)
+endif(MSVC)
+
 # Collect the source files
 add_subdirectory(cl_dll)
 add_subdirectory(common)
