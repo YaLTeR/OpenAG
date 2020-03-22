@@ -97,14 +97,11 @@ if(MSVC)
 		/wd4018 # Signed/unsigned mismatch
 		/wd4838 # Conversion from double to float
 		/wd4996 # The POSIX name for this item is deprecated
-
-		# Treat warnings as errors
-		/WX)
+		)
 else(MSVC)
 	target_compile_options(client PRIVATE
 		# High warning level and treat warnings as errors
 		-Wall
-		-Werror
 
 		# Disable some warnings which would take too much effort to fix
 		-Wno-parentheses
