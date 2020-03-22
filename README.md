@@ -8,16 +8,27 @@ OpenAG is an open-source client of the Half-Life promod Adrenaline Gamer, comple
 
 # Building
 ## Windows
+### Visual Studio 2017 (without CMake)
 1. Install Visual Studio 2017 from https://my.visualstudio.com/Downloads?q=Visual%20Studio%202017 (make sure you select Visual Studio 2017 Community version 15.9). In the Visual Studio Installer, select Desktop Development for C++ and not anything else.
-2. Install Git from https://git-scm.com/. Make sure you add it to PATH.
-3. Install CMake from https://cmake.org. Make sure you add it to PATH.
-4. On the start window on Visual Studio, select Clone or Check out Code. Under repository location, type `https://github.com/yalter/openag`
-5. Go to where you saved this cloned repo, right click and select 'Git Bash Here.' In Git, type: `git submodule update --init`
-6. `mkdir build`
-7. `cd build`
+2. Go to File→Open→Open from Source Control.
+Click Clone, enter https://github.com/YaLTeR/OpenAG.git and press the Clone button. Wait for the process to finish. In the solution explorer, you can edit the files you need to in the dlls folder.
+3. Press `CTRL + SHIFT + B` to build the project. To find the built DLL, go to the top ribbon, Project->CMake Cache (x86-Debug Only)->Show in explorer.
+### Visual Studio 2017 (with CMake)
+#### Use this if you want to have a solution file
+1. Install Visual Studio 2017 (see above).
+2. Install Git and CMake and add them both to PATH in their installers.
+3. Clone this repository using Visual Studio (see above).
+4. Go to this cloned repository in Windows Explorer. Right Click->Git Bash Here.
+5. `git submodule update --init`
+6. `mkdir Build`
+7. `cd Build`
 8. `cmake .. -G "Visual Studio 15 2017"`
-9. `cmake --build . --config Release`
-10. The CMake program will generate the OpenAG.sln file that you can use with Visual Studio 2017. You can build the DLL with either CMake or Visual Studio 2017 (by pressing CTRL + SHIFT + B). To build with CMake, save the files you have changed in Visual Studio and run the `cmake --build . --config Release` command. The built DLL will be in the Release folder.
+9. `cmake --build . Release`
+### Visual Studio 2019
+1. Get Visual Studio 2019 from https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&rel=16
+2. Install Desktop Development for C++
+3. On the start window, select "Clone or check out code" and type `https://github.com/YaLTeR/OpenAG` and wait for the process to finish. Once Git has finished cloning, VS will begin configuring CMake.
+4. You can edit the files you need to in the dlls folder. To build, press `CTRL + SHIFT + B` and it will build using CMake. To find the built DLL, go to Project->Cmake Cache (x86-Debug Only)->Open in explorer.
 
 ## macOS
 1. Install Xcode.
