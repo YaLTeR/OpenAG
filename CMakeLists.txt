@@ -37,10 +37,19 @@ if(GIT_FOUND)
 	message(STATUS "Found git at ${GIT_EXECUTABLE}")
 	execute_process(COMMAND "${GIT_EXECUTABLE}" show -s --format=%ct
 			OUTPUT_VARIABLE CURRENT_VERSION
-			OUTPUT_STRIP_TRAILING_WHITESPACE)
-	set(CURRENT_VERSION "${CURRENT_VERSION}ull")
+			OUTPUT_STRIP_TRAILING_WHITESPACE
+			RESULT_VARIABLE CURRENT_VERSION_RESULT)
+
+	if(CURRENT_VERSION_RESULT EQUAL "0")
+		set(CURRENT_VERSION "${CURRENT_VERSION}ull")
+		message(STATUS "Set current version to ${CURRENT_VERSION}")
+	else()
+		set(CURRENT_VERSION UINT64_MAX)
+		message(WARNING "Could not get current version from git; update checking will be disabled")
+	endif()
 else(GIT_FOUND)
 	set(CURRENT_VERSION UINT64_MAX)
+	message(WARNING "Could not find git; update checking will be disabled")
 endif(GIT_FOUND)
 
 configure_file(cl_dll/current_version.h.in current_version.h)
