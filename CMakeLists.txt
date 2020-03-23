@@ -56,7 +56,7 @@ endif(GIT_FOUND)
 configure_file(cl_dll/current_version.h.in current_version.h)
 
 # Add discord-rpc
-set(BUILD_EXAMPLES OFF)
+set(BUILD_EXAMPLES OFF CACHE BOOL "build discord-rpc examples" FORCE)
 set(CLANG_FORMAT_SUFFIX "-dummy")
 add_subdirectory(external/discord-rpc)
 
