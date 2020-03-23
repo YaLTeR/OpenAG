@@ -8,6 +8,13 @@
         "org.freedesktop.Sdk.Compat.i386",
         "org.freedesktop.Sdk.Extension.toolchain-i386"
     ],
+    "build-options": {
+        "append-path": "/usr/lib/sdk/toolchain-i386/bin",
+        "env": {
+            "CC": "i686-unknown-linux-gnu-gcc",
+            "CXX": "i686-unknown-linux-gnu-g++"
+        }
+    },
     "modules": [
         {
             "name": "client",
@@ -17,13 +24,6 @@
             "post-install": [
                 "cp client.so /app/"
             ],
-            "build-options": {
-                "append-path": "/usr/lib/sdk/toolchain-i386/bin",
-                "env": {
-                    "CC": "i686-unknown-linux-gnu-gcc",
-                    "CXX": "i686-unknown-linux-gnu-g++"
-                }
-            },
             "sources": [
                 {
                     "type": "archive",
