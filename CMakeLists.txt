@@ -198,17 +198,11 @@ elseif(UNIX)
 		# Things like imported targets result in linking with relative path.
 		set(VGUI_LINK_FLAGS "-L${CMAKE_SOURCE_DIR}/linux/release -l:vgui.so")
 
-		# --push-state isn't supported on older compilers. Check for the support.
-		include(CheckCXXSourceCompiles)
-		set(CMAKE_REQUIRED_LINK_OPTIONS "-Wl,--push-state")
-		check_cxx_source_compiles("int main() { return 0; }" PUSH_STATE_SUPPORTED)
-		if(PUSH_STATE_SUPPORTED)
-			set(VGUI_LINK_FLAGS
-				"-Wl,--push-state,--no-as-needed ${VGUI_LINK_FLAGS} -Wl,--pop-state")
-		else(PUSH_STATE_SUPPORTED)
-			# Guess older compilers are getting global no-as-needed.
-			set(VGUI_LINK_FLAGS "-Wl,--no-as-needed ${VGUI_LINK_FLAGS}")
-		endif(PUSH_STATE_SUPPORTED)
+		# --push-state isn't supported on older compilers. I tried checking for support
+		# using CheckCXXCompilerFlag and CheckCXXSourceCompiles, but they were reporting
+		# success on Travis while the flag was still giving an error. Thus, I will set
+		# --no-as-needed for all compilers.
+		set(VGUI_LINK_FLAGS "-Wl,--no-as-needed ${VGUI_LINK_FLAGS}")
 
 		set_property(TARGET client PROPERTY LINK_FLAGS ${VGUI_LINK_FLAGS})
 	endif(APPLE)
