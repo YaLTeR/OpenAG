@@ -197,7 +197,7 @@ elseif(UNIX)
 		# I wasn't able to do this in any other way.
 		# Things like imported targets result in linking with relative path.
 		set_property(TARGET client PROPERTY LINK_FLAGS
-			"-L${CMAKE_SOURCE_DIR}/linux/release -l:vgui.so")
+			"-Wl,--push-state,--no-as-needed -L${CMAKE_SOURCE_DIR}/linux/release -l:vgui.so -Wl,--pop-state")
 	endif(APPLE)
 endif(WIN32)
 
