@@ -196,7 +196,7 @@ static void convert_locations(char* dest, const char* src, size_t count, int pla
 			auto loc_len = strlen(loc);
 			auto bytes_to_copy = min(loc_len, count - i - 1);
 
-			strncpy(&dest[i], loc, bytes_to_copy);
+			memcpy(&dest[i], loc, bytes_to_copy);
 			i += bytes_to_copy;
 
 			if (i + 1 == count)

@@ -68,6 +68,11 @@ if(MSVC)
 		/wd5039 # '_Thrd_start': pointer or reference to potentially throwing function passed to extern C function under -EHc. Undefined behavior may occur if this function throws an exception.
 		/wd5045 # "Compiler will insert Spectre mitigation if /Qspectre is enabled"
 		)
+else(MSVC)
+	if(NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+		target_compile_options(discord-rpc PRIVATE
+			$<$<COMPILE_LANGUAGE:CXX>:-Wno-class-memaccess>)
+	endif(NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif(MSVC)
 
 # Collect the source files
@@ -137,6 +142,8 @@ else(MSVC)
 	else(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 		target_compile_options(client PRIVATE
 			-Wno-unused-but-set-variable
+			-Wno-stringop-truncation
+			-Wno-format-truncation
 			$<$<COMPILE_LANGUAGE:CXX>:-Wno-class-memaccess>)
 	endif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 

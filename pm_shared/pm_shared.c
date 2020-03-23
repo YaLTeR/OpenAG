@@ -139,7 +139,7 @@ void PM_SwapTextures( int i, int j )
 	strcpy( szTemp, grgszTextureName[ i ] );
 	chTemp = grgchTextureType[ i ];
 	
-	strcpy( grgszTextureName[ i ], grgszTextureName[ j ] );
+	memmove( grgszTextureName[ i ], grgszTextureName[ j ], strlen(grgszTextureName[ j ]) + 1 );
 	grgchTextureType[ i ] = grgchTextureType[ j ];
 
 	strcpy( grgszTextureName[ j ], szTemp );
