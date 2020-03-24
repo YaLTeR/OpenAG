@@ -1,6 +1,6 @@
 {
     "app-id": "pro.openag.OpenAG",
-    "runtime": "org.freedesktop.Platform",
+    "runtime": "org.freedesktop.Sdk",
     "runtime-version": "19.08",
     "command": "",
     "sdk": "org.freedesktop.Sdk",
