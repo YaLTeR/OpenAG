@@ -88,6 +88,8 @@ extern client_sprite_t *GetSpriteList(client_sprite_t *pList, const char *psz, i
 extern cvar_t *sensitivity;
 cvar_t *cl_lw = NULL;
 cvar_t *cl_righthand = nullptr;
+cvar_t *cl_viewrollangle;
+cvar_t *cl_viewrollspeed;
 
 void ShutdownInput (void);
 
@@ -452,6 +454,8 @@ void CHud :: Init( void )
 
 	// VGUI Menus
 	HOOK_MESSAGE( VGUIMenu );
+	cl_viewrollangle = CVAR_CREATE ( "cl_viewrollangle", "0.65", FCVAR_CLIENTDLL | FCVAR_ARCHIVE );
+	cl_viewrollspeed = CVAR_CREATE ( "cl_viewrollspeed", "300", FCVAR_CLIENTDLL | FCVAR_ARCHIVE );
 
 	HOOK_MESSAGE( CheatCheck );
 	HOOK_MESSAGE( WhString );
