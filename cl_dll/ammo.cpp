@@ -887,7 +887,7 @@ int CHudAmmo::Draw(float flTime)
 		}
 		else
 		{
-			UnpackRGB(r, g, b, RGB_REDISH);
+			UnpackRGB(r, g, b, RGB_LOW);
 			ScaleColors(r, g, b, 128);
 		}
 
@@ -985,7 +985,7 @@ int DrawBar(int x, int y, int width, int height, float f)
 		// Always show at least one pixel if we have ammo.
 		if (w <= 0)
 			w = 1;
-		UnpackRGB(r, g, b, RGB_GREENISH);
+		UnpackRGB(r, g, b, RGB_WEAPONBAR);
 		FillRGBA(x, y, w, height, r, g, b, 255);
 		x += w;
 		width -= w;
@@ -1139,7 +1139,7 @@ int CHudAmmo::DrawWList(float flTime)
 						ScaleColors(r, g, b, 192);
 					else
 					{
-						UnpackRGB(r,g,b, RGB_REDISH);
+						UnpackRGB(r,g,b, RGB_LOW);
 						ScaleColors(r, g, b, 128);
 					}
 
@@ -1177,7 +1177,7 @@ int CHudAmmo::DrawWList(float flTime)
 				}
 				else
 				{
-					UnpackRGB(r,g,b, RGB_REDISH);
+					UnpackRGB(r,g,b, RGB_LOW);
 					a = 96;
 				}
 
