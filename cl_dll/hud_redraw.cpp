@@ -271,7 +271,7 @@ void CHud::UpdateDefaultHUDColor()
 
 		m_iDefaultHUDColor = (r << 16) | (g << 8) | b;
 	} else {
-		m_iDefaultHUDColor = RGB_YELLOWISH;
+		m_iDefaultHUDColor = RGB_DEFAULT;
 	}
 }
 

@@ -8,12 +8,31 @@ OpenAG is an open-source client of the Half-Life promod Adrenaline Gamer, comple
 
 # Building
 ## Windows
-1. Get Visual Studio 2017 and CMake.
-2. `git submodule update --init`
-3. `mkdir build`
-4. `cd build`
-5. `cmake ..`
-6. `cmake --build . --config Release`
+### Visual Studio 2019
+1. Install [Visual Studio 2019](https://my.visualstudio.com/Downloads?q=Visual%20Studio%20Community%202019). In the Visual Studio Installer, select Desktop Development for C++.
+1. Open Visual Studio.
+1. On the starting screen, click "Clone or check out code".
+1. Enter `https://github.com/YaLTeR/OpenAG.git` and press the Clone button. Wait for the process to finish.
+1. You can build the project using Build→Build All. To find the built client.dll, go to Project→CMake Cache (x86-Debug Only)→Open in Explorer.
+
+### Visual Studio 2017
+1. Install [Visual Studio 2017](https://my.visualstudio.com/Downloads?q=Visual%20Studio%20Community%202017). In the Visual Studio Installer, select Desktop Development for C++.
+1. Open Visual Studio.
+1. Go to File→Open→Open from Source Control.
+1. Click Clone:
+
+    ![Screenshot of the clone button.](https://user-images.githubusercontent.com/1794388/77243489-8e90ea00-6c1b-11ea-8000-09d576266162.png)
+
+    Enter `https://github.com/YaLTeR/OpenAG.git` and press the Clone button. Wait for the process to finish.
+1. You can build the project using CMake→Build All. To find the built client.dll, go to CMake→Cache (x86-Debug Only)→Open Cache Folder→OpenAG.
+
+### Manually using Git and CMake
+1. Install Visual Studio 2017 or above, Git and CMake. Make sure to add them to PATH.
+1. Clone the repository.
+1. Open Git Bash in the OpenAG folder.
+1. `git submodule update --init`
+1. `cmake -B build`
+1. `cmake --build build --config Release`
 
 ## macOS
 1. Install Xcode.
@@ -25,6 +44,20 @@ OpenAG is an open-source client of the Half-Life promod Adrenaline Gamer, comple
 7. `cmake --build . --config Release`
 
 ## Linux
+### GNOME Builder
+1. Set up FlatHub by following the [guide](https://flatpak.org/setup/) for your distribution.
+1. Install [GNOME Builder](https://flathub.org/apps/details/org.gnome.Builder).
+1. Open GNOME Builder.
+1. Press the Clone Repository button, enter `https://github.com/YaLTeR/OpenAG.git` and press Clone Project. Wait until it finishes.
+
+   The cloning window should close, and a new window with the OpenAG project should open. If the cloning window doesn't close after a minute, close it manually, open Builder, and open the folder that OpenAG was cloned into.
+1. If Builder prompts you to install missing SDKs, press Install and wait for the process to finish. It will take a while. You can monitor the progress by pressing the circle in the top-right.
+
+   When all SDKs are downloaded and installed, close Builder, open it again and open the OpenAG project.
+1. Click on the bar at the top-center which says OpenAG, and click the Build button.
+1. Once the build finishes, in the same bar menu click the Export Bundle button. The file manager will open. Navigate to the "files" folder where you will find the built client.so.
+
+### Manually
 1. Get a 32-bit/multilib **gcc** (6 and above) or **clang** (3.9 and above) build environment set up, as well as CMake.
 2. `git submodule update --init`
 3. `mkdir build`

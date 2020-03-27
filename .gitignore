@@ -4,3 +4,4 @@ linux/release
 build
 compile_commands.json
 thirdparty
+/.vs/openag/v15/Browse.VC.opendb

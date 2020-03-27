@@ -53,8 +53,8 @@ char *GetTGANameForRes(const char *pszName)
 		i = 320;
 	else
 		i = 640;
-	sprintf(sz, pszName, i);
-	sprintf(gd, "gfx/vgui/%s.tga", sz);
+	snprintf(sz, sizeof(sz), pszName, i);
+	snprintf(gd, sizeof(gd), "gfx/vgui/%s.tga", sz);
 	return gd;
 }
 
@@ -66,7 +66,7 @@ BitmapTGA *LoadTGAForRes( const char* pImageName )
 	BitmapTGA	*pTGA;
 
 	char sz[256];
-	sprintf(sz, "%%d_%s", pImageName);
+	snprintf(sz, sizeof(sz), "%%d_%s", pImageName);
 	pTGA = vgui_LoadTGA(GetTGANameForRes(sz));
 
 	return pTGA;

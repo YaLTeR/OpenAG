@@ -21,9 +21,10 @@
 //
 
 
-#define RGB_YELLOWISH 0x00009617 //255,160,0
-#define RGB_REDISH 0x00FF1010 //255,160,0
-#define RGB_GREENISH 0x0000A000 //0,160,0
+
+#define RGB_DEFAULT 0x00009617 // 150, 0, 0
+#define RGB_LOW 0x00FF1010 //255,160,0
+#define RGB_WEAPONBAR 0x0000A000 //0,160,0
 
 #ifndef _WIN32
 #define _cdecl 
@@ -686,7 +687,7 @@ public:
 	int Redraw( float flTime, int intermission );
 	int UpdateClientData( client_data_t *cdata, float time );
 
-	CHud() : m_pHudList(NULL), m_iSpriteCount(0), m_iDefaultHUDColor(RGB_YELLOWISH) {}
+	CHud() : m_pHudList(NULL), m_iSpriteCount(0), m_iDefaultHUDColor(RGB_DEFAULT) {}
 	~CHud();			// destructor, frees allocated memory
 
 	// user messages

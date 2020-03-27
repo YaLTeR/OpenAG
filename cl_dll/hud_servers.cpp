@@ -821,7 +821,7 @@ int CHudServers::LoadMasterAddresses( int maxservers, int *count, netadr_t *padr
 			if ( !stricmp ( m_szToken, "}" ) )
 				break;
 			
-			sprintf( base, "%s", m_szToken );
+			snprintf( base, sizeof(base), "%s", m_szToken );
 				
 			pstart = gEngfuncs.COM_ParseFile( pstart, m_szToken );
 			
@@ -840,7 +840,7 @@ int CHudServers::LoadMasterAddresses( int maxservers, int *count, netadr_t *padr
 			if ( !nPort )
 				nPort = nDefaultPort;
 
-			sprintf( szAdr, "%s:%i", base, nPort );
+			snprintf( szAdr, sizeof(szAdr), "%s:%i", base, nPort );
 
 			// Can we resolve it any better
 			if ( !NET_API->StringToAdr( szAdr, &adr ) )
