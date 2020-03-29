@@ -24,7 +24,6 @@
 
 #include <string.h>
 #include <stdio.h>
-#include <malloc.h> // _alloca
 
 #include "vgui_TeamFortressViewport.h"
 #include "discord_integration.h"
