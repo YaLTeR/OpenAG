@@ -101,6 +101,18 @@ jobs:
       working-directory: build
       run: ninja
 
+  build-flatpak:
+    name: Build under Flatpak
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+    - name: Build
+      uses: nahuelwexd/flatpak-builder-action@freedesktop-19-08
+      with:
+        manifest-path: build-aux/flatpak/pro.openag.OpenAG.json
+
 # GitHub Actions doesn't have a needed macOS/Xcode version
   #build-macos:
   #  runs-on: macos
