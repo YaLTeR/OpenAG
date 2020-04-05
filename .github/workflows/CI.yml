@@ -4,14 +4,12 @@ on:
   push:
     paths-ignore:
       - '.travis.yml'
-      - 'appveyor.yml'
       - 'filecopy.bat'
       - 'LICENSE*'
       - 'README.md'
   pull_request:
     paths-ignore:
       - '.travis.yml'
-      - 'appveyor.yml'
       - 'filecopy.bat'
       - 'LICENSE*'
       - 'README.md'
