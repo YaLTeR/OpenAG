@@ -13,6 +13,8 @@ on:
       - 'filecopy.bat'
       - 'LICENSE*'
       - 'README.md'
+  schedule:
+    - cron: '0 0 1 * *' # Monthly
 
 jobs:
   build-windows:
