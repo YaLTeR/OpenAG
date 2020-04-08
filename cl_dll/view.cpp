@@ -90,7 +90,7 @@ cvar_t	*cl_bob;
 cvar_t	*cl_bobup;
 cvar_t	*cl_waterdist;
 cvar_t	*cl_chasedist;
-cvar_t* cl_bobtilt;
+cvar_t	*cl_bobtilt;
 
 // These cvars are not registered (so users can't cheat), so set the ->value field directly
 // Register these cvars in V_Init() if needed for easy tweaking
