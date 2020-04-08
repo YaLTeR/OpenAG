@@ -1723,7 +1723,7 @@ void V_Init (void)
 	cl_bobup			= gEngfuncs.pfnRegisterVariable( "cl_bobup","0.5", 0 );
 	cl_waterdist		= gEngfuncs.pfnRegisterVariable( "cl_waterdist","4", 0 );
 	cl_chasedist		= gEngfuncs.pfnRegisterVariable( "cl_chasedist","112", 0 );
-	cl_bobtilt			= gEngfuncs.pfnRegisterVariable("cl_bobtilt", "1", 0);
+	cl_bobtilt			= gEngfuncs.pfnRegisterVariable("cl_bobtilt", "0", 0);
 
 }
 
