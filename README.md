@@ -31,7 +31,7 @@ OpenAG is an open-source client of the Half-Life promod Adrenaline Gamer, comple
 1. Clone the repository.
 1. Open Git Bash in the OpenAG folder.
 1. `git submodule update --init`
-1. `cmake -B build`
+1. `cmake -A Win32 -B build`
 1. `cmake --build build --config Release`
 
 ## macOS
