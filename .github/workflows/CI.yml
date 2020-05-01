@@ -3,100 +3,107 @@ name: CI
 on:
   push:
     paths-ignore:
-      - '.travis.yml'
-      - 'filecopy.bat'
+      - '.github/*'
+      - '.github/*_TEMPLATE/**'
+      - '*.bat'
+      - '*.yml'
+      - '*.md'
       - 'LICENSE*'
-      - 'README.md'
   pull_request:
     paths-ignore:
-      - '.travis.yml'
-      - 'filecopy.bat'
+      - '.github/*'
+      - '.github/*_TEMPLATE/**'
+      - '*.bat'
+      - '*.yml'
+      - '*.md'
       - 'LICENSE*'
-      - 'README.md'
+  workflow_dispatch:
   schedule:
     - cron: '0 0 1 * *' # Monthly
 
 jobs:
   build-windows:
     runs-on: windows-latest
+    env:
+      POWERSHELL_TELEMETRY_OPTOUT: 1
     strategy:
       fail-fast: false
       matrix:
         toolset: [v141_xp, v141, v142]
         configuration: [Release, Debug]
     steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: recursive
-    - name: CMake generate
-      run: |
-        mkdir build
-        cd build
-        cmake -T ${{ matrix.toolset }} -A Win32 ..
-    - name: Build
-      working-directory: build
-      run: cmake --build . -j $env:NUMBER_OF_PROCESSORS --config ${{ matrix.configuration }}
-    - uses: actions/upload-artifact@v1
-      if: matrix.toolset == 'v141_xp'
-      with:
-        name: openag-${{ runner.os }}-${{ matrix.configuration }}
-        path: build\${{ matrix.configuration }}\client.dll
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: CMake generate
+        run: cmake -T ${{ matrix.toolset }} -A Win32 -B build
+      - name: Build
+        run: cmake --build build -j $env:NUMBER_OF_PROCESSORS --config ${{ matrix.configuration }}
+      - uses: actions/upload-artifact@v2
+        if: matrix.toolset == 'v141_xp'
+        with:
+          name: openag-${{ runner.os }}-${{ matrix.configuration }}
+          path: build\${{ matrix.configuration }}\client.dll
+          if-no-files-found: error
 
   build-linux-gcc:
+    name: build-linux (gcc-${{ matrix.gcc-ver }}, ${{ matrix.configuration }})
     runs-on: ubuntu-18.04
+    strategy:
+      fail-fast: false
+      matrix:
+        gcc-ver: [6, 7, 8, 9, 10, 11]
+        configuration: [Release, Debug]
     env:
       CC: gcc-${{ matrix.gcc-ver }}
       CXX: g++-${{ matrix.gcc-ver }}
-    strategy:
-      fail-fast: false
-      matrix:
-        gcc-ver: [6, 7, 8]
-        configuration: [Release, Debug]
     steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: recursive
-    - name: Setup
-      run: |
-        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-        sudo apt-get update
-        sudo apt-get -y install g++-${{ matrix.gcc-ver }} g++-${{ matrix.gcc-ver }}-multilib linux-libc-dev-i386-cross mesa-common-dev ninja-build rapidjson-dev
-        mkdir build
-    - name: CMake generate
-      working-directory: build
-      run: cmake -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} ..
-    - name: Build
-      working-directory: build
-      run: ninja
-    - uses: actions/upload-artifact@v1
-      if: matrix.gcc-ver == '8'
-      with:
-        name: openag-${{ runner.os }}-${{ matrix.configuration }}
-        path: build/client.so
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Setup
+        run: |
+          sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+          sudo apt-get update
+          sudo apt-get install -y g++-${{ matrix.gcc-ver }}-multilib libgl-dev ninja-build rapidjson-dev
+      - name: CMake generate
+        run: cmake -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -B build
+      - name: Build
+        working-directory: build
+        run: ninja
+      - uses: actions/upload-artifact@v2
+        if: matrix.gcc-ver == '11'
+        with:
+          name: openag-${{ runner.os }}-${{ matrix.configuration }}
+          path: build/client.so
+          if-no-files-found: error
 
   build-linux-clang:
+    name: build-linux (clang-${{ matrix.clang-ver }}, ${{ matrix.configuration }})
     runs-on: ubuntu-18.04
-    env:
-      compiler: clang
-      CC: clang
-      CXX: clang++
     strategy:
       fail-fast: false
       matrix:
+        clang-ver: [3.9, '4.0', '5.0', '6.0', 7, 8, 9, 10, 11, 12] # #.0 is interpreted as integer without quotation marks
         configuration: [Release, Debug]
+    env:
+      CC: clang-${{ matrix.clang-ver }}
+      CXX: clang++-${{ matrix.clang-ver }}
     steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: recursive
-    - name: Setup
-      run: |
-        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-        sudo apt-get update
-        sudo apt-get -y install g++-8 g++-8-multilib linux-libc-dev-i386-cross mesa-common-dev ninja-build rapidjson-dev
-        mkdir build
-    - name: CMake generate
-      working-directory: build
-      run: cmake -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} ..
-    - name: Build
-      working-directory: build
-      run: ninja
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Setup
+        run: |
+          if [ '${{ matrix.clang-ver }}' -ge '11' ]; then
+            wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+            sudo add-apt-repository 'deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-11 main'
+            sudo add-apt-repository 'deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-12 main'
+          fi
+          sudo apt-get update
+          sudo apt-get install -y clang-${{ matrix.clang-ver }} g++-multilib libgl-dev ninja-build rapidjson-dev
+      - name: CMake generate
+        run: cmake -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -B build
+      - name: Build
+        working-directory: build
+        run: ninja
