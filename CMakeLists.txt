@@ -1,4 +1,9 @@
 cmake_minimum_required(VERSION 3.3)
+
+# Set the SDK according to what discord-rpc uses as the lowest common denominator.
+# Must be a cache variable: https://stackoverflow.com/a/34208904
+set(CMAKE_OSX_DEPLOYMENT_TARGET "10.10" CACHE STRING "Minimum OS X deployment version")
+
 project(OpenAG)
 
 include("CMake/helpers.cmake")

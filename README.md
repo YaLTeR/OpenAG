@@ -1,7 +1,7 @@
 ﻿OpenAG
 ======================
+[![Build Status](https://github.com/YaLTeR/OpenAG/workflows/CI/badge.svg?branch=master)](https://github.com/YaLTeR/OpenAG/actions?query=branch:master)
 [![Build Status](https://travis-ci.org/YaLTeR/OpenAG.svg?branch=master)](https://travis-ci.org/YaLTeR/OpenAG)
-[![Build Status](https://ci.appveyor.com/api/projects/status/o758yugwuavrt9qi?svg=true)](https://ci.appveyor.com/project/YaLTeR/openag)
 [![Chat on Discord](https://discordapp.com/api/guilds/252168904359542784/widget.png)](https://discord.gg/jCYhYNH)
 
 OpenAG is an open-source client of the Half-Life promod Adrenaline Gamer, completely rewritten from scratch on latest Half-Life SDK. It adds new features, bugfixes and other tweaks over the original mod, while maintaining the ability to play on all currently existing servers.
@@ -31,7 +31,7 @@ OpenAG is an open-source client of the Half-Life promod Adrenaline Gamer, comple
 1. Clone the repository.
 1. Open Git Bash in the OpenAG folder.
 1. `git submodule update --init`
-1. `cmake -B build`
+1. `cmake -A Win32 -B build`
 1. `cmake --build build --config Release`
 
 ## macOS
