@@ -35,6 +35,10 @@ extern BEAM *pBeam2;
 void ClearEventList( void );
 #endif
 
+extern "C" {
+	void update_slopebug_fix(float slopebug_fix);
+}
+
 /// USER-DEFINED SERVER MESSAGE HANDLERS
 
 int CHud :: MsgFunc_ResetHUD(const char *pszName, int iSize, void *pbuf )
@@ -69,8 +73,16 @@ void CHud :: MsgFunc_ViewMode( const char *pszName, int iSize, void *pbuf )
 
 void CHud :: MsgFunc_InitHUD( const char *pszName, int iSize, void *pbuf )
 {
+	BEGIN_READ(pbuf, iSize);
+
+	// Here we'll get a -1 if the server is AG 6.6 or less, because it's not sent at all, and 1 for AG 6.7
+	const auto slopefix = (READ_BYTE() == 1) ? 1.0f : 0.0f;
+	update_slopebug_fix(slopefix);
+
+	gEngfuncs.Con_DPrintf("Slopefix is %sactive on this server.\n", slopefix ? "" : "not ");
+
 	// prepare all hud data
-	HUDLIST *pList = m_pHudList;
+	HUDLIST* pList = m_pHudList;
 
 	while (pList)
 	{

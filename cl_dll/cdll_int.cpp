@@ -71,10 +71,6 @@ void InitInput (void);
 void EV_HookEvents( void );
 void IN_Commands( void );
 
-extern "C" {
-	void update_slopebug_fix(float slopebug_fix);
-}
-
 /*
 ================================
 HUD_GetHullBounds
@@ -151,7 +147,6 @@ char CL_DLLEXPORT HUD_PlayerMoveTexture( char *name )
 void CL_DLLEXPORT HUD_PlayerMove( struct playermove_s *ppmove, int server )
 {
 //	RecClClientMove(ppmove, server);
-	update_slopebug_fix(CVAR_GET_FLOAT("cl_slopebug_fix"));
 
 	PM_Move( ppmove, server );
 }

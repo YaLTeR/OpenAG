@@ -587,7 +587,6 @@ public:
 	cvar_t	*m_pCvarDraw;
 	cvar_t	*m_pCvarDrawDeathNoticesAlways;
 	cvar_t	*m_pCvarAutostop;
-	cvar_t	*m_pCvarSlopebugFix;
 
 	int m_iFontHeight;
 

@@ -483,7 +483,6 @@ void CHud :: Init( void )
 	m_pCvarDraw = CVAR_CREATE( "hud_draw", "1", FCVAR_ARCHIVE );
 	m_pCvarDrawDeathNoticesAlways = CVAR_CREATE( "cl_draw_deathnotices_always", "0", FCVAR_ARCHIVE );
 	m_pCvarAutostop = CVAR_CREATE("cl_autostop", "0", FCVAR_ARCHIVE);
-	m_pCvarSlopebugFix = CVAR_CREATE( "cl_slopebug_fix", "0", FCVAR_ARCHIVE );
 	m_pCvarColor = CVAR_CREATE( "hud_color", "", FCVAR_ARCHIVE );
 	cl_lw = gEngfuncs.pfnGetCvarPointer( "cl_lw" );
 
