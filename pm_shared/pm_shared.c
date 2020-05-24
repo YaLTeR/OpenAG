@@ -130,6 +130,7 @@ static char grgszTextureName[CTEXTURESMAX][CBTEXTURENAMEMAX];
 static char grgchTextureType[CTEXTURESMAX];
 
 int g_onladder = 0;
+float g_slopebug_fix = 0.0f;
 
 void PM_SwapTextures( int i, int j )
 {
@@ -806,6 +807,20 @@ int PM_FlyMove (void)
 
 		// See if we can make it from origin to end point.
 		trace = pmove->PM_PlayerTrace (pmove->origin, end, PM_NORMAL, -1 );
+
+		if (g_slopebug_fix > 0.0f)
+		{
+			// Slopebug fix from: https://github.com/LevShisterov/BugfixedHL/blob/master/pm_shared/pm_shared.c#L835
+			// Check if we are stuck on the surface (HACKHACK: this solves precision error in the engine for small movements)
+			if (trace.fraction == 0.0)
+			{
+				// Move end point to a thousandth fraction of the unit vector away from the wall and try to move again
+				for (i = 0; i < 3; i++)
+					end[i] += trace.plane.normal[i] * 0.001;
+
+				trace = pmove->PM_PlayerTrace(pmove->origin, end, PM_NORMAL, -1);
+			}
+		}
 
 		allFraction += trace.fraction;
 		// If we started in a solid object, or we were in solid space
@@ -3355,3 +3370,10 @@ void PM_Init( struct playermove_s *ppmove )
 
 	pm_shared_initialized = 1;
 }
+
+#ifdef CLIENT_DLL
+	void update_slopebug_fix(float slopebug_fix)
+	{
+		g_slopebug_fix = slopebug_fix;
+	}
+#endif
