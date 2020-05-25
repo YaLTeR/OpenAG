@@ -438,7 +438,6 @@ void CHud :: Init( void )
 	HOOK_MESSAGE( TeamNames );
 	HOOK_MESSAGE( Feign );
 	HOOK_MESSAGE( Detpack );
-
 	HOOK_MESSAGE( MOTD );
 	HOOK_MESSAGE( BuildSt );
 	HOOK_MESSAGE( RandomPC );
@@ -878,5 +877,4 @@ float CHud::GetSensitivity( void )
 {
 	return m_flMouseSensitivity;
 }
-
 
