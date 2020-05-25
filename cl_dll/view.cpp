@@ -1310,6 +1310,14 @@ void V_GetInEyePos(int target, float * origin, float * angles )
 
 	angles[PITCH]*=-3.0f;	// see CL_ProcessEntityUpdate()
 
+	if (gHUD.m_pCvarViewheightMode->value != 0.0f)
+	{
+		// In the latest HLSDK some observer stuff is performed serverside which ends up
+		// adding some extra viewheight here when spectating in first person mode, so use
+		// cl_viewheight_mode 1 to avoid the extra viewheight
+		return;
+	}
+
 	if ( ent->curstate.solid == SOLID_NOT )
 	{
 		angles[ROLL] = 80;	// dead view angle
