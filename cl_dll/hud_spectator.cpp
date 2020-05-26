@@ -1305,7 +1305,7 @@ bool CHudSpectator::ParseOverviewFile( )
 
 	if (!pfile)
 	{
-		gEngfuncs.Con_DPrintf("Couldn't open file %s. Using default values for overiew mode.\n", filename );
+		gEngfuncs.Con_DPrintf("Couldn't open file %s. Using default values for overiew mode.\n", filename.c_str() );
 		return false;
 	}
 	
@@ -1323,7 +1323,7 @@ bool CHudSpectator::ParseOverviewFile( )
 			pfile = gEngfuncs.COM_ParseFile(pfile, token);
 			if ( stricmp( token, "{" ) ) 
 			{
-				gEngfuncs.Con_Printf("Error parsing overview file %s. (expected { )\n", filename );
+				gEngfuncs.Con_Printf("Error parsing overview file %s. (expected { )\n", filename.c_str() );
 				return false;
 			}
 
@@ -1364,7 +1364,7 @@ bool CHudSpectator::ParseOverviewFile( )
 				}
 				else
 				{
-					gEngfuncs.Con_Printf("Error parsing overview file %s. (%s unkown)\n", filename, token );
+					gEngfuncs.Con_Printf("Error parsing overview file %s. (%s unkown)\n", filename.c_str(), token );
 					return false;
 				}
 
@@ -1383,7 +1383,7 @@ bool CHudSpectator::ParseOverviewFile( )
 				
 			if ( stricmp( token, "{" ) ) 
 			{
-				gEngfuncs.Con_Printf("Error parsing overview file %s. (expected { )\n", filename );
+				gEngfuncs.Con_Printf("Error parsing overview file %s. (expected { )\n", filename.c_str() );
 				return false;
 			}
 
@@ -1406,7 +1406,7 @@ bool CHudSpectator::ParseOverviewFile( )
 				}
 				else
 				{
-					gEngfuncs.Con_Printf("Error parsing overview file %s. (%s unkown)\n", filename, token );
+					gEngfuncs.Con_Printf("Error parsing overview file %s. (%s unkown)\n", filename.c_str(), token );
 					return false;
 				}
 
