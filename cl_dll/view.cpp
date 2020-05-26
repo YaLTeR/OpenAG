@@ -1503,7 +1503,25 @@ void V_CalcSpectatorRefdef ( struct ref_params_s * pparams )
 //		if ( gEngfuncs.IsSpectateOnly() )
 //#endif
 		{
-			V_GetInEyePos( g_iUser2, pparams->simorg, pparams->cl_viewangles );
+			if ( gHUD.m_pCvarViewheightMode->value != 0.0f && ( gHUD.m_Spectator.m_pip->value == INSET_IN_EYE || g_iUser1 == OBS_IN_EYE ) )
+			{
+				// In the latest HLSDK some observer stuff is performed serverside which ends up
+				// adding some extra viewheight when spectating in first person mode, so use
+				// cl_viewheight_mode 1 to avoid the extra viewheight
+
+				// Get eye position and angles
+				VectorCopy ( ent->origin, pparams->simorg );
+				VectorCopy ( ent->angles, pparams->cl_viewangles );
+
+				pparams->cl_viewangles[PITCH]*=-3.0f;	// see CL_ProcessEntityUpdate()
+
+				if ( ent->curstate.solid == SOLID_NOT )
+					pparams->cl_viewangles[ROLL] = 80;	// dead view angle
+			}
+			else
+			{
+				V_GetInEyePos( g_iUser2, pparams->simorg, pparams->cl_viewangles );
+			}
 
 			pparams->health = 1;
 
