@@ -594,7 +594,7 @@ int CHudSpectator::VidInit()
 	m_hsprPlayerBlue	= SPR_Load("sprites/iplayerblue.spr");
 	m_hsprPlayerRed		= SPR_Load("sprites/iplayerred.spr");
 	m_hsprPlayerDead	= SPR_Load("sprites/iplayerdead.spr");
-	m_hsprUnkownMap		= SPR_Load("sprites/tile.spr");
+	m_hsprUnknownMap	= SPR_Load("sprites/tile.spr");
 	m_hsprBeam			= SPR_Load("sprites/laserbeam.spr");
 	m_hsprCamera		= SPR_Load("sprites/camera.spr");
 	m_hCrosshair		= SPR_Load("sprites/crosshairs.spr");
@@ -1279,18 +1279,8 @@ bool CHudSpectator::ParseOverviewFile( )
 	float height;
 	
 	char *pfile  = NULL;
-
-	memset( &m_OverviewData, 0, sizeof(m_OverviewData));
-
-	// fill in standrd values
-	m_OverviewData.insetWindowX = 4;	// upper left corner
-	m_OverviewData.insetWindowY = 4;
-	m_OverviewData.insetWindowHeight = 180;
-	m_OverviewData.insetWindowWidth = 240;
-	m_OverviewData.origin[0] = 0.0f;
-	m_OverviewData.origin[1] = 0.0f;
-	m_OverviewData.origin[2] = 0.0f;
-	m_OverviewData.zoom	= 1.0f;
+	
+	m_OverviewData = Overview();
 	m_OverviewData.map = gEngfuncs.pfnGetLevelName();
 
 	const auto mapLen = m_OverviewData.map.size();
@@ -1305,7 +1295,7 @@ bool CHudSpectator::ParseOverviewFile( )
 
 	if (!pfile)
 	{
-		gEngfuncs.Con_DPrintf("Couldn't open file %s. Using default values for overiew mode.\n", filename.c_str() );
+		gEngfuncs.Con_DPrintf("Couldn't open file %s. Using default values for overview mode.\n", filename.c_str() );
 		return false;
 	}
 	
@@ -1364,7 +1354,7 @@ bool CHudSpectator::ParseOverviewFile( )
 				}
 				else
 				{
-					gEngfuncs.Con_Printf("Error parsing overview file %s. (%s unkown)\n", filename.c_str(), token );
+					gEngfuncs.Con_Printf("Error parsing overview file %s. (%s unknown)\n", filename.c_str(), token );
 					return false;
 				}
 
@@ -1406,7 +1396,7 @@ bool CHudSpectator::ParseOverviewFile( )
 				}
 				else
 				{
-					gEngfuncs.Con_Printf("Error parsing overview file %s. (%s unkown)\n", filename.c_str(), token );
+					gEngfuncs.Con_Printf("Error parsing overview file %s. (%s unknown)\n", filename.c_str(), token );
 					return false;
 				}
 
@@ -1432,7 +1422,7 @@ void CHudSpectator::LoadMapSprites()
 	for (auto& layer : m_OverviewData.layers)
 	{
 		if (layer.imagePath.empty())
-			layer.mapSprite = (struct model_s*) gEngfuncs.GetSpritePointer(m_hsprUnkownMap);
+			layer.mapSprite = (struct model_s*) gEngfuncs.GetSpritePointer(m_hsprUnknownMap);
 		else
 			layer.mapSprite = gEngfuncs.LoadMapSprite(layer.imagePath.c_str());
 	}
@@ -1447,12 +1437,13 @@ void CHudSpectator::DrawOverviewLayer()
 	GetCameraView(camOrigin, camAngles);
 
 	const auto currLayer = GetCurrentLayer(camOrigin);
-	const auto hasMapImage = currLayer.mapSprite == (struct model_s*)gEngfuncs.GetSpritePointer(m_hsprUnkownMap) ? false : true;
+	const auto unknown_map = (struct model_s*)gEngfuncs.GetSpritePointer(m_hsprUnknownMap);
+	const auto hasMapImage = (currLayer.mapSprite != unknown_map);
 
 	if ( hasMapImage)
 	{
 		i = currLayer.mapSprite->numframes / (4*3);
-		i = (int) sqrt((float)i);
+		i = sqrt((float)i);
 		xTiles = i*4;
 		yTiles = i*3;
 	}
@@ -1945,7 +1936,7 @@ void CHudSpectator::Reset()
 		ParseOverviewFile();
 
 		// A default layer for dummy overview when there's no overview file
-		if (m_OverviewData.layers.size() == 0)
+		if (m_OverviewData.layers.empty())
 			m_OverviewData.layers.push_back(OverviewLayer());
 
 		LoadMapSprites();
@@ -1992,10 +1983,10 @@ void CHudSpectator::InitHUDData()
 CHudSpectator::OverviewLayer CHudSpectator::GetCurrentLayer(Vector playerPos)
 {
 	// Get the layer with highest Z, that will be the default layer,
-	// or it will be the dummy oneif an overview file doesn't exist for this map
+	// or it will be the dummy one if an overview file doesn't exist for this map
 	OverviewLayer result = GetHighestLayer();
 
-	// Get the overview with highest Z that is below player Z position too
+	// Get the overview with lowest Z that is above player Z position too
 	for (const auto& layer : m_OverviewData.layers)
 	{
 		if (playerPos.z < layer.z && layer.z < result.z)
@@ -2005,6 +1996,7 @@ CHudSpectator::OverviewLayer CHudSpectator::GetCurrentLayer(Vector playerPos)
 	}
 	return result;
 }
+
 CHudSpectator::OverviewLayer CHudSpectator::GetHighestLayer()
 {
 	// There's always at least one layer, because a dummy one is put if there is no overview file

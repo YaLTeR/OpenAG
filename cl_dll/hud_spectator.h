@@ -57,6 +57,7 @@ class CHudSpectator : public CHudBase
 		std::string		imagePath;
 		float			z;
 		model_s*		mapSprite;
+
 		OverviewLayer()
 			: imagePath("")
 			, z(0.0f)
@@ -64,6 +65,7 @@ class CHudSpectator : public CHudBase
 		{
 		}
 	};
+
 	struct Overview
 	{
 		std::string					map;		// cl.levelname or empty
@@ -71,10 +73,22 @@ class CHudSpectator : public CHudBase
 		float						zoom;		// zoom of map images
 		std::vector<OverviewLayer>	layers;
 		qboolean					rotated;	// are map images rotated (90 degrees) ?
-		int			insetWindowX;
-		int			insetWindowY;
-		int			insetWindowHeight;
-		int			insetWindowWidth;
+		int							insetWindowX;
+		int							insetWindowY;
+		int							insetWindowHeight;
+		int							insetWindowWidth;
+
+		Overview()
+			: origin(Vector(0, 0, 0))
+			, zoom(1.0f)
+			, rotated(false)
+			, insetWindowX(4)
+			, insetWindowY(4)
+			, insetWindowHeight(180)
+			, insetWindowWidth(240)
+		{
+		}
+
 	};
 
 public:
@@ -150,7 +164,7 @@ private:
 	HSPRITE		m_hsprCamera;
 	HSPRITE		m_hsprPlayerDead;
 	HSPRITE		m_hsprViewcone;
-	HSPRITE		m_hsprUnkownMap;
+	HSPRITE		m_hsprUnknownMap;
 	HSPRITE		m_hsprBeam;
 	HSPRITE		m_hCrosshair;
 
