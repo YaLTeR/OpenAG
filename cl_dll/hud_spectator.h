@@ -78,14 +78,19 @@ class CHudSpectator : public CHudBase
 		int							insetWindowHeight;
 		int							insetWindowWidth;
 
-		Overview()
-			: origin(Vector(0, 0, 0))
+		Overview(const std::string& map)
+			: map(map)
+			, origin(Vector(0, 0, 0))
 			, zoom(1.0f)
 			, rotated(false)
 			, insetWindowX(4)
 			, insetWindowY(4)
 			, insetWindowHeight(180)
 			, insetWindowWidth(240)
+		{
+		}
+
+		Overview() : Overview("")
 		{
 		}
 

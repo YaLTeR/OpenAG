@@ -1280,8 +1280,7 @@ bool CHudSpectator::ParseOverviewFile( )
 	
 	char *pfile  = NULL;
 	
-	m_OverviewData = Overview();
-	m_OverviewData.map = gEngfuncs.pfnGetLevelName();
+	m_OverviewData = Overview(gEngfuncs.pfnGetLevelName());
 
 	const auto mapLen = m_OverviewData.map.size();
 	if ( mapLen == 0 )
