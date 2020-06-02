@@ -9,6 +9,9 @@
 #define SPECTATOR_H
 #pragma once
 
+#include <string>
+#include <vector>
+
 #include "cl_entity.h"
 #include "interpolation.h"
 
@@ -21,30 +24,12 @@
 
 #define MAX_SPEC_HUD_MESSAGES	8
 
-#define OVERVIEW_TILE_SIZE		128		// don't change this
-#define OVERVIEW_MAX_LAYERS		1
-
 extern void VectorAngles( const float *forward, float *angles );
 extern "C" void NormalizeAngles( float *angles );
 
 //-----------------------------------------------------------------------------
 // Purpose: Handles the drawing of the spectator stuff (camera & top-down map and all the things on it )
 //-----------------------------------------------------------------------------
-
-typedef struct overviewInfo_s {
-	char		map[64];	// cl.levelname or empty
-	vec3_t		origin;		// center of map
-	float		zoom;		// zoom of map images
-	int			layers;		// how may layers do we have
-	float		layersHeights[OVERVIEW_MAX_LAYERS];
-	char		layersImages[OVERVIEW_MAX_LAYERS][255];
-	qboolean	rotated;	// are map images rotated (90 degrees) ?
-	
-	int			insetWindowX;
-	int			insetWindowY;
-	int			insetWindowHeight;
-	int			insetWindowWidth;
-} overviewInfo_t;
 
 typedef struct overviewEntity_s {
 
@@ -67,6 +52,50 @@ typedef struct cameraWayPoint_s
 
 class CHudSpectator : public CHudBase
 {
+	struct OverviewLayer
+	{
+		std::string		imagePath;
+		float			z;
+		model_s*		mapSprite;
+
+		OverviewLayer()
+			: imagePath("")
+			, z(0.0f)
+			, mapSprite(nullptr)
+		{
+		}
+	};
+
+	struct Overview
+	{
+		std::string					map;		// cl.levelname or empty
+		Vector						origin;		// center of map
+		float						zoom;		// zoom of map images
+		std::vector<OverviewLayer>	layers;
+		qboolean					rotated;	// are map images rotated (90 degrees) ?
+		int							insetWindowX;
+		int							insetWindowY;
+		int							insetWindowHeight;
+		int							insetWindowWidth;
+
+		Overview(const std::string& map)
+			: map(map)
+			, origin(Vector(0, 0, 0))
+			, zoom(1.0f)
+			, rotated(false)
+			, insetWindowX(4)
+			, insetWindowY(4)
+			, insetWindowHeight(180)
+			, insetWindowWidth(240)
+		{
+		}
+
+		Overview() : Overview("")
+		{
+		}
+
+	};
+
 public:
 	void Reset();
 	int  ToggleInset(bool allowOff);
@@ -100,13 +129,17 @@ public:
 	float	GetFOV();
 	bool	GetDirectorCamera(vec3_t &position, vec3_t &angle);
 	void	SetWayInterpolation(cameraWayPoint_t * prev, cameraWayPoint_t * start, cameraWayPoint_t * end, cameraWayPoint_t * next);
+	void	GetCameraView(Vector& pos, Vector& angle);
+
+	OverviewLayer GetCurrentLayer(Vector playerPos);
+	OverviewLayer GetHighestLayer();
 
 
 	int m_iDrawCycle;
 	client_textmessage_t m_HUDMessages[MAX_SPEC_HUD_MESSAGES];
 	char				m_HUDMessageText[MAX_SPEC_HUD_MESSAGES][128];
 	int					m_lastHudMessage;
-	overviewInfo_t		m_OverviewData;
+	Overview			m_OverviewData;
 	overviewEntity_t	m_OverviewEntities[MAX_OVERVIEW_ENTITIES];
 	int					m_iObserverFlags;
 	int					m_iSpectatorNumber;
@@ -136,13 +169,12 @@ private:
 	HSPRITE		m_hsprCamera;
 	HSPRITE		m_hsprPlayerDead;
 	HSPRITE		m_hsprViewcone;
-	HSPRITE		m_hsprUnkownMap;
+	HSPRITE		m_hsprUnknownMap;
 	HSPRITE		m_hsprBeam;
 	HSPRITE		m_hCrosshair;
 
 	wrect_t		m_crosshairRect;
 
-	struct model_s * m_MapSprite;	// each layer image is saved in one sprite, where each tile is a sprite frame
 	float		m_flNextObserverInput;
 	float		m_FOV;
 	float		m_zoomDelta;

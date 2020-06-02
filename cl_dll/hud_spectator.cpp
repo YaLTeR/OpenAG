@@ -391,6 +391,24 @@ void CHudSpectator::SetSpectatorStartPosition()
 	iJumpSpectator = 1;	// jump anyway
 }
 
+void CHudSpectator::GetCameraView(Vector& pos, Vector& angle)
+{
+	if (m_pip->value == INSET_IN_EYE || g_iUser1 == OBS_IN_EYE)
+	{
+		V_GetInEyePos(g_iUser2, pos, angle);
+	}
+	else if (m_pip->value == INSET_CHASE_FREE || g_iUser1 == OBS_CHASE_FREE)
+	{
+		V_GetChasePos(g_iUser2, v_cl_angles, pos, angle);
+	}
+	else if (g_iUser1 == OBS_ROAMING)
+	{
+		VectorCopy(v_sim_org, pos);
+		VectorCopy(v_cl_angles, angle);
+	}
+	else
+		V_GetChasePos(g_iUser2, NULL, pos, angle);
+}
 
 void CHudSpectator::SetCameraView( vec3_t pos, vec3_t angle, float fov)
 {
@@ -576,7 +594,7 @@ int CHudSpectator::VidInit()
 	m_hsprPlayerBlue	= SPR_Load("sprites/iplayerblue.spr");
 	m_hsprPlayerRed		= SPR_Load("sprites/iplayerred.spr");
 	m_hsprPlayerDead	= SPR_Load("sprites/iplayerdead.spr");
-	m_hsprUnkownMap		= SPR_Load("sprites/tile.spr");
+	m_hsprUnknownMap	= SPR_Load("sprites/tile.spr");
 	m_hsprBeam			= SPR_Load("sprites/laserbeam.spr");
 	m_hsprCamera		= SPR_Load("sprites/camera.spr");
 	m_hCrosshair		= SPR_Load("sprites/crosshairs.spr");
@@ -1255,41 +1273,28 @@ bool CHudSpectator::IsActivePlayer(cl_entity_t * ent)
 
 bool CHudSpectator::ParseOverviewFile( )
 {
-	char filename[255];
-	char levelname[255];
+	std::string filename;
+	std::string levelname;
 	char token[1024];
 	float height;
 	
 	char *pfile  = NULL;
+	
+	m_OverviewData = Overview(gEngfuncs.pfnGetLevelName());
 
-	memset( &m_OverviewData, 0, sizeof(m_OverviewData));
-
-	// fill in standrd values
-	m_OverviewData.insetWindowX = 4;	// upper left corner
-	m_OverviewData.insetWindowY = 4;
-	m_OverviewData.insetWindowHeight = 180;
-	m_OverviewData.insetWindowWidth = 240;
-	m_OverviewData.origin[0] = 0.0f;
-	m_OverviewData.origin[1] = 0.0f;
-	m_OverviewData.origin[2] = 0.0f;
-	m_OverviewData.zoom	= 1.0f;
-	m_OverviewData.layers = 0;
-	m_OverviewData.layersHeights[0] = 0.0f;
-	strcpy( m_OverviewData.map, gEngfuncs.pfnGetLevelName() );
-
-	if ( strlen( m_OverviewData.map ) == 0 )
+	const auto mapLen = m_OverviewData.map.size();
+	if ( mapLen == 0 )
 		return false; // not active yet
 
-	strcpy(levelname, m_OverviewData.map + 5);
-	levelname[strlen(levelname)-4] = 0;
-	
-	snprintf(filename, sizeof(filename), "overviews/%s.txt", levelname );
+	// Remove "maps/", ie. first 5 chars, and then the ".bsp" extension (4 chars)
+	levelname = m_OverviewData.map.substr(5, mapLen - 5 - 4);
+	filename = "overviews/" + levelname + ".txt";
 
-	pfile = (char *)gEngfuncs.COM_LoadFile( filename, 5, NULL);
+	pfile = (char *)gEngfuncs.COM_LoadFile(filename.c_str(), 5, NULL);
 
 	if (!pfile)
 	{
-		gEngfuncs.Con_DPrintf("Couldn't open file %s. Using default values for overiew mode.\n", filename );
+		gEngfuncs.Con_DPrintf("Couldn't open file %s. Using default values for overview mode.\n", filename.c_str() );
 		return false;
 	}
 	
@@ -1307,7 +1312,7 @@ bool CHudSpectator::ParseOverviewFile( )
 			pfile = gEngfuncs.COM_ParseFile(pfile, token);
 			if ( stricmp( token, "{" ) ) 
 			{
-				gEngfuncs.Con_Printf("Error parsing overview file %s. (expected { )\n", filename );
+				gEngfuncs.Con_Printf("Error parsing overview file %s. (expected { )\n", filename.c_str() );
 				return false;
 			}
 
@@ -1348,7 +1353,7 @@ bool CHudSpectator::ParseOverviewFile( )
 				}
 				else
 				{
-					gEngfuncs.Con_Printf("Error parsing overview file %s. (%s unkown)\n", filename, token );
+					gEngfuncs.Con_Printf("Error parsing overview file %s. (%s unknown)\n", filename.c_str(), token );
 					return false;
 				}
 
@@ -1360,18 +1365,14 @@ bool CHudSpectator::ParseOverviewFile( )
 		{
 			// parse a layer data
 
-			if ( m_OverviewData.layers == OVERVIEW_MAX_LAYERS )
-			{
-				gEngfuncs.Con_Printf("Error parsing overview file %s. ( too many layers )\n", filename );
-				return false;
-			}
+			OverviewLayer currLayer;
 
 			pfile = gEngfuncs.COM_ParseFile(pfile,token);
 
 				
 			if ( stricmp( token, "{" ) ) 
 			{
-				gEngfuncs.Con_Printf("Error parsing overview file %s. (expected { )\n", filename );
+				gEngfuncs.Con_Printf("Error parsing overview file %s. (expected { )\n", filename.c_str() );
 				return false;
 			}
 
@@ -1382,26 +1383,26 @@ bool CHudSpectator::ParseOverviewFile( )
 				if ( !stricmp( token, "image" ) )
 				{
 					pfile = gEngfuncs.COM_ParseFile(pfile,token);
-					strcpy(m_OverviewData.layersImages[ m_OverviewData.layers ], token);
-					
+					currLayer.imagePath = token;
+
 					
 				} 
 				else if ( !stricmp( token, "height" ) )
 				{
 					pfile = gEngfuncs.COM_ParseFile(pfile,token); 
 					height = atof(token);
-					m_OverviewData.layersHeights[ m_OverviewData.layers ] = height;
+					currLayer.z = height;
 				}
 				else
 				{
-					gEngfuncs.Con_Printf("Error parsing overview file %s. (%s unkown)\n", filename, token );
+					gEngfuncs.Con_Printf("Error parsing overview file %s. (%s unknown)\n", filename.c_str(), token );
 					return false;
 				}
 
 				pfile = gEngfuncs.COM_ParseFile(pfile,token); // parse next token
 			}
 
-			m_OverviewData.layers++;
+			m_OverviewData.layers.push_back(currLayer);
 
 		}
 	}
@@ -1417,13 +1418,13 @@ bool CHudSpectator::ParseOverviewFile( )
 
 void CHudSpectator::LoadMapSprites()
 {
-	// right now only support for one map layer
-	if (m_OverviewData.layers > 0 )
+	for (auto& layer : m_OverviewData.layers)
 	{
-		m_MapSprite = gEngfuncs.LoadMapSprite( m_OverviewData.layersImages[0] );
+		if (layer.imagePath.empty())
+			layer.mapSprite = (struct model_s*) gEngfuncs.GetSpritePointer(m_hsprUnknownMap);
+		else
+			layer.mapSprite = gEngfuncs.LoadMapSprite(layer.imagePath.c_str());
 	}
-	else
-		m_MapSprite = NULL; // the standard "unkown map" sprite will be used instead
 }
 
 void CHudSpectator::DrawOverviewLayer()
@@ -1431,12 +1432,16 @@ void CHudSpectator::DrawOverviewLayer()
 	float screenaspect, xs, ys, xStep, yStep, x,y,z;
 	int ix,iy,i,xTiles,yTiles,frame;
 
-	qboolean	hasMapImage = m_MapSprite?TRUE:FALSE;
-	model_t *   dummySprite = (struct model_s *)gEngfuncs.GetSpritePointer( m_hsprUnkownMap);
+	Vector camOrigin, camAngles;
+	GetCameraView(camOrigin, camAngles);
+
+	const auto currLayer = GetCurrentLayer(camOrigin);
+	const auto unknown_map = (struct model_s*)gEngfuncs.GetSpritePointer(m_hsprUnknownMap);
+	const auto hasMapImage = (currLayer.mapSprite != unknown_map);
 
 	if ( hasMapImage)
 	{
-		i = m_MapSprite->numframes / (4*3);
+		i = currLayer.mapSprite->numframes / (4*3);
 		i = sqrt((float)i);
 		xTiles = i*4;
 		yTiles = i*3;
@@ -1454,7 +1459,7 @@ void CHudSpectator::DrawOverviewLayer()
 	xs = m_OverviewData.origin[0];
 	ys = m_OverviewData.origin[1];
 	z  = ( 90.0f - v_angles[0] ) / 90.0f;		
-	z *= m_OverviewData.layersHeights[0]; // gOverviewData.z_min - 32;	
+	z *= m_OverviewData.origin.z;
 
 	// i = r_overviewTexture + ( layer*OVERVIEW_X_TILES*OVERVIEW_Y_TILES );
 
@@ -1479,10 +1484,7 @@ void CHudSpectator::DrawOverviewLayer()
 
 			for (ix = 0; ix < xTiles; ix++)
 			{
-				if (hasMapImage)
-					gEngfuncs.pTriAPI->SpriteTexture( m_MapSprite, frame );
-				else
-					gEngfuncs.pTriAPI->SpriteTexture( dummySprite, 0 );
+				gEngfuncs.pTriAPI->SpriteTexture( currLayer.mapSprite, frame );
 
 				gEngfuncs.pTriAPI->Begin( TRI_QUADS );
 					gEngfuncs.pTriAPI->TexCoord2f( 0, 0 );
@@ -1498,7 +1500,9 @@ void CHudSpectator::DrawOverviewLayer()
 					gEngfuncs.pTriAPI->Vertex3f (x, y+yStep, z);
 				gEngfuncs.pTriAPI->End();
 
-				frame++;
+				if (hasMapImage)
+					frame++;
+
 				x+= xStep;
 			}
 
@@ -1522,10 +1526,7 @@ void CHudSpectator::DrawOverviewLayer()
 						
 			for (iy = 0; iy < xTiles; iy++)	
 			{
-				if (hasMapImage)
-					gEngfuncs.pTriAPI->SpriteTexture( m_MapSprite, frame );
-				else
-					gEngfuncs.pTriAPI->SpriteTexture( dummySprite, 0 );
+				gEngfuncs.pTriAPI->SpriteTexture( currLayer.mapSprite, frame );
 
 				gEngfuncs.pTriAPI->Begin( TRI_QUADS );
 					gEngfuncs.pTriAPI->TexCoord2f( 0, 0 );
@@ -1541,7 +1542,8 @@ void CHudSpectator::DrawOverviewLayer()
 					gEngfuncs.pTriAPI->Vertex3f (x, y+yStep, z);
 				gEngfuncs.pTriAPI->End();
 
-				frame++;
+				if (hasMapImage)
+					frame++;
 				
 				y+=yStep;
 			}
@@ -1563,8 +1565,7 @@ void CHudSpectator::DrawOverviewEntities()
 	
 	float			zScale = (90.0f - v_angles[0] ) / 90.0f;
 	
-
-	z = m_OverviewData.layersHeights[0] * zScale;
+	z = m_OverviewData.origin.z * zScale;
 	// get yellow/brown HUD color
 	UnpackRGB(ir,ig,ib, gHUD.m_iDefaultHUDColor);
 	r = (float)ir/255.0f;
@@ -1692,22 +1693,7 @@ void CHudSpectator::DrawOverviewEntities()
 		return;
 
 	// get current camera position and angle
-
-	if ( m_pip->value == INSET_IN_EYE || g_iUser1 == OBS_IN_EYE )
-	{ 
-		V_GetInEyePos( g_iUser2, origin, angles );
-	}
-	else if ( m_pip->value == INSET_CHASE_FREE  || g_iUser1 == OBS_CHASE_FREE )
-	{
-		V_GetChasePos( g_iUser2, v_cl_angles, origin, angles );
-	}
-	else if ( g_iUser1 == OBS_ROAMING )
-	{
-		VectorCopy( v_sim_org, origin );
-		VectorCopy( v_cl_angles, angles );
-	}
-	else
-		V_GetChasePos( g_iUser2, NULL, origin, angles );
+	GetCameraView(origin, angles);
 
 	
 	// draw camera sprite
@@ -1943,10 +1929,15 @@ int CHudSpectator::ToggleInset(bool allowOff)
 void CHudSpectator::Reset()
 {
 	// Reset HUD
-	if ( strcmp( m_OverviewData.map, gEngfuncs.pfnGetLevelName() ) )
+	if ( strcmp( m_OverviewData.map.c_str(), gEngfuncs.pfnGetLevelName() ) )
 	{
 		// update level overview if level changed
 		ParseOverviewFile();
+
+		// A default layer for dummy overview when there's no overview file
+		if (m_OverviewData.layers.empty())
+			m_OverviewData.layers.push_back(OverviewLayer());
+
 		LoadMapSprites();
 	}
 
@@ -1988,3 +1979,34 @@ void CHudSpectator::InitHUDData()
 	gHUD.m_iFOV =  CVAR_GET_FLOAT("default_fov");
 }
 
+CHudSpectator::OverviewLayer CHudSpectator::GetCurrentLayer(Vector playerPos)
+{
+	// Get the layer with highest Z, that will be the default layer,
+	// or it will be the dummy one if an overview file doesn't exist for this map
+	OverviewLayer result = GetHighestLayer();
+
+	// Get the overview with lowest Z that is above player Z position too
+	for (const auto& layer : m_OverviewData.layers)
+	{
+		if (playerPos.z < layer.z && layer.z < result.z)
+		{
+			result = layer;
+		}
+	}
+	return result;
+}
+
+CHudSpectator::OverviewLayer CHudSpectator::GetHighestLayer()
+{
+	// There's always at least one layer, because a dummy one is put if there is no overview file
+	OverviewLayer result = m_OverviewData.layers[0];
+
+	for (const auto& layer : m_OverviewData.layers)
+	{
+		if (layer.z > result.z)
+		{
+			result = layer;
+		}
+	}
+	return result;
+}
