@@ -19,7 +19,7 @@ script:
 
 deploy:
   provider: releases
-  file: build/client.dylib
+  file: client.dylib
   skip_cleanup: true
   draft: true
   on:
