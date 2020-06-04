@@ -48,6 +48,14 @@ int CL_DLLEXPORT HUD_AddEntity( int type, struct cl_entity_s *ent, const char *m
 	default:
 		break;
 	}
+
+	if (gHUD.m_pCvarFixStandingCorpses->value > 0 
+		&& (ent->player || ent->curstate.renderfx == kRenderFxDeadPlayer) && ent->curstate.framerate == 0)
+		ent->curstate.frame = 255;
+
+	if (gHUD.m_pCvarHideCorpses->value > 0 && ent->curstate.renderfx == kRenderFxDeadPlayer)
+		return 0;
+			
 	// each frame every entity passes this function, so the overview hooks it to filter the overview entities
 	// in spectator mode:
 	// each frame every entity passes this function, so the overview hooks 
