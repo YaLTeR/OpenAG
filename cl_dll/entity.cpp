@@ -49,12 +49,14 @@ int CL_DLLEXPORT HUD_AddEntity( int type, struct cl_entity_s *ent, const char *m
 		break;
 	}
 
-	if (gHUD.m_pCvarFixStandingCorpses->value > 0 
-		&& (ent->player || ent->curstate.renderfx == kRenderFxDeadPlayer) && ent->curstate.framerate == 0)
-		ent->curstate.frame = 255;
-
+	// hide corpses option
 	if (gHUD.m_pCvarHideCorpses->value > 0 && ent->curstate.renderfx == kRenderFxDeadPlayer)
 		return 0;
+
+	// fix standing corpses from players with high fps by setting animation to his last frame
+	// note: we only do this when the animation is done (framerate is equal to 0)
+	if ((ent->player || ent->curstate.renderfx == kRenderFxDeadPlayer) && ent->curstate.framerate == 0)
+		ent->curstate.frame = 256.0f;
 			
 	// each frame every entity passes this function, so the overview hooks it to filter the overview entities
 	// in spectator mode:
