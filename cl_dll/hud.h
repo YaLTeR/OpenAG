@@ -588,6 +588,7 @@ public:
 	cvar_t	*m_pCvarDrawDeathNoticesAlways;
 	cvar_t	*m_pCvarAutostop;
 	cvar_t	*m_pCvarViewheightMode;
+	cvar_t	*m_pCvarHideCorpses;
 
 	int m_iFontHeight;
 
