@@ -72,10 +72,14 @@ void CHud :: MsgFunc_InitHUD( const char *pszName, int iSize, void *pbuf )
 {
 	BEGIN_READ(pbuf, iSize);
 
-	// Here we'll get a -1 if the server is AG 6.6 or less, because it's not sent at all, and 1 for AG 6.7
-	g_slopebug_fix = (READ_BYTE() == 1);
+	// Playdemo sends InitHUD with nullptr pbuf.
+	if (pbuf != nullptr)
+	{
+		// Here we'll get a -1 if the server is AG 6.6 or less, because it's not sent at all, and 1 for AG 6.7
+		g_slopebug_fix = (READ_BYTE() == 1);
 
-	gEngfuncs.Con_DPrintf("Slopebug fix is %sactive on this server.\n", g_slopebug_fix ? "" : "not ");
+		gEngfuncs.Con_DPrintf("Slopebug fix is %sactive on this server.\n", g_slopebug_fix ? "" : "not ");
+	}
 
 	// prepare all hud data
 	HUDLIST *pList = m_pHudList;
