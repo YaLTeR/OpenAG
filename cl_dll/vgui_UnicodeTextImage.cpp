@@ -351,7 +351,7 @@ bool UnicodeTextImage::shouldFallback()
 	return !g_bSurfaceLoaded;
 }
 
-UnicodeTextImage::HFont UnicodeTextImage::createFont(const char *fontName, int tall, int weight, bool antialias)
+UnicodeTextImage::HFont UnicodeTextImage::createFont(const char *fontName, int tall, int weight)
 {
 	initInterfaces();
 
@@ -359,7 +359,7 @@ UnicodeTextImage::HFont UnicodeTextImage::createFont(const char *fontName, int t
 		return INVALID_FONT;
 
 	int flags = 0;
-	if (antialias && tall >= MIN_AA_FONT_SIZE)
+	if (tall >= MIN_AA_FONT_SIZE)
 		flags |= ISurface::FONTFLAG_ANTIALIAS;
 
 	HFont font = g_pVGuiSurface->CreateFont();

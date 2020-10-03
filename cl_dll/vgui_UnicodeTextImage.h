@@ -47,7 +47,7 @@ public:
 	 * @param	weight		Weight of the font
 	 * @param	antialias	Enable antialiasing (if tall >= MIN_AA_FONT_SIZE or vgui_unicode_aa = 2)
 	 */
-	static HFont createFont(const char *fontName, int tall, int weight, bool antialias);
+	static HFont createFont(const char *fontName, int tall, int weight);
 
 	//------------------------------------------------------------------
 
