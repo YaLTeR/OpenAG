@@ -324,19 +324,24 @@ void UnicodeTextImage::initInterfaces()
 		if (!fnFactory)
 		{
 			gEngfuncs.Con_Printf("UnicodeTextImage: Error: %s doesn't export factory.\n", moduleName);
-			return;
+			return false;
 		}
 
 		pIface = static_cast<IfaceType>(fnFactory(ifaceName, nullptr));
 		if (!g_pVGuiSurface)
 		{
 			gEngfuncs.Con_Printf("UnicodeTextImage: Error: %s doesn't export %s.\n", moduleName, ifaceName);
-			return;
+			return false;
 		}
+
+		return true;
 	};
 
-	fnLoadInterface("Engine", g_hEngineModule, VGUI_SURFACE_INTERFACE_VERSION, g_pVGuiSurface);
-	fnLoadInterface("VGUI2", g_hVGuiModule, VGUI_LOCALIZE_INTERFACE_VERSION, g_pVGuiLocalize);
+	if (!fnLoadInterface("Engine", g_hEngineModule, VGUI_SURFACE_INTERFACE_VERSION, g_pVGuiSurface))
+		return;
+
+	if (!fnLoadInterface("VGUI2", g_hVGuiModule, VGUI_LOCALIZE_INTERFACE_VERSION, g_pVGuiLocalize))
+		return;
 
 	g_bSurfaceLoaded = true;
 }
