@@ -279,7 +279,7 @@ void UnicodeTextImage::initInterfaces()
 	else
 	{
 		// Try software engine (sw.dll)
-		GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, "hw.dll", &sw);
+		GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, "sw.dll", &sw);
 		if (sw)
 		{
 			g_hEngineModule = reinterpret_cast<CSysModule *>(sw);
