@@ -1,5 +1,6 @@
 #include <cwchar>
 #include <vector>
+#include <type_traits>
 
 #ifdef _WIN32
 
@@ -317,7 +318,7 @@ void UnicodeTextImage::initInterfaces()
 
 	auto fnLoadInterface = [](const char *moduleName, CSysModule *pModule, const char *ifaceName, auto &pIface)
 	{
-		using IfaceType = std::remove_reference<decltype(pIface)>::type;
+		using IfaceType = typename std::remove_reference<decltype(pIface)>::type;
 
 		CreateInterfaceFn fnFactory = Sys_GetFactory(pModule);
 		if (!fnFactory)
