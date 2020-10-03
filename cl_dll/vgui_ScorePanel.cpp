@@ -102,9 +102,9 @@ ScorePanel::ScorePanel(int x,int y,int wide,int tall) : Panel(x,y,wide,tall)
 	Font *tfont = pSchemes->getFont(hTitleScheme);
 	Font *smallfont = pSchemes->getFont(hSmallScheme);
 
-	m_UFont = UnicodeTextImage::createFont("Arial", YRES(12), 300, gHUD.m_pCvarVGuiUnicodeAA->value);
-	m_UTitleFont = UnicodeTextImage::createFont("Arial", tfont->getTall(), 700, gHUD.m_pCvarVGuiUnicodeAA->value);
-	m_USmallFont = UnicodeTextImage::createFont("Arial", smallfont->getTall(), 400, gHUD.m_pCvarVGuiUnicodeAA->value);
+	m_UFont = UnicodeTextImage::createFont("Arial", YRES(12), 300, true);
+	m_UTitleFont = UnicodeTextImage::createFont("Arial", tfont->getTall(), 700, true);
+	m_USmallFont = UnicodeTextImage::createFont("Arial", smallfont->getTall(), 400, true);
 
 	setBgColor(0, 0, 0, 96);
 	m_pCurrentHighlightLabel = NULL;
