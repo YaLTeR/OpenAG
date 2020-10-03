@@ -102,6 +102,10 @@ ScorePanel::ScorePanel(int x,int y,int wide,int tall) : Panel(x,y,wide,tall)
 	Font *tfont = pSchemes->getFont(hTitleScheme);
 	Font *smallfont = pSchemes->getFont(hSmallScheme);
 
+	m_UFont = UnicodeTextImage::createFont("Arial", YRES(12), 300, gHUD.m_pCvarVGuiUnicodeAA->value);
+	m_UTitleFont = UnicodeTextImage::createFont("Arial", tfont->getTall(), 700, gHUD.m_pCvarVGuiUnicodeAA->value);
+	m_USmallFont = UnicodeTextImage::createFont("Arial", smallfont->getTall(), 400, gHUD.m_pCvarVGuiUnicodeAA->value);
+
 	setBgColor(0, 0, 0, 96);
 	m_pCurrentHighlightLabel = NULL;
 	m_iHighlightRow = -1;
@@ -168,7 +172,7 @@ ScorePanel::ScorePanel(int x,int y,int wide,int tall) : Panel(x,y,wide,tall)
 
 		m_HeaderLabels[i].setBgColor(0,0,0,255);
 		m_HeaderLabels[i].setFgColor(Scheme::sc_primary1);
-		m_HeaderLabels[i].setFont(smallfont);
+		m_HeaderLabels[i].setFont(m_USmallFont, smallfont);
 		m_HeaderLabels[i].setContentAlignment(g_ColumnInfo[i].m_Alignment);
 
 		int yres = 12;
@@ -612,7 +616,7 @@ void ScorePanel::FillGrid()
 			pLabel->setVisible(true);
 			pLabel->setText2("");
 			pLabel->setImage(NULL);
-			pLabel->setFont(sfont);
+			pLabel->setFont(m_UFont, sfont);
 			pLabel->setTextOffset(0, 0);
 			
 			int rowheight = 13;
@@ -655,7 +659,7 @@ void ScorePanel::FillGrid()
 					rowheight = YRES(rowheight);
 				}
 				pLabel->setSize(pLabel->getWide(), rowheight);
-				pLabel->setFont(tfont);
+				pLabel->setFont(m_UTitleFont, tfont);
 
 				pGridRow->SetRowUnderline(	0,
 											true,
@@ -677,7 +681,7 @@ void ScorePanel::FillGrid()
 					rowheight = YRES(rowheight);
 				}
 				pLabel->setSize(pLabel->getWide(), rowheight);
-				pLabel->setFont(tfont);
+				pLabel->setFont(m_UTitleFont, tfont);
 
 				pGridRow->SetRowUnderline(0, true, YRES(3), 100, 100, 100, 0);
 
@@ -768,7 +772,7 @@ void ScorePanel::FillGrid()
 						}
 
 						pLabel->setText2(sz2);
-						pLabel->setFont2(smallfont);
+						pLabel->setFont2(m_USmallFont, smallfont);
 					}
 					break;
 				case COLUMN_VOICE:

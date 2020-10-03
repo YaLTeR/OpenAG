@@ -120,6 +120,8 @@ add_sources(
 	vgui_SpectatorPanel.h
 	vgui_TeamFortressViewport.cpp
 	vgui_teammenu.cpp
+	vgui_UnicodeTextImage.cpp
+	vgui_UnicodeTextImage.h
 	view.cpp
 	view.h
 	voice_status.cpp

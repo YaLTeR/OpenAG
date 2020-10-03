@@ -484,6 +484,8 @@ void CHud :: Init( void )
 	m_pCvarAutostop = CVAR_CREATE("cl_autostop", "0", FCVAR_ARCHIVE);
 	m_pCvarViewheightMode = CVAR_CREATE("cl_viewheight_mode", "0", FCVAR_ARCHIVE);
 	m_pCvarHideCorpses = CVAR_CREATE("cl_hidecorpses", "0", FCVAR_ARCHIVE);
+	m_pCvarVGuiUnicode = CVAR_CREATE("vgui_unicode", "1", FCVAR_ARCHIVE);
+	m_pCvarVGuiUnicodeAA = CVAR_CREATE("vgui_unicode_aa", "1", FCVAR_ARCHIVE);
 	m_pCvarColor = CVAR_CREATE( "hud_color", "", FCVAR_ARCHIVE );
 	cl_lw = gEngfuncs.pfnGetCvarPointer( "cl_lw" );
 
