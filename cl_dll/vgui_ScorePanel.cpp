@@ -19,6 +19,7 @@
 
 #include<VGUI_LineBorder.h>
 
+#include <cmath>
 #include "hud.h"
 #include "cl_util.h"
 #include "const.h"
@@ -102,9 +103,23 @@ ScorePanel::ScorePanel(int x,int y,int wide,int tall) : Panel(x,y,wide,tall)
 	Font *tfont = pSchemes->getFont(hTitleScheme);
 	Font *smallfont = pSchemes->getFont(hSmallScheme);
 
-	m_UFont = UnicodeTextImage::createFont("Arial", YRES(12), 300);
-	m_UTitleFont = UnicodeTextImage::createFont("Arial", tfont->getTall(), 700);
-	m_USmallFont = UnicodeTextImage::createFont("Arial", smallfont->getTall(), 400);
+	if (ScreenHeight > 768)
+	{
+		// Scale fonts for high-resolutions screens
+		m_UFont = UnicodeTextImage::createFont("Arial", std::round(YRES(10)), 300);
+		m_UTitleFont = UnicodeTextImage::createFont("Arial", std::round(YRES(16)), 700);
+		m_USmallFont = UnicodeTextImage::createFont("Arial", std::round(YRES(8)), 400);
+	}
+	else
+	{
+		// Use font sizes from the scheme for low resolutions (640x480, 800x600, 1024x768)
+		SchemeHandle_t hScheme = pSchemes->getSchemeHandle("Scoreboard Text");
+		Font *sfont = pSchemes->getFont(hScheme);
+
+		m_UFont = UnicodeTextImage::createFont("Arial", sfont->getTall(), 300);
+		m_UTitleFont = UnicodeTextImage::createFont("Arial", tfont->getTall(), 700);
+		m_USmallFont = UnicodeTextImage::createFont("Arial", smallfont->getTall(), 400);
+	}
 
 	setBgColor(0, 0, 0, 96);
 	m_pCurrentHighlightLabel = NULL;
