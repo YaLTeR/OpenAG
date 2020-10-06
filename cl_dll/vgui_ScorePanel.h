@@ -15,6 +15,7 @@
 #include<VGUI_Label.h>
 #include<VGUI_TextImage.h>
 #include "../game_shared/vgui_listbox.h"
+#include "vgui_UnicodeTextImage.h"
 
 #include <ctype.h>
 
@@ -40,8 +41,8 @@ class CTextImage2 : public Image
 public:
 	CTextImage2()
 	{
-		_image[0] = new TextImage("");
-		_image[1] = new TextImage("");
+		_image[0] = new UnicodeTextImage();
+		_image[1] = new UnicodeTextImage();
 	}
 
 	~CTextImage2()
@@ -57,7 +58,7 @@ public:
 #endif
 	}
 
-	TextImage *GetImage(int image)
+	UnicodeTextImage *GetImage(int image)
 	{
 		return _image[image];
 	}
@@ -102,7 +103,7 @@ public:
 	}
 
 private:
-	TextImage *_image[2];
+	UnicodeTextImage *_image[2];
 
 };
 
@@ -149,26 +150,25 @@ public:
 		_dualImage->GetImage(0)->setText(text);
 
 		// calculate the text size
-		Font *font = _dualImage->GetImage(0)->getFont();
-		_gap = 0;
-		for (const char *ch = text; *ch != 0; ch++)
-		{
-			int a, b, c;
-			font->getCharABCwide(*ch, a, b, c);
-			_gap += (a + b + c);
-		}
-
-		_gap += XRES(5);
+		int wide, tall;
+		_dualImage->GetImage(0)->getTextSize(wide, tall);
+		_gap = wide + XRES(5);
 	}
 
 	virtual void setText(const char* text)
 	{
+		// std::isspace assert-fails on UTF-8 chars
+		auto fnIsSpace = [](char c)
+		{
+			return c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f' || c == '\r';
+		};
+
 		// strip any non-alnum characters from the end
 		char buf[512];
 		strcpy(buf, text);
 
 		int len = strlen(buf);
-		while (len && isspace(buf[--len]))
+		while (len && fnIsSpace(buf[--len]))
 		{
 			buf[len] = 0;
 		}
@@ -205,14 +205,14 @@ public:
 		setFgColor( r, g, b, a );
 	}
 
-	void setFont(Font *font)
+	void setFont(UnicodeTextImage::HFont font, Font *fallbackFont)
 	{
-		_dualImage->GetImage(0)->setFont(font);
+		_dualImage->GetImage(0)->setFont(font, fallbackFont);
 	}
 
-	void setFont2(Font *font)
+	void setFont2(UnicodeTextImage::HFont font, Font *fallbackFont)
 	{
-		_dualImage->GetImage(1)->setFont(font);
+		_dualImage->GetImage(1)->setFont(font, fallbackFont);
 	}
 
 	// this adjust the absolute position of the text after alignment is calculated
@@ -279,6 +279,10 @@ private:
 	CLabelHeader*	GetPlayerEntry(int x, int y)	{return &m_PlayerEntries[x][y];}
 
 	vgui::BitmapTGA* m_pFlagIcon;
+
+	UnicodeTextImage::HFont m_UFont;
+	UnicodeTextImage::HFont m_USmallFont;
+	UnicodeTextImage::HFont m_UTitleFont;
 
 public:
 	
