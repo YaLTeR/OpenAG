@@ -799,7 +799,7 @@ void CL_DLLEXPORT CL_CreateMove ( float frametime, struct usercmd_s *cmd, int ac
 	if (in_ducktap.state & 1)
 	{
 		cmd->buttons |= IN_DUCK;
-		autofuncs::handle_ducktap(cmd);
+		autofuncs::handle_ducktap(cmd); // Ducktap takes priority over autojump
 	} else 
 		autofuncs::handle_autojump(cmd);
 
