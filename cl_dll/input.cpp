@@ -66,7 +66,6 @@ cvar_t	*cl_yawspeed;
 cvar_t	*cl_pitchspeed;
 cvar_t	*cl_anglespeedkey;
 cvar_t	*cl_vsmoothing;
-cvar_t	*cl_autojump_priority;
 
 namespace autofuncs
 {
@@ -104,7 +103,6 @@ namespace autofuncs
 
 	static void handle_ducktap(usercmd_t* cmd)
 	{
-
 		static bool s_duck_was_down_last_frame = false;
 
 		bool should_release_duck = (!player.onground && !player.inwater && player.walking);
@@ -798,17 +796,12 @@ void CL_DLLEXPORT CL_CreateMove ( float frametime, struct usercmd_s *cmd, int ac
 	//
 	cmd->buttons = CL_ButtonBits( 1 );
 
-	if (cl_autojump_priority->value != 0.0f)
-		autofuncs::handle_autojump(cmd);
-
 	if (in_ducktap.state & 1)
 	{
 		cmd->buttons |= IN_DUCK;
 		autofuncs::handle_ducktap(cmd);
-	} else if (cl_autojump_priority->value == 0.0f)
+	} else 
 		autofuncs::handle_autojump(cmd);
-	
-
 
 	// If they're in a modal dialog, ignore the attack button.
 	if(GetClientVoiceMgr()->IsInSquelchMode())
@@ -1075,7 +1068,6 @@ void InitInput (void)
 	cl_vsmoothing		= gEngfuncs.pfnRegisterVariable ( "cl_vsmoothing", "0.05", FCVAR_ARCHIVE );
 
 	autofuncs::cl_autojump = gEngfuncs.pfnRegisterVariable ( "cl_autojump", "1", FCVAR_ARCHIVE );
-	cl_autojump_priority = gEngfuncs.pfnRegisterVariable ( "cl_autojump_priority", "0", FCVAR_ARCHIVE ); 
 
 	m_pitch			    = gEngfuncs.pfnRegisterVariable ( "m_pitch","0.022", FCVAR_ARCHIVE );
 	m_yaw				= gEngfuncs.pfnRegisterVariable ( "m_yaw","0.022", FCVAR_ARCHIVE );
