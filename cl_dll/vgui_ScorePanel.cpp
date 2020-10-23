@@ -137,6 +137,14 @@ ScorePanel::ScorePanel(int x,int y,int wide,int tall) : Panel(x,y,wide,tall)
 	m_TitleLabel.setFgColor( Scheme::sc_primary1 );
 	m_TitleLabel.setContentAlignment( vgui::Label::a_west );
 
+	if (!UnicodeTextImage::shouldFallback())
+	{
+		m_pTitleImage = new UnicodeTextImage();
+		m_pTitleImage->setFont(m_UTitleFont, tfont);
+		m_pTitleImage->setColor(Scheme::sc_primary1);
+		m_TitleLabel.setImage(m_pTitleImage);
+	}
+
 	LineBorder *border = new LineBorder(Color(60, 60, 60, 128));
 	setBorder(border);
 	setPaintBorderEnabled(true);
@@ -268,6 +276,9 @@ ScorePanel::~ScorePanel()
 #endif
 	if (m_pFlagIcon)
 		delete m_pFlagIcon;
+
+	m_TitleLabel.setImage(nullptr);
+	delete m_pTitleImage;
 #ifdef POSIX
 #pragma GCC diagnostic pop
 #endif
@@ -304,7 +315,11 @@ void ScorePanel::Update()
 	// {
 		char sz[MAX_SERVERNAME_LENGTH + 16];
 		sprintf(sz, "%s", gViewPort->m_szServerName );
-		m_TitleLabel.setText(sz);
+
+		if (!m_pTitleImage->shouldFallback())
+			m_pTitleImage->setText(sz);
+		else
+			m_TitleLabel.setText(sz);
 	// }
 
 	m_iRows = 0;
