@@ -284,7 +284,7 @@ private:
 	UnicodeTextImage::HFont m_USmallFont;
 	UnicodeTextImage::HFont m_UTitleFont;
 
-	UnicodeTextImage *m_pTitleImage;
+	UnicodeTextImage *m_pTitleImage = nullptr;
 
 public:
 	
