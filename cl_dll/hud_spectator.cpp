@@ -1432,6 +1432,11 @@ void CHudSpectator::DrawOverviewLayer()
 	float screenaspect, xs, ys, xStep, yStep, x,y,z;
 	int ix,iy,i,xTiles,yTiles,frame;
 
+	// m_OverviewData.layers must have at least one dummy overview, which is added in Reset().
+	// But it's possible for rendering to begin before ResetHUD message is received.
+	if (m_OverviewData.layers.empty())
+		return;
+
 	Vector camOrigin, camAngles;
 	GetCameraView(camOrigin, camAngles);
 
