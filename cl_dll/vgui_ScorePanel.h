@@ -284,6 +284,8 @@ private:
 	UnicodeTextImage::HFont m_USmallFont;
 	UnicodeTextImage::HFont m_UTitleFont;
 
+	UnicodeTextImage *m_pTitleImage;
+
 public:
 	
 	int				m_iNumTeams;
