@@ -34,6 +34,11 @@ class IHTML;
 class IHTMLEvents;
 class VGuiVertex;
 
+}
+
+namespace vgui2
+{
+
 class ISurface : public IBaseInterface
 {
 public:
@@ -246,14 +251,19 @@ public:
 
 #define VGUI_LOCALIZE_INTERFACE_VERSION "VGUI_Localize003"
 
+}
+
+namespace
+{
+
 bool g_bSurfaceLoaded = false;
 
 // hw.dll or sw.dll on Windows, hw.so on Linux, hw.dylib on macOS.
 CSysModule *g_hEngineModule = nullptr;
 CSysModule *g_hVGuiModule = nullptr;
 
-ISurface *g_pVGuiSurface = nullptr;
-ILocalize *g_pVGuiLocalize = nullptr;
+vgui2::ISurface *g_pVGuiSurface = nullptr;
+vgui2::ILocalize *g_pVGuiLocalize = nullptr;
 
 }
 
@@ -328,7 +338,7 @@ void UnicodeTextImage::initInterfaces()
 		}
 
 		pIface = static_cast<IfaceType>(fnFactory(ifaceName, nullptr));
-		if (!g_pVGuiSurface)
+		if (!pIface)
 		{
 			gEngfuncs.Con_Printf("UnicodeTextImage: Error: %s doesn't export %s.\n", moduleName, ifaceName);
 			return false;
@@ -360,7 +370,7 @@ UnicodeTextImage::HFont UnicodeTextImage::createFont(const char *fontName, int t
 
 	int flags = 0;
 	if (tall >= MIN_AA_FONT_SIZE)
-		flags |= ISurface::FONTFLAG_ANTIALIAS;
+		flags |= vgui2::ISurface::FONTFLAG_ANTIALIAS;
 
 	HFont font = g_pVGuiSurface->CreateFont();
 	g_pVGuiSurface->AddGlyphSetToFont(font, fontName, tall, weight, 0, 0, flags, 0, 0);
