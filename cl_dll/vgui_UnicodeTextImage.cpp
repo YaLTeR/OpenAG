@@ -368,6 +368,11 @@ UnicodeTextImage::HFont UnicodeTextImage::createFont(const char *fontName, int t
 	if (!g_bSurfaceLoaded)
 		return INVALID_FONT;
 
+#ifdef LINUX
+	// On linux fonts are 2px taller than they should be
+	tall -= 2;
+#endif
+
 	int flags = 0;
 	if (tall >= MIN_AA_FONT_SIZE)
 		flags |= vgui2::ISurface::FONTFLAG_ANTIALIAS;
