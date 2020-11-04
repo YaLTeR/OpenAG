@@ -32,6 +32,7 @@ public:
 
 	// getting info from schemes
 	vgui::Font *getFont( SchemeHandle_t schemeHandle );
+	const char *getFontName( SchemeHandle_t schemeHandle );
 	void getFgColor( SchemeHandle_t schemeHandle, int &r, int &g, int &b, int &a );
 	void getBgColor( SchemeHandle_t schemeHandle, int &r, int &g, int &b, int &a );
 	void getFgArmedColor( SchemeHandle_t schemeHandle, int &r, int &g, int &b, int &a );

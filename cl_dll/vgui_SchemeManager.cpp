@@ -496,6 +496,11 @@ vgui::Font *CSchemeManager::getFont( SchemeHandle_t schemeHandle )
 	return getSafeScheme( schemeHandle )->font;
 }
 
+const char *CSchemeManager::getFontName( SchemeHandle_t schemeHandle )
+{
+	return getSafeScheme( schemeHandle )->fontName;
+}
+
 void CSchemeManager::getFgColor( SchemeHandle_t schemeHandle, int &r, int &g, int &b, int &a )
 {
 	CScheme *pScheme = getSafeScheme( schemeHandle );
