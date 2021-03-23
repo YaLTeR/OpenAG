@@ -308,10 +308,10 @@ void __CmdFunc_Savemap()
 	char map_name_to_check[64];
 
 	get_map_name(map_name, ARRAYSIZE(map_name));
-	sprintf(map_name, "%s\n", map_name);
 
 	if (map_name[0])
 	{
+		sprintf(map_name, "%s\n", map_name);
 		saved_maps = fopen("saved_maps.txt", "r");
 
 		if (saved_maps)
