@@ -311,7 +311,7 @@ void __CmdFunc_Savemap()
 
 	if (map_name[0])
 	{
-		saved_maps = fopen("saved_maps.txt", "r+");
+		saved_maps = fopen("saved_maps.txt", "r+"); // returns NULL if the file doesn't exist or if the file is read-only
 
 		if (saved_maps)
 		{
@@ -327,9 +327,9 @@ void __CmdFunc_Savemap()
 				}
 			}
 		}
-		else
-		{
-			saved_maps = fopen("saved_maps.txt", "a"); // creates the file if it doesn't exist
+		else if(!(saved_maps = fopen("saved_maps.txt", "a"))) // checks if the folder is read-only. If yes - saved_maps is NULL, if not - creates the file
+		{                                                      
+			return;
 		}
 
 		fprintf(saved_maps, "%s\n", map_name);
