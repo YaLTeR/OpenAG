@@ -311,24 +311,28 @@ void __CmdFunc_Savemap()
 
 	if (map_name[0])
 	{
-		sprintf(map_name, "%s\n", map_name);
-		saved_maps = fopen("saved_maps.txt", "r");
+		saved_maps = fopen("saved_maps.txt", "r+");
 
 		if (saved_maps)
 		{
 			while (fgets(map_name_to_check, ARRAYSIZE(map_name_to_check), saved_maps))
 			{
+				map_name_to_check[strlen(map_name_to_check) - 1] = '\0';
+
 				if (!strcmp(map_name, map_name_to_check))
 				{
-					gEngfuncs.Con_Printf("Current map is already in saved_maps.txt");
+					gEngfuncs.Con_Printf("Current map is already in saved_maps.txt\n");
 					fclose(saved_maps);
 					return;
 				}
 			}
 		}
+		else
+		{
+			saved_maps = fopen("saved_maps.txt", "a"); // creates the file if it doesn't exist
+		}
 
-		saved_maps = fopen("saved_maps.txt", "a");
-		fprintf(saved_maps, "%s", map_name);
+		fprintf(saved_maps, "%s\n", map_name);
 		fclose(saved_maps);
 	}
 }
