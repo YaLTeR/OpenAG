@@ -301,7 +301,7 @@ void __CmdFunc_Append()
 	EngineClientCmd(gEngfuncs.Cmd_Argv(1));
 }
 
-void __CmdFunc_Savemap()
+void __CmdFunc_Writemap()
 {
 	FILE* saved_maps;
 	char map_name[64];
@@ -311,7 +311,7 @@ void __CmdFunc_Savemap()
 
 	if (map_name[0])
 	{
-		saved_maps = fopen("saved_maps.txt", "r+"); // returns NULL if the file doesn't exist or if the file is read-only
+		saved_maps = fopen("saved_maps.txt", "r+");
 
 		if (saved_maps)
 		{
@@ -467,7 +467,7 @@ void CHud :: Init( void )
 
 	HOOK_COMMAND( "agrecord", Agrecord );
 	HOOK_COMMAND( "append", Append );
-	HOOK_COMMAND( "savemap", Savemap );
+	HOOK_COMMAND( "writemap", Writemap );
 	EngineClientCmd("alias zpecial \"append _zpecial\"");
 
 	force_model::hook_commands();
