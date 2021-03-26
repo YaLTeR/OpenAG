@@ -301,6 +301,44 @@ void __CmdFunc_Append()
 	EngineClientCmd(gEngfuncs.Cmd_Argv(1));
 }
 
+void __CmdFunc_Writemap()
+{
+	FILE* saved_maps;
+	char map_name[64];
+	char map_name_to_check[64];
+
+	get_map_name(map_name, ARRAYSIZE(map_name));
+
+	if (map_name[0])
+	{
+		saved_maps = fopen("saved_maps.txt", "r+");
+
+		if (saved_maps)
+		{
+			while (fgets(map_name_to_check, ARRAYSIZE(map_name_to_check), saved_maps))
+			{
+				map_name_to_check[strlen(map_name_to_check) - 1] = '\0';
+
+				if (!strcmp(map_name, map_name_to_check))
+				{
+					gEngfuncs.Con_Printf("Current map is already in saved_maps.txt\n");
+					fclose(saved_maps);
+					return;
+				}
+			}
+		}
+		else
+		{           
+			saved_maps = fopen("saved_maps.txt", "a");
+			if(!saved_maps)
+				return;
+		}
+
+		fprintf(saved_maps, "%s\n", map_name);
+		fclose(saved_maps);
+	}
+}
+
 // TFFree Command Menu Message Handlers
 int __MsgFunc_ValClass(const char *pszName, int iSize, void *pbuf)
 {
@@ -429,6 +467,7 @@ void CHud :: Init( void )
 
 	HOOK_COMMAND( "agrecord", Agrecord );
 	HOOK_COMMAND( "append", Append );
+	HOOK_COMMAND( "writemap", Writemap );
 	EngineClientCmd("alias zpecial \"append _zpecial\"");
 
 	force_model::hook_commands();
