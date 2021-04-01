@@ -880,7 +880,11 @@ int CHudAmmo::Draw(float flTime)
 	{
 		int r, g, b;
 
-		if (gWR.HasAmmo(m_pWeapon))
+		if (gHUD.IsRainbow())
+		{
+			gHUD.GetRainbowColor(ScreenWidth / 1.73, r, g, b);
+		}
+		else if (gWR.HasAmmo(m_pWeapon))
 		{
 			UnpackRGB(r, g, b, gHUD.m_iDefaultHUDColor);
 			ScaleColors(r, g, b, 192);
@@ -918,7 +922,10 @@ int CHudAmmo::Draw(float flTime)
 
 			x += AmmoWidth/2;
 
-			UnpackRGB(r,g,b, gHUD.m_iDefaultHUDColor);
+			if (gHUD.IsRainbow())
+				gHUD.GetRainbowColor(x, r, g, b);
+			else
+				UnpackRGB(r,g,b, gHUD.m_iDefaultHUDColor);
 
 			// draw the | bar
 			FillRGBA(x, y, iBarWidth, gHUD.m_iFontHeight, r, g, b, a);
@@ -939,6 +946,8 @@ int CHudAmmo::Draw(float flTime)
 		}
 
 		// Draw the ammo Icon
+		if (gHUD.IsRainbow())
+			gHUD.GetRainbowColor(x, r, g, b);
 		int iOffset = (m_pWeapon->rcAmmo.bottom - m_pWeapon->rcAmmo.top)/8;
 		SPR_Set(m_pWeapon->hAmmo, r, g, b);
 		SPR_DrawAdditive(0, x, y - iOffset, &m_pWeapon->rcAmmo);
@@ -957,6 +966,8 @@ int CHudAmmo::Draw(float flTime)
 			x = gHUD.DrawHudNumber(x, y, iFlags|DHN_3DIGITS, gWR.CountAmmo(pw->iAmmo2Type), r, g, b);
 
 			// Draw the ammo Icon
+			if (gHUD.IsRainbow())
+				gHUD.GetRainbowColor(x, r, g, b);
 			SPR_Set(m_pWeapon->hAmmo2, r, g, b);
 			int iOffset = (m_pWeapon->rcAmmo2.bottom - m_pWeapon->rcAmmo2.top)/8;
 			SPR_DrawAdditive(0, x, y - iOffset, &m_pWeapon->rcAmmo2);
@@ -985,7 +996,11 @@ int DrawBar(int x, int y, int width, int height, float f)
 		// Always show at least one pixel if we have ammo.
 		if (w <= 0)
 			w = 1;
-		UnpackRGB(r, g, b, RGB_GREENISH);
+
+		if (gHUD.IsRainbow())
+			gHUD.GetRainbowColor(x, r, g, b);
+		else
+			UnpackRGB(r, g, b, RGB_GREENISH);
 		FillRGBA(x, y, w, height, r, g, b, 255);
 		x += w;
 		width -= w;
@@ -1067,7 +1082,10 @@ int CHudAmmo::DrawWList(float flTime)
 	{
 		int iWidth;
 
-		UnpackRGB(r,g,b, gHUD.m_iDefaultHUDColor);
+		if (gHUD.IsRainbow())
+			gHUD.GetRainbowColor(x, r, g, b);
+		else
+			UnpackRGB(r,g,b, gHUD.m_iDefaultHUDColor);
 	
 		if ( iActiveSlot == i )
 			a = 255;
@@ -1119,7 +1137,10 @@ int CHudAmmo::DrawWList(float flTime)
 				if ( !p || !p->iId )
 					continue;
 
-				UnpackRGB( r,g,b, gHUD.m_iDefaultHUDColor );
+				if (gHUD.IsRainbow())
+					gHUD.GetRainbowColor(x, r, g, b);
+				else
+					UnpackRGB( r,g,b, gHUD.m_iDefaultHUDColor );
 			
 				// if active, then we must have ammo.
 
@@ -1135,8 +1156,14 @@ int CHudAmmo::DrawWList(float flTime)
 				{
 					// Draw Weapon if Red if no ammo
 
-					if ( gWR.HasAmmo(p) )
+					if (gHUD.IsRainbow())
+					{
+						gHUD.GetRainbowColor(x, r, g, b);
+					}
+					else if (gWR.HasAmmo(p))
+					{
 						ScaleColors(r, g, b, 192);
+					}
 					else
 					{
 						UnpackRGB(r,g,b, RGB_REDISH);
@@ -1170,7 +1197,11 @@ int CHudAmmo::DrawWList(float flTime)
 				if ( !p || !p->iId )
 					continue;
 
-				if ( gWR.HasAmmo(p) )
+				if (gHUD.IsRainbow())
+				{
+					gHUD.GetRainbowColor(x, r, g, b);
+				}
+				else if ( gWR.HasAmmo(p) )
 				{
 					UnpackRGB(r,g,b, gHUD.m_iDefaultHUDColor);
 					a = 128;

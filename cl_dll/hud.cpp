@@ -93,6 +93,38 @@ cvar_t *cl_viewrollspeed;
 
 void ShutdownInput (void);
 
+static void HSVtoRGB(float H, float S, float V, int &R, int &G, int &B) {
+	// https://www.codespeedy.com/hsv-to-rgb-in-cpp/
+	assert(H >= 0 && H <= 360 && S >= 0 && S <= 100 && V >= 0 && V <= 100);
+	float s = S / 100;
+	float v = V / 100;
+	float C = s * v;
+	float X = C * (1 - abs(fmod(H / 60.0, 2) - 1));
+	float m = v - C;
+	float r, g, b;
+	if (H >= 0 && H < 60) {
+		r = C, g = X, b = 0;
+	}
+	else if (H >= 60 && H < 120) {
+		r = X, g = C, b = 0;
+	}
+	else if (H >= 120 && H < 180) {
+		r = 0, g = C, b = X;
+	}
+	else if (H >= 180 && H < 240) {
+		r = 0, g = X, b = C;
+	}
+	else if (H >= 240 && H < 300) {
+		r = X, g = 0, b = C;
+	}
+	else {
+		r = C, g = 0, b = X;
+	}
+	R = (r + m) * 255;
+	G = (g + m) * 255;
+	B = (b + m) * 255;
+}
+
 //DECLARE_MESSAGE(m_Logo, Logo)
 int __MsgFunc_Logo(const char *pszName, int iSize, void *pbuf)
 {
@@ -526,6 +558,12 @@ void CHud :: Init( void )
 	m_pCvarColor = CVAR_CREATE( "hud_color", "", FCVAR_ARCHIVE );
 	cl_lw = gEngfuncs.pfnGetCvarPointer( "cl_lw" );
 
+	m_pCvarRainbow = CVAR_CREATE("hud_rainbow", "1", FCVAR_ARCHIVE);
+	m_pCvarRainbowS = CVAR_CREATE("hud_rainbow_sat", "100", FCVAR_ARCHIVE);
+	m_pCvarRainbowV = CVAR_CREATE("hud_rainbow_val", "100", FCVAR_ARCHIVE);
+	m_pCvarRainbowSpeed = CVAR_CREATE("hud_rainbow_speed", "40", FCVAR_ARCHIVE);
+	m_pCvarRainbowPhase = CVAR_CREATE("hud_rainbow_phase", "0.4", FCVAR_ARCHIVE);
+
 	m_pSpriteList = NULL;
 
 	// Clear any old HUD list
@@ -919,3 +957,101 @@ float CHud::GetSensitivity( void )
 	return m_flMouseSensitivity;
 }
 
+bool CHud::IsRainbow()
+{
+	return m_pCvarRainbow->value != 0.f;
+}
+
+void CHud::GetRainbowColor(int x, int &r, int &g, int &b)
+{
+	float phase = m_pCvarRainbowSpeed->value * m_flTime;
+	phase += m_pCvarRainbowPhase->value * x;
+	phase = fmodf(phase, 360.f);
+	HSVtoRGB(phase, m_pCvarRainbowS->value, m_pCvarRainbowV->value, r, g, b);
+}
+
+using DrawStringFn = int (*)(int x, int y, const char *str, int r, int g, int b);
+using DrawConsoleStringFn = int (*)(int x, int y, const char *str);
+static DrawStringFn pfnEngineDrawString;
+static DrawConsoleStringFn pfnEngineDrawConsoleString;
+
+static int DrawRainbowString(int x, int y, const char *str, const std::function<int(int x, int y, const char *buf, int r, int g, int b)> &func)
+{
+	int i = 0;
+	int r, g, b;
+	int width = x;
+	char buf[5]; // 4 UTF-8 bytes + null terminator
+	while (str[i] != '\0')
+	{
+		char c = str[i];
+
+		if ((c & 0b1110'0000) == 0b1100'0000)
+		{
+			// Two bytes
+			buf[0] = str[i];
+			buf[1] = str[i + 1];
+			buf[2] = '\0';
+			i += 2;
+		}
+		else if ((c & 0b1111'0000) == 0b1110'0000)
+		{
+			// Three bytes
+			buf[0] = str[i];
+			buf[1] = str[i + 1];
+			buf[2] = str[i + 2];
+			buf[3] = '\0';
+			i += 3;
+		}
+		else if ((c & 0b1111'1000) == 0b1111'0000)
+		{
+			// Four bytes
+			buf[0] = str[i];
+			buf[1] = str[i + 1];
+			buf[2] = str[i + 2];
+			buf[3] = str[i + 3];
+			buf[4] = '\0';
+			i += 4;
+		}
+		else
+		{
+			// One byte or invalid (assume one byte)
+			buf[0] = c;
+			buf[1] = '\0';
+			i += 1;
+		}
+
+		gHUD.GetRainbowColor(width, r, g, b);
+		width += func(width, y, buf, r, g, b);
+	}
+
+	return width - x;
+}
+
+void CHud::UpdateRainbowState()
+{
+	static bool bIsEnabled = false;
+
+	if (IsRainbow() && !bIsEnabled)
+	{
+		bIsEnabled = true;
+		pfnEngineDrawString = gEngfuncs.pfnDrawString;
+		pfnEngineDrawConsoleString = gEngfuncs.pfnDrawConsoleString;
+
+		gEngfuncs.pfnDrawString = [](int x, int y, const char *str, int r, int g, int b) {
+			return DrawRainbowString(x, y, str, pfnEngineDrawString);
+		};
+
+		gEngfuncs.pfnDrawConsoleString = [](int x, int y, const char *str) -> int {
+			return x + DrawRainbowString(x, y, str, [](int x, int y, const char *str, int r, int g, int b) {
+				gEngfuncs.pfnDrawSetTextColor(r * 255.f, g * 255.f, b * 255.f);
+				return pfnEngineDrawConsoleString(x, y, str) - x;
+			});
+		};
+	}
+	else if (!IsRainbow() && bIsEnabled)
+	{
+		bIsEnabled = false;
+		gEngfuncs.pfnDrawString = pfnEngineDrawString;
+		gEngfuncs.pfnDrawConsoleString = pfnEngineDrawConsoleString;
+	}
+}

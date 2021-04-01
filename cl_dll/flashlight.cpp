@@ -110,15 +110,17 @@ int CHudFlashlight::Draw(float flTime)
 	else
 		a = MIN_ALPHA;
 
-	if (m_flBat < 0.20)
+	y = (m_prc1->bottom - m_prc2->top) / 2;
+	x = ScreenWidth - m_iWidth - m_iWidth / 2;
+
+	if (gHUD.IsRainbow())
+		gHUD.GetRainbowColor(x, r, g, b);
+	else if (m_flBat < 0.20)
 		UnpackRGB(r,g,b, RGB_REDISH);
 	else
 		UnpackRGB(r,g,b, gHUD.m_iDefaultHUDColor);
 
 	ScaleColors(r, g, b, a);
-
-	y = (m_prc1->bottom - m_prc2->top)/2;
-	x = ScreenWidth - m_iWidth - m_iWidth/2 ;
 
 	// Draw the flashlight casing
 	SPR_Set(m_hSprite1, r, g, b );
@@ -127,6 +129,9 @@ int CHudFlashlight::Draw(float flTime)
 	if ( m_fOn )
 	{  // draw the flashlight beam
 		x = ScreenWidth - m_iWidth/2;
+
+		if (gHUD.IsRainbow())
+			gHUD.GetRainbowColor(x, r, g, b);
 
 		SPR_Set( m_hBeam, r, g, b );
 		SPR_DrawAdditive( 0, x, y, m_prcBeam );
@@ -139,6 +144,9 @@ int CHudFlashlight::Draw(float flTime)
 	{
 		rc = *m_prc2;
 		rc.left += iOffset;
+
+		if (gHUD.IsRainbow())
+			gHUD.GetRainbowColor(x + iOffset, r, g, b);
 
 		SPR_Set(m_hSprite2, r, g, b );
 		SPR_DrawAdditive( 0, x + iOffset, y, &rc);

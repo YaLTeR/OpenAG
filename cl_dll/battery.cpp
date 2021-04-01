@@ -142,6 +142,9 @@ int CHudBattery::Draw(float flTime)
 	if ( !m_hSprite2 )
 		m_hSprite2 = gHUD.GetSprite( gHUD.GetSpriteIndex( "suit_full" ) );
 
+	if (gHUD.IsRainbow())
+		gHUD.GetRainbowColor(x, r, g, b);
+
 	SPR_Set(m_hSprite1, r, g, b );
 	SPR_DrawAdditive( 0,  x, y - iOffset, m_prc1);
 

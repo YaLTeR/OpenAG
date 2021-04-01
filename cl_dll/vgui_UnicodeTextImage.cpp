@@ -556,6 +556,12 @@ void UnicodeTextImage::paint(vgui::Panel *panel)
 		if (ch == L'\r' || ch == L'\n')
 			continue;
 
+		if (gHUD.IsRainbow())
+		{
+			gHUD.GetRainbowColor(x, r, g, b);
+			g_pVGuiSurface->DrawSetTextColor(r, g, b, 255);
+		}
+
 		g_pVGuiSurface->DrawSetTextPos(x, y);
 		g_pVGuiSurface->DrawUnicodeChar(ch);
 		x += g_pVGuiSurface->GetCharacterWidth(m_Font, ch);

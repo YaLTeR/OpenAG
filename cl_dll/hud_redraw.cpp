@@ -43,6 +43,8 @@ void CHud::Think(void)
 	m_scrinfo.iSize = sizeof(m_scrinfo);
 	GetScreenInfo(&m_scrinfo);
 
+	UpdateRainbowState();
+
 	int newfov;
 	HUDLIST *pList = m_pHudList;
 
@@ -307,7 +309,9 @@ int CHud :: DrawHudNumber( int x, int y, int iFlags, int iNumber, int r, int g, 
 		// SPR_Draw 100's
 		if (iNumber >= 100)
 		{
-			 k = iNumber/100;
+			if (gHUD.IsRainbow())
+				gHUD.GetRainbowColor(x, r, g, b);
+			k = iNumber/100;
 			SPR_Set(GetSprite(m_HUD_number_0 + k), r, g, b );
 			SPR_DrawAdditive( 0, x, y, &GetSpriteRect(m_HUD_number_0 + k));
 			x += iWidth;
@@ -321,6 +325,8 @@ int CHud :: DrawHudNumber( int x, int y, int iFlags, int iNumber, int r, int g, 
 		// SPR_Draw 10's
 		if (iNumber >= 10)
 		{
+			if (gHUD.IsRainbow())
+				gHUD.GetRainbowColor(x, r, g, b);
 			k = (iNumber % 100)/10;
 			SPR_Set(GetSprite(m_HUD_number_0 + k), r, g, b );
 			SPR_DrawAdditive( 0, x, y, &GetSpriteRect(m_HUD_number_0 + k));
@@ -333,6 +339,8 @@ int CHud :: DrawHudNumber( int x, int y, int iFlags, int iNumber, int r, int g, 
 		}
 
 		// SPR_Draw ones
+		if (gHUD.IsRainbow())
+			gHUD.GetRainbowColor(x, r, g, b);
 		k = iNumber % 10;
 		SPR_Set(GetSprite(m_HUD_number_0 + k), r, g, b );
 		SPR_DrawAdditive(0,  x, y, &GetSpriteRect(m_HUD_number_0 + k));
@@ -384,6 +392,9 @@ int CHud::DrawHudNumber(int x, int y, int number, int r, int g, int b)
 
 	for (int i = digit_count; i > 0; --i) {
 		int digit = number / ten_powers[i - 1];
+
+		if (gHUD.IsRainbow())
+			gHUD.GetRainbowColor(x, r, g, b);
 
 		SPR_Set(GetSprite(m_HUD_number_0 + digit), r, g, b);
 		SPR_DrawAdditive(0, x, y, &GetSpriteRect(m_HUD_number_0 + digit));
