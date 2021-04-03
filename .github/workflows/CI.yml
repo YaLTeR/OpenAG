@@ -101,27 +101,28 @@ jobs:
       working-directory: build
       run: ninja
 
-# GitHub Actions doesn't have a needed macOS/Xcode version
-  #build-macos:
-  #  runs-on: macos
-  #  strategy:
-  #    fail-fast: false
-  #    matrix:
-  #      configuration: [Release, Debug]
-  #  steps:
-  #  - uses: actions/checkout@v2
-  #    with:
-  #      submodules: recursive
-  #  - name: Prepare for build
-  #    env:
-  #      HOMEBREW_NO_ANALYTICS: 1
-  #    run: |
-  #      brew analytics off
-  #      brew update
-  #      brew install ninja
-  #      mkdir build
-  #      cd build
-  #      cmake -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} ..
-  #  - name: Build
-  #    working-directory: build
-  #    run: ninja
+  build-macos:
+    runs-on: macos-10.15
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Release, Debug]
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+    - name: Prepare for build
+      env:
+        HOMEBREW_NO_ANALYTICS: 1
+        CC: clang -mmacosx-version-min=10.14
+        CXX: clang++ -mmacosx-version-min=10.14
+      run: |
+        brew analytics off
+        brew update
+        brew install ninja
+        mkdir build
+        cd build
+        cmake -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} ..
+    - name: Build
+      working-directory: build
+      run: ninja
