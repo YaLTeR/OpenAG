@@ -5,17 +5,11 @@ env:
   - CONFIGURATION=Debug
   - CONFIGURATION=Release
 
-addons:
-  homebrew:
-    update: true
-    packages:
-      - ninja
-
 script:
   - mkdir build
   - cd build
-  - cmake -G Ninja -DCMAKE_BUILD_TYPE="${CONFIGURATION}" ..
-  - ninja
+  - cmake -DCMAKE_BUILD_TYPE="${CONFIGURATION}" ..
+  - make
 
 deploy:
   provider: releases
