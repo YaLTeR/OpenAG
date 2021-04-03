@@ -43,7 +43,7 @@ jobs:
         path: build\${{ matrix.configuration }}\client.dll
 
   build-linux-gcc:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     env:
       CC: gcc-${{ matrix.gcc-ver }}
       CXX: g++-${{ matrix.gcc-ver }}
@@ -75,7 +75,7 @@ jobs:
         path: build/client.so
 
   build-linux-clang:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     env:
       compiler: clang
       CC: clang
