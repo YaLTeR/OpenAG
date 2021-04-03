@@ -548,6 +548,8 @@ void UnicodeTextImage::paint(vgui::Panel *panel)
 	int x, y;
 	getPos(x, y);
 
+	bool bRainbowEnabled = gHUD.m_Rainbow.IsEnabled();
+
 	for (int i = 0; i < m_Text.size(); i++)
 	{
 		wchar_t ch = m_Text[i];
@@ -555,6 +557,12 @@ void UnicodeTextImage::paint(vgui::Panel *panel)
 		// Ignore linebreaks
 		if (ch == L'\r' || ch == L'\n')
 			continue;
+
+		if (bRainbowEnabled)
+		{
+			gHUD.m_Rainbow.GetRainbowColor(x, y, r, g, b);
+			g_pVGuiSurface->DrawSetTextColor(r, g, b, 255);
+		}
 
 		g_pVGuiSurface->DrawSetTextPos(x, y);
 		g_pVGuiSurface->DrawUnicodeChar(ch);

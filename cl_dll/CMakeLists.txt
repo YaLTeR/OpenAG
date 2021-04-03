@@ -87,6 +87,8 @@ add_sources(
 	kbutton.h
 	menu.cpp
 	message.cpp
+	rainbow.cpp
+	rainbow.h
 	saytext.cpp
 	status_icons.cpp
 	statusbar.cpp
