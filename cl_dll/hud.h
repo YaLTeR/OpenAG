@@ -107,6 +107,7 @@ struct HUDLIST {
 #include "hud_timer.h"
 #include "hud_vote.h"
 #include "hud_watermark.h"
+#include "rainbow.h"
 
 
 //
@@ -681,6 +682,8 @@ public:
 	CHudTimer		m_Timer;
 	CHudVote		m_Vote;
 	CHudWatermark	m_Watermark;
+
+	CRainbow m_Rainbow;
 
 	void Init( void );
 	void VidInit( void );
