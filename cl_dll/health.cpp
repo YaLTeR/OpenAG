@@ -213,9 +213,6 @@ int CHudHealth::Draw(float flTime)
 		y = ScreenHeight - gHUD.m_iFontHeight - gHUD.m_iFontHeight / 2;
 		x = CrossWidth /2;
 
-		if (gHUD.IsRainbow())
-			gHUD.GetRainbowColor(x, r, g, b);
-
 		SPR_Set(gHUD.GetSprite(m_HUD_cross), r, g, b);
 		SPR_DrawAdditive(0, x, y, &gHUD.GetSpriteRect(m_HUD_cross));
 
@@ -228,11 +225,7 @@ int CHudHealth::Draw(float flTime)
 		int iHeight = gHUD.m_iFontHeight;
 		int iWidth = HealthWidth/10;
 
-		if (gHUD.IsRainbow())
-			gHUD.GetRainbowColor(x, r, g, b);
-		else
-			UnpackRGB(r, g, b, gHUD.m_iDefaultHUDColor);
-
+		UnpackRGB(r, g, b, gHUD.m_iDefaultHUDColor);
 		FillRGBA(x, y, iWidth, iHeight, r, g, b, a);
 	}
 

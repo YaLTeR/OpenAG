@@ -144,10 +144,6 @@ int CHudDeathNotice :: Draw( float flTime )
 			{
 				r = 10;	g = 240; b = 10;  // display it in sickly green
 			}
-			else if (gHUD.IsRainbow())
-			{
-				gHUD.GetRainbowColor(x, r, g, b);
-			}
 
 			// Draw death weapon
 			SPR_Set( gHUD.GetSprite(id), r, g, b );
