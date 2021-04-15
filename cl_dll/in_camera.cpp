@@ -1,4 +1,4 @@
-//========= Copyright ï¿½ 1996-2002, Valve LLC, All rights reserved. ============
+//========= Copyright © 1996-2002, Valve LLC, All rights reserved. ============
 //
 // Purpose: 
 //
@@ -168,6 +168,8 @@ extern trace_t SV_ClipMoveToEntity (edict_t *ent, vec3_t start, vec3_t mins, vec
 void CL_DLLEXPORT CAM_Think( void )
 {
 //	RecClCamThink();
+	if ( gEngfuncs.GetMaxClients() > 1 && CL_IsThirdPerson() )
+		CAM_ToFirstPerson();
 
 	float cam_mouse_x, cam_mouse_y;
 	vec3_t origin;
@@ -426,14 +428,15 @@ void CAM_OutUp(void) { KeyUp( &cam_out ); }
 
 void CAM_ToThirdPerson(void)
 { 
-	//Only allow cam_command if we are running a debug version of the client.dll
-#if !defined( _DEBUG )
-	// Reset the cam_command cvar so this function isn't called on every think 
-	// if player used cam_command 1 and not thirdperson
-	gEngfuncs.Cvar_SetValue( "cam_command", 0 );
-	return;
-#endif
 	vec3_t viewangles;
+
+#if !defined( _DEBUG )
+	if ( gEngfuncs.GetMaxClients() > 1 )
+	{
+		// no thirdperson in multiplayer.
+		return;
+	}
+#endif
 
 	gEngfuncs.GetViewAngles( (float *)viewangles );
 
