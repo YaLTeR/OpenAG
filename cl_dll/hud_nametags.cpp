@@ -11,19 +11,16 @@
 #include "triangleapi.h"
 #include "vgui_TeamFortressViewport.h"
 #include "vgui_SpectatorPanel.h"
-#include "hltv.h"
 
 #include "pm_shared.h"
 #include "pm_defs.h"
 #include "pmtrace.h"
 #include "parsemsg.h"
-#include "entity_types.h"
 
 // these are included for the math functions
 #include "com_model.h"
 #include "demo_api.h"
 #include "event_api.h"
-#include "studio_util.h"
 #include "screenfade.h"
 #include "vgui_TeamFortressViewport.h"
 #include "vgui_helpers.h"
@@ -49,9 +46,9 @@ int CHudNameTags::Init()
 
 	m_iFlags |= HUD_ACTIVE;
 
-    m_hud_nametags		= gEngfuncs.pfnRegisterVariable("hud_nametags","1", FCVAR_ARCHIVE);
-	m_hud_nametags_type	= gEngfuncs.pfnRegisterVariable("hud_nametags_type","1", FCVAR_ARCHIVE);
-	m_hud_nametags_team_always	= gEngfuncs.pfnRegisterVariable("hud_nametags_team_always","1", FCVAR_ARCHIVE);
+	m_hud_nametags		= gEngfuncs.pfnRegisterVariable("hud_nametags", "1", FCVAR_ARCHIVE);
+	m_hud_nametags_type	= gEngfuncs.pfnRegisterVariable("hud_nametags_type", "1", FCVAR_ARCHIVE);
+	m_hud_nametags_team_max_distance = gEngfuncs.pfnRegisterVariable("hud_nametags_team_max_distance", "1", FCVAR_ARCHIVE);
 
 	return 1;
 }
@@ -66,6 +63,13 @@ int CHudNameTags::VidInit()
 	return 1;
 }
 
+bool CHudNameTags::IsTeamMate(cl_entity_t *localPlayer, int playerId)
+{
+	return !strcmp(g_PlayerExtraInfo[localPlayer->index].teamname,
+			g_PlayerExtraInfo[playerId + 1].teamname)
+			&& gHUD.m_Teamplay;
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Input  : flTime - 
@@ -73,8 +77,8 @@ int CHudNameTags::VidInit()
 //-----------------------------------------------------------------------------
 int CHudNameTags::Draw(float flTime)
 {
-    // Only draw if client wants us to
-    if(m_hud_nametags->value != 1) 
+	// Only draw if client wants us to
+	if(m_hud_nametags->value != 1)
 		return 1;
 	
 	int lx;
@@ -172,33 +176,27 @@ int CHudNameTags::Draw(float flTime)
 		{
 			// If the player is 600 units(?) away from the local player, show the nametag
 			// Or if we are playing a demo, show the nametag however far away he is
-            // Or if client wants teammates to always appear, regardless of their distance (obv only when in our PVS and traceable)
+			// Or if client wants teammates to always appear, regardless of their distance (obv only when in our PVS and traceable)
 			// Or if the gamemode is Kreedz
 			// Or if the localplayer is spectating
-            // TODO: Really distance? & really 600?
-            // TODO: V_GetInEyePos( g_iUser2, origin, angles );
-			
-            if(Distance(trace->endpos, localPlayer->origin) < 600.0f 
-            || gEngfuncs.pDemoAPI->IsPlayingback()
-            || (!strcmp(g_PlayerExtraInfo[localPlayer->index].teamname, g_PlayerExtraInfo[i + 1].teamname) 
-					&& m_hud_nametags_team_always->value == 1 
-					&& gHUD.m_Teamplay)
-			|| !strcmp(gamemode, "Kreedz")
-			|| g_iUser1
-			) 
+			// TODO: V_GetInEyePos( g_iUser2, origin, angles );
+
+			if (Distance(trace->endpos, localPlayer->origin) < m_hud_nametags_team_max_distance->value && IsTeamMate(localPlayer, i) ||
+				gEngfuncs.pDemoAPI->IsPlayingback() ||
+				!strcmp(gamemode, "Kreedz") ||
+				g_iUser1)
 			{
-				if(m_hud_nametags_type->value == 1) // Looks like chat HUD font 
+				if(m_hud_nametags_type->value == 1) // Looks like chat HUD font
 				{
 					gHUD.DrawConsoleStringWithColorTags(
-						x - lx, 
-						y, 
+						x - lx,
+						y,
 						string,
 						true,
 						color[0],
 						color[1],
 						color[2]
 					);
-
 				}
 				else // Looks like HUD font
 				{

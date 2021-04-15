@@ -45,11 +45,13 @@ public:
 	int armor;
 	
 	cvar_t * 			m_hud_nametags;
-	cvar_t * 			m_hud_nametags_type;	
-    cvar_t *            m_hud_nametags_team_always;
+	cvar_t * 			m_hud_nametags_type;
+	cvar_t *            m_hud_nametags_team_max_distance;
 
 private:
 	vec3_t		m_vPlayerPos[MAX_PLAYERS];
+
+    bool IsTeamMate(cl_entity_t *localPlayer, int playerId);
 };
 
 #endif // SPECTATOR_H
