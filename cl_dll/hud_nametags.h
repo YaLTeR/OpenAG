@@ -9,6 +9,9 @@
 #define NAMETAGS_H
 #pragma once
 
+#define	DEFAULT_VIEWHEIGHT	28
+#define VEC_DUCK_VIEW 12
+
 #include <string>
 #include <vector>
 
@@ -27,25 +30,19 @@ class CHudNameTags : public CHudBase
 public:
 	void Reset();
 	void InitHUDData( void );
-	bool AddOverviewEntityToList( HSPRITE sprite, cl_entity_t * ent, double killTime);
-	void DeathMessage(int victim);
-	bool AddOverviewEntity( int type, struct cl_entity_s *ent, const char *modelname );
-	void CheckOverviewEntities();
 	bool IsActivePlayer(cl_entity_t * ent);
-	void DirectorMessage( int iSize, void *pbuf );
+
+	int MsgFunc_PlayerId(const char* name, int size, void* buf);
+	//void EV_GetGunPosition(cl_entity_s *args, float *pos, float *origin);
 	int Init();
 	int VidInit();
 
 	int Draw(float flTime);
 
-	void	AddWaypoint( float time, vec3_t pos, vec3_t angle, float fov, int flags );
-	void	SetCameraView( vec3_t pos, vec3_t angle, float fov);
-	float	GetFOV();
-	bool	GetDirectorCamera(vec3_t &position, vec3_t &angle);
-	
-	int m_iDrawCycle;
-	client_textmessage_t m_HUDMessages[MAX_SPEC_HUD_MESSAGES];
-	char				m_HUDMessageText[MAX_SPEC_HUD_MESSAGES][128];
+	int player_id;
+	bool teammate;
+	int health;
+	int armor;
 	
 	cvar_t * 			m_hud_nametags;
 	cvar_t * 			m_hud_nametags_type;	
@@ -53,15 +50,6 @@ public:
 
 private:
 	vec3_t		m_vPlayerPos[MAX_PLAYERS];
-
-	float		m_flNextObserverInput;
-	float		m_FOV;
-	float		m_zoomDelta;
-	float		m_moveDelta;
-	int			m_lastPrimaryObject;
-	int			m_lastSecondaryObject;
-
-	cameraWayPoint_t	m_CamPath[MAX_CAM_WAYPOINTS];
 };
 
 #endif // SPECTATOR_H

@@ -736,6 +736,7 @@ void CHud :: VidInit( void )
 	m_Location.VidInit();
 	m_NextMap.VidInit();
 	m_PlayerId.VidInit();
+	m_NameTags.VidInit();
 	m_Scores.VidInit();
 	m_Settings.VidInit();
 	m_Speedometer.VidInit();
@@ -745,6 +746,7 @@ void CHud :: VidInit( void )
 	m_Vote.VidInit();
 	m_Watermark.VidInit();
 	m_OldScoreBoard.VidInit();
+	//m_NameTagsVGUI.VidInit();
 	GetClientVoiceMgr()->VidInit();
 }
 

@@ -25,7 +25,9 @@
 #include "event_api.h"
 #include "studio_util.h"
 #include "screenfade.h"
-
+#include "vgui_TeamFortressViewport.h"
+#include "vgui_helpers.h"
+#include "vgui_loadtga.h"
 
 #ifdef _MSC_VER
 #pragma warning(disable: 4244)
@@ -33,31 +35,34 @@
 
 extern "C" float	Distance(const float * v1, const float * v2);
 extern float * GetClientColor( int clientIndex );
+extern void V_GetInEyePos(int entity, float * origin, float * angles );
+
+//DECLARE_MESSAGE(m_NameTags, PlayerId);
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 int CHudNameTags::Init()
 {
+	//HOOK_MESSAGE(PlayerId);
 	gHUD.AddHudElem(this);
 
 	m_iFlags |= HUD_ACTIVE;
 
-    m_hud_nametags		= gEngfuncs.pfnRegisterVariable("hud_nametags","1",0);
-	m_hud_nametags_type	= gEngfuncs.pfnRegisterVariable("hud_nametags_type","1",0);
-	m_hud_nametags_team_always	= gEngfuncs.pfnRegisterVariable("m_hud_nametags_team_always","1",0);
+    m_hud_nametags		= gEngfuncs.pfnRegisterVariable("hud_nametags","1", FCVAR_ARCHIVE);
+	m_hud_nametags_type	= gEngfuncs.pfnRegisterVariable("hud_nametags_type","1", FCVAR_ARCHIVE);
+	m_hud_nametags_team_always	= gEngfuncs.pfnRegisterVariable("hud_nametags_team_always","1", FCVAR_ARCHIVE);
 
 	return 1;
 }
-
 
 //-----------------------------------------------------------------------------
 // Purpose: Loads new icons
 //-----------------------------------------------------------------------------
 int CHudNameTags::VidInit()
 {
-	m_iFlags &= ~HUD_ACTIVE;
-	
+	//m_iFlags &= ~HUD_ACTIVE;
+	//m_hsprPlayer = SPR_Load("sprites/ascii_table_test.spr");
 	return 1;
 }
 
@@ -69,34 +74,48 @@ int CHudNameTags::VidInit()
 int CHudNameTags::Draw(float flTime)
 {
     // Only draw if client wants us to
-    if(m_hud_nametags->value != 1) return 1;        
-
+    if(m_hud_nametags->value != 1) 
+		return 1;
+	
 	int lx;
-
-	char string[256];
+	char string[512];
 	float * color;
+
+	vec3_t origin_above_target_head, world, screen;
+	vec3_t origin_pl;
+	vec3_t vecSrc;
+	vec3_t vecTargetPlayer;
+	vec3_t view_ofs;
+	float			x,y,z;
+	int 			r,g,b;
 
 	// make sure we have player info
 	gViewPort->GetAllPlayersInfo();
-	
-	vec3_t			origin, angles, point, forward, right, left, up, world, screen, offset;
-	float			x,y,z;
-	int r,g,b;
-	cl_entity_t *	ent;
-	float rmatrix[3][4];	// transformation matrix
-	//float			zScale = (90.0f - v_angles[0] ) / 90.0f;
-	
+	// get server's gamemode 
+	auto gamemode = gHUD.m_Settings.GetGamemode();
 	// get yellow/brown HUD color
 	UnpackRGB(r, g, b, gHUD.m_iDefaultHUDColor);
-	
+
+	// get local player and get his eye level
 	cl_entity_t *localPlayer = gEngfuncs.GetLocalPlayer();
-    
-	// loop through all the players and draw additional infos to their sprites on the map
+	VectorCopy( localPlayer->origin, origin_pl );
+	
+	VectorClear(view_ofs); 
+
+	if (localPlayer->curstate.usehull == 1) // if we're ducking
+		view_ofs[2] = VEC_DUCK_VIEW;
+	else
+		view_ofs[2] = DEFAULT_VIEWHEIGHT;
+
+	VectorAdd( origin_pl, view_ofs, vecSrc );
+
+	//AngleVectors( angles_pl, forward, NULL, NULL ); // For get user aim
+	
 	for (int i = 0; i < MAX_PLAYERS; i++)
 	{
-		//ent = m_OverviewEntities[i].entity;
 		cl_entity_s *ent = gEngfuncs.GetEntityByIndex(i+1);
 		
+		// Target player not here, or not in our PVS
 		if(!ent || ent->curstate.messagenum < localPlayer->curstate.messagenum)
 			continue; 
 
@@ -107,100 +126,84 @@ int CHudNameTags::Draw(float flTime)
 		if(ent == localPlayer)
 			continue;
 
+		// Don't draw for player without a name (TODO: ?)
 		if (g_PlayerInfoList[i + 1].name == nullptr)
 			continue;
 
-		// Don't show an icon for dead or spectating players (ie: invisible entities).
+		// Don't show a nametag for dead or spectating players (ie: invisible entities).
 		if(ent->curstate.effects & EF_NODRAW)
 			continue;
 
-		VectorCopy(ent->origin, origin);
-		origin[2] += 45.0f; // Kinda above the head TODO: Fix somewhat?
+		VectorCopy(ent->origin, origin_above_target_head);
+		origin_above_target_head[2] += 45.0f; // Kinda above the head 
+		// ^ TODO: change based on distance?
 
 		// calculate screen position for name and infromation in hud::draw()
-		if ( gEngfuncs.pTriAPI->WorldToScreen(origin, screen) )
+		if ( gEngfuncs.pTriAPI->WorldToScreen(origin_above_target_head, screen) )
 			continue;	// object is behind viewer
 
-		/*char mrdka[512];
-		_snprintf( mrdka, sizeof( mrdka ), "HUD_SPEC ORIGIN x = %f, ORIGIN y = %f \n", origin[0], origin[1]);
-		gEngfuncs.pfnConsolePrint( mrdka );
-		_snprintf( mrdka, sizeof( mrdka ), "HUD_SPEC BEFORE screen x = %f, screen y = %f \n", screen[0], screen[1]);
-		gEngfuncs.pfnConsolePrint( mrdka );*/
+		x = XPROJECT(screen[0]);
+		y = YPROJECT(screen[1]);
 
-		screen[0] = XPROJECT(screen[0]);
-		screen[1] = YPROJECT(screen[1]);
-		screen[2] = 0.0f;
-
-		//_snprintf( mrdka, sizeof( mrdka ), "HUD_SPEC AFTER screen x = %f, screen y = %f \n", screen[0], screen[1]);
-		//gEngfuncs.pfnConsolePrint( mrdka );
-
-		x = screen[0];	
-		y = screen[1]; //+ Length(offset);	
-
-		color = GetClientColor( i+1 );
+		color = GetClientColor( i+1 ); // team color
 
 		// draw the players name and health underneath
 		char colorless_name[256];
 		color_tags::strip_color_tags(colorless_name, g_PlayerInfoList[i + 1].name, ARRAYSIZE(colorless_name));
 
-		//sprintf(string, "%s", g_PlayerInfoList[i+1].name );
-		sprintf(string, "%s", colorless_name);
+		/*if(!strcmp(g_PlayerExtraInfo[localPlayer->index].teamname, g_PlayerExtraInfo[i + 1].teamname) && gHUD.m_Teamplay)
+			sprintf(string, "%s", colorless_name, health, armor, teammate);
+		else */ // For playerid msg
+			sprintf(string, "%s", colorless_name);
+
+		lx = strlen(string)*4; // 3 is avg. character length :)
+
+		VectorCopy(ent->origin, vecTargetPlayer);
 		
-		lx = strlen(string)*3; // 3 is avg. character length :)
+		// Since the nametag is above the player's head, let's somewhat try to see if we can see his head
+		if (ent->curstate.usehull == 1) 
+			vecTargetPlayer[2] += VEC_DUCK_VIEW;
+		else 
+			vecTargetPlayer[2] += DEFAULT_VIEWHEIGHT;
 		
-        // TODO: Fix, this can't trace origin to origin, it's not accurate
-        // TODO: e.g. when we are under the player and there are walls in the way
-        // TODO: etc.
-		pmtrace_t * trace = gEngfuncs.PM_TraceLine( localPlayer->origin, ent->origin, PM_TRACELINE_PHYSENTSONLY, 2, -1 );
+		pmtrace_t * trace = gEngfuncs.PM_TraceLine( vecSrc, vecTargetPlayer, PM_TRACELINE_PHYSENTSONLY, 2, -1 );
 		
-        if ( trace->fraction != 1.0 )
+		if ( trace->fraction == 1.0 )
 		{
-			// We didn't hit
-			//gEngfuncs.pfnServerCmd(string);
-		}
-		else
-		{	
-			// If the player is 600 units away from the local player, show the nametag
+			// If the player is 600 units(?) away from the local player, show the nametag
 			// Or if we are playing a demo, show the nametag however far away he is
             // Or if client wants teammates to always appear, regardless of their distance (obv only when in our PVS and traceable)
+			// Or if the gamemode is Kreedz
+			// Or if the localplayer is spectating
             // TODO: Really distance? & really 600?
+            // TODO: V_GetInEyePos( g_iUser2, origin, angles );
+			
             if(Distance(trace->endpos, localPlayer->origin) < 600.0f 
             || gEngfuncs.pDemoAPI->IsPlayingback()
-            || (g_PlayerExtraInfo[i + 1].teamname == g_PlayerExtraInfo[localPlayer->index].teamname && m_hud_nametags_team_always->value == 1)
-            ) 
+            || (!strcmp(g_PlayerExtraInfo[localPlayer->index].teamname, g_PlayerExtraInfo[i + 1].teamname) 
+					&& m_hud_nametags_team_always->value == 1 
+					&& gHUD.m_Teamplay)
+			|| !strcmp(gamemode, "Kreedz")
+			|| g_iUser1
+			) 
 			{
-				char mrdka[512];
-				sprintf(mrdka, "X=%.2f Y=%.2f Z=%.2f\n", trace->endpos[0], trace->endpos[1], trace->endpos[2]);
-				gEngfuncs.pfnConsolePrint( mrdka );	
-				sprintf(mrdka, "PL X=%.2f Y=%.2f Z=%.2f\n", localPlayer->origin[0], localPlayer->origin[1], localPlayer->origin[2]);
-				gEngfuncs.pfnConsolePrint( mrdka );	
-				//gEngfuncs.pfnServerCmd(string);
-
-				if(m_hud_nametags_type->value == 1) // Looks like "amxx_csay" HUD font
+				if(m_hud_nametags_type->value == 1) // Looks like chat HUD font 
 				{
 					gHUD.DrawConsoleStringWithColorTags(
-						//m_vPlayerPos[i][0] - lx,
-						//m_vPlayerPos[i][1],
 						x - lx, 
-						y, // - 50,
+						y, 
 						string,
 						true,
 						color[0],
 						color[1],
 						color[2]
 					);
+
 				}
-				else // Looks like chat HUD font
+				else // Looks like HUD font
 				{
-					//gEngfuncs.pfnDrawString(x - lx, y, string, r, g, b );
 					gHUD.DrawHudStringCentered(x, y, string, r, g, b);
 				}
-			}
-			else
-			{
-				char mrdka[512];
-				sprintf(mrdka, "HE TOO FAR AWAY");
-				gEngfuncs.pfnConsolePrint( mrdka );	
 			}
 		}
 	}
@@ -225,7 +228,18 @@ void CHudNameTags::Reset()
 void CHudNameTags::InitHUDData()
 {
 	Reset();
+}
 
-	// reset HUD FOV
-	gHUD.m_iFOV =  CVAR_GET_FLOAT("default_fov");
+int CHudNameTags::MsgFunc_PlayerId(const char* name, int size, void* buf)
+{
+	BEGIN_READ(buf, size);
+
+	player_id = READ_BYTE();
+	teammate = (READ_BYTE() == 1);
+	health = READ_SHORT();
+	armor = READ_SHORT();
+
+	m_iFlags |= HUD_ACTIVE;
+
+	return 1;
 }
