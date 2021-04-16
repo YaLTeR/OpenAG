@@ -61,10 +61,10 @@ void SpectatorPanel::ActionSignal(int cmd)
 		case SPECTATOR_PANEL_CMD_OPTIONS :		gViewPort->ShowCommandMenu( gViewPort->m_SpectatorOptionsMenu );
 												break;
 
-		case SPECTATOR_PANEL_CMD_NEXTPLAYER :	gHUD.m_Spectator.FindNextPlayer(true);
+		case SPECTATOR_PANEL_CMD_NEXTPLAYER :	gHUD.m_Spectator.FindNextPlayer(false);
 												break;
 
-		case SPECTATOR_PANEL_CMD_PREVPLAYER :	gHUD.m_Spectator.FindNextPlayer(false);
+		case SPECTATOR_PANEL_CMD_PREVPLAYER :	gHUD.m_Spectator.FindNextPlayer(true);
 												break;
 
 		case SPECTATOR_PANEL_CMD_PLAYERS :		gViewPort->ShowCommandMenu( gViewPort->m_PlayerMenu );

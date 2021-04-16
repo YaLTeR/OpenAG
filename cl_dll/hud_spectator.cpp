@@ -990,10 +990,82 @@ void CHudSpectator::FindPlayer(const char *name)
 	// if we are NOT in HLTV mode, spectator targets are set on server
 	if ( !gEngfuncs.IsSpectateOnly() )
 	{
+		/*
+		 * HACK HACK HACK: AG server DLL doesn't let us "follow" a player with a specific name, but only lets us
+		 * use "follownext". This code uses follownext several times until it gets to the specific player
+		 * that the user clicked in the VGUI menu.
+		 *
+		 * Cannot use while(g_iUser2.name == current.name) because g_iUser doesn't get updated fast enough
+		 * (it's a server msg after all) which results in an infinite loop.
+		 *
+		 * If the user picks a player that has an ID that's higher than the one we're currently spectating (g_iUser2)
+		 * we step forward (reverse = 0)
+		 * If the user picks a player that has an ID that's lower than the one we're currently spectatng (g_iUser2)
+		 * we step backwards (reverse = 1)
+		 *
+		 */
+
+		std::vector<std::string> player_names;
+		std::vector<std::string> player_names_backwards;
+
+		cl_entity_t * pEnt = NULL;
+		gViewPort->GetAllPlayersInfo();
+		for (int i = 1; i < MAX_PLAYERS; i++ )
+		{
+			pEnt = gEngfuncs.GetEntityByIndex(i);
+
+			if (!gHUD.m_Spectator.IsActivePlayer(pEnt))
+				continue;
+
+			// Our user is already spectating this player, let's bail out
+			if (!strcmp(g_PlayerInfoList[i].name, name) && i == g_iUser2)
+				return;
+
+			// The current (i) player's id is higher than the one the user is currently spectating, let's save him to the forward gang
+			if ( i > g_iUser2 )
+				player_names.push_back(g_PlayerInfoList[i].name);
+
+			// The current (i) player's id is lower than the one the user is currently spectating, let's save him to the backward gang
+			else if ( i < g_iUser2 )
+				player_names_backwards.insert(player_names_backwards.begin(), g_PlayerInfoList[i].name);
+		}
+
+		int reverse = -1; // -1 so we can tell if we found the player going forwards or backwards
+		int steps = 1; // We start at 1 because the player we are currently spectating is NOT present in the list
+
+		for ( auto &player_name : player_names )
+		{
+			if(player_name == name)
+			{
+				reverse = 0; // set reverse to false, we're gonna go forward to get to our target player
+				break;
+			}
+			else
+				steps += 1;
+		}
+
+		if(reverse == -1)
+		{
+			steps = 1; // reset the steps we got from forwards
+			for ( auto &player_name_backwards : player_names_backwards )
+			{
+				if(player_name_backwards == name)
+				{
+					reverse = 1; // set reverse to true, we're gonna go backwards to get to our target player
+					break;
+				}
+				else
+					steps += 1;
+			}
+		}
+
 		char cmdstring[32];
-		// forward command to server
-		sprintf(cmdstring,"follow %s",name);
-		gEngfuncs.pfnServerCmd(cmdstring);
+		for(int i=0; i < steps; i++)
+		{
+			// forward command to server
+			sprintf(cmdstring,"follownext %i", reverse);
+			gEngfuncs.pfnServerCmd(cmdstring);
+		}
 		return;
 	}
 	
@@ -1182,7 +1254,10 @@ void CHudSpectator::SetModes(int iNewMainMode, int iNewInsetMode)
 		{
 			char cmdstring[32];
 			// forward command to server
-			sprintf(cmdstring,"specmode %i",iNewMainMode );
+			if (!strcmp(gEngfuncs.pfnGetGameDirectory(), "ag"))
+				sprintf(cmdstring,"spec_mode %i",iNewMainMode );
+			else
+				sprintf(cmdstring,"specmode %i",iNewMainMode );
 			gEngfuncs.pfnServerCmd(cmdstring);
 			return;
 		}
