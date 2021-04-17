@@ -477,6 +477,40 @@ namespace force_model
 		}
 
 		const auto local_player_index = gEngfuncs.GetLocalPlayer()->index;
+		if (g_IsSpectator[local_player_index])
+		{
+			/*
+			 * Hack.
+			 *
+			 * We cannot get the correct model from g_PlayerInfoList[local_player_index].model
+			 * as it always shows the one we had BEFORE we changed to a new team.
+			 *
+			 * I.e. if one would use g_PlayerInfoList[local_player_index].model here, it would only work with the team
+			 * you were in BEFORE you switched to spectator, and any changes of the team while being in spectator
+			 * won't propagate soon enough into g_PlayerInfoList[local_player_index].model so we can check it here.
+			 * No amount of careful gEngfuncs.pfnGetPlayerInfo( clientIndex, &g_PlayerInfoList[clientIndex] );
+			 * placements unfortunately helps as per my testing.
+			 *
+			 * gEngfuncs.GetLocalPlayer()->model can't be used either as that just always has models/player.mdl.
+			 *
+			 * E.g. 1) You are playing on team "blue" with a teammate against a team red.
+			 * 2) You switch to spectator
+			 * 3) You are on model blue according to g_PlayerInfoList[local_player_index].model
+			 * You are on team (null) according to g_PlayerInfoList[local_player_index].teamname
+			 * 4) You switch to team red while spectating.
+			 * 5) You STILL are on model blue according to g_PlayerInfoList[local_player_index].model at the time of
+			 * this function being called.
+			 */
+			std::string model_name(CVAR_GET_STRING("model"));
+			std::transform(model_name.begin(), model_name.end(), model_name.begin(), ::tolower);
+
+			if (!strcmp(model_name.c_str(), g_PlayerExtraInfo[player_index + 1].teamname))
+				teammate_enemy_model_overrides_cache[player_index] = teammate_model_override;
+			else
+				teammate_enemy_model_overrides_cache[player_index] = enemy_model_override;
+			return;
+		}
+
 		if (!strcmp(g_PlayerExtraInfo[local_player_index].teamname, g_PlayerExtraInfo[player_index + 1].teamname))
 			teammate_enemy_model_overrides_cache[player_index] = teammate_model_override;
 		else
