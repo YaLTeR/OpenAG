@@ -55,7 +55,8 @@ OpenAG is an open-source client of the Half-Life promod Adrenaline Gamer, comple
 
    When all SDKs are downloaded and installed, close Builder, open it again and open the OpenAG project.
 1. Click on the bar at the top-center which says OpenAG, and click the Build button.
-1. Once the build finishes, in the same bar menu click the Export Bundle button. The file manager will open. Navigate to the "files" folder where you will find the built client.so.
+1. Once the build finishes, in the same bar menu click the Export Bundle button. The file manager will open in a path that looks like `gnome-builder/projects/OpenAG/flatpak/staging/x86_64-master`. Navigate up to the `OpenAG` folder, then down to `builds/pro.openag.OpenAG.json-...` where you will find the built `client.so`.
+1. Now you can make some changes to the code and press Build, then grab `client.so` from the same folder.
 
 ### Manually
 1. Get a 32-bit/multilib **gcc** (6 and above) or **clang** (3.9 and above) build environment set up, as well as CMake.
