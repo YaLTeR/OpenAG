@@ -1,5 +1,16 @@
 // studio_model.cpp
 // routines for setting up to draw 3DStudio models
+#ifdef _WIN32
+#include <winsani_in.h>
+#include <Windows.h>
+#include <winsani_out.h>
+#endif
+
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#else
+#include <GL/gl.h>
+#endif
 
 #include "hud.h"
 #include "cl_util.h"
@@ -54,6 +65,7 @@ void CStudioModelRenderer::Init( void )
 	m_pCvarHiModels			= IEngineStudio.GetCvar( "cl_himodels" );
 	m_pCvarDeveloper		= IEngineStudio.GetCvar( "developer" );
 	m_pCvarDrawEntities		= IEngineStudio.GetCvar( "r_drawentities" );
+	m_pCvarViewmodelFov		= gEngfuncs.pfnRegisterVariable( "cl_viewmodel_fov","0", FCVAR_ARCHIVE );
 
 	m_pChromeSprite			= IEngineStudio.GetChromeSprite();
 
@@ -2063,6 +2075,32 @@ void CStudioModelRenderer::StudioRenderFinal_Software( void )
 	IEngineStudio.RestoreRenderer();
 }
 
+void CStudioModelRenderer::SetViewmodelFovProjection( void )
+{
+	if(m_pCvarViewmodelFov->value < 1 || m_pCvarViewmodelFov->value > 179)
+	{
+		m_pCvarViewmodelFov->value = 0.0;
+		gEngfuncs.Con_Printf("Invalid cl_viewmodel_fov value (minimum 1, maximum 179, 0 to disable). Resetting to 0 (disable).\n");
+		gEngfuncs.Con_Printf("Usage: cl_viewmodel_fov [1-179] or 0 to disable and use default_fov's FOV.\n");
+		return;
+	}
+
+	glMatrixMode (GL_PROJECTION);
+	glLoadIdentity();
+	GLfloat w, h;
+	GLfloat _near = 1.0f;
+	GLfloat _far = 4096.0f;
+	float fovY = m_pCvarViewmodelFov->value;
+	float aspect = (float)ScreenWidth / (float)ScreenHeight;
+
+	h = tan (fovY / 360 * M_PI) * _near * ((float)ScreenHeight / (float)ScreenWidth);
+	w = h * aspect;
+	glFrustum (-w, w, -h, h, _near, _far);
+	// shouldn't be needed, as the API's render funcs called after us probably just set it themselves
+	// but just to be sure
+	glMatrixMode (GL_MODELVIEW);
+}
+
 /*
 ====================
 StudioRenderFinal_Hardware
@@ -2098,6 +2136,11 @@ void CStudioModelRenderer::StudioRenderFinal_Hardware( void )
 			}
 
 			IEngineStudio.GL_SetRenderMode( rendermode );
+			// Warning: Order is IMPORANT here. I repeat, this has to be HERE.
+			if (m_pCurrentEntity == gEngfuncs.GetViewModel() && m_pCvarViewmodelFov->value != 0.0f)
+			{
+				SetViewmodelFovProjection();
+			}
 			IEngineStudio.StudioDrawPoints();
 			IEngineStudio.GL_StudioDrawShadow();
 		}
@@ -2119,7 +2162,7 @@ StudioRenderFinal
 
 ====================
 */
-void CStudioModelRenderer::StudioRenderFinal(void)
+void CStudioModelRenderer::StudioRenderFinal( void )
 {
 	if ( IEngineStudio.IsHardware() )
 	{
