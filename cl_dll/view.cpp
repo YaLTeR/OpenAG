@@ -90,6 +90,9 @@ cvar_t	*cl_bob;
 cvar_t	*cl_bobup;
 cvar_t	*cl_waterdist;
 cvar_t	*cl_chasedist;
+cvar_t	*cl_viewmodel_ofs_right;
+cvar_t	*cl_viewmodel_ofs_forward;
+cvar_t	*cl_viewmodel_ofs_up;
 
 // These cvars are not registered (so users can't cheat), so set the ->value field directly
 // Register these cvars in V_Init() if needed for easy tweaking
@@ -504,6 +507,10 @@ void V_CalcNormalRefdef ( struct ref_params_s *pparams )
 	vec3_t camAngles, camForward, camRight, camUp;
 	cl_entity_t *pwater;
 
+	float forward_offset = cl_viewmodel_ofs_forward->value;
+	float right_offset = cl_viewmodel_ofs_right->value;
+	float up_offset = cl_viewmodel_ofs_up->value;
+
 	V_DriftPitch ( pparams );
 
 	if ( gEngfuncs.IsSpectateOnly() )
@@ -650,6 +657,21 @@ void V_CalcNormalRefdef ( struct ref_params_s *pparams )
 	VectorCopy ( pparams->simorg, view->origin );      
 	view->origin[2] += ( waterOffset );
 	VectorAdd( view->origin, pparams->viewheight, view->origin );
+
+	// Change the origin from which the camera is looking at the viewmodel
+	// This does not change the angles of the viewmodel camera
+	// This does not the player's angles & origin
+	extern cvar_t* cl_righthand;
+	if (cl_righthand->value != 0.0)
+	{
+		right_offset *= -1;
+	}
+	for ( i = 0; i < 3; i++ )
+	{
+		view->origin[i] += forward_offset * pparams->forward[i] +
+				right_offset * pparams->right[i] +
+				up_offset * pparams->up[i];
+	}
 
 	// Let the viewmodel shake at about 10% of the amplitude
 	gEngfuncs.V_ApplyShake( view->origin, view->angles, 0.9 );
@@ -1751,6 +1773,10 @@ void V_Init (void)
 	cl_bobup			= gEngfuncs.pfnRegisterVariable( "cl_bobup","0.5", 0 );
 	cl_waterdist		= gEngfuncs.pfnRegisterVariable( "cl_waterdist","4", 0 );
 	cl_chasedist		= gEngfuncs.pfnRegisterVariable( "cl_chasedist","112", 0 );
+
+	cl_viewmodel_ofs_right		= gEngfuncs.pfnRegisterVariable( "cl_viewmodel_ofs_right","0", FCVAR_ARCHIVE ); // x = right
+	cl_viewmodel_ofs_forward	= gEngfuncs.pfnRegisterVariable( "cl_viewmodel_ofs_forward","0", FCVAR_ARCHIVE ); // y = forward
+	cl_viewmodel_ofs_up		    = gEngfuncs.pfnRegisterVariable( "cl_viewmodel_ofs_up","0", FCVAR_ARCHIVE ); // z = up
 }
 
 
