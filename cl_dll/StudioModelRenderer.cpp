@@ -36,6 +36,7 @@
 #include "forcemodel.h"
 
 extern cvar_t *tfc_newmodels;
+extern float g_flRenderFOV;
 
 extern extra_player_info_t  g_PlayerExtraInfo[MAX_PLAYERS+1];
 
@@ -2082,6 +2083,11 @@ void CStudioModelRenderer::SetViewmodelFovProjection( void )
 		m_pCvarViewmodelFov->value = 0.0;
 		gEngfuncs.Con_Printf("Invalid cl_viewmodel_fov value (minimum 1, maximum 179, 0 to disable). Resetting to 0 (disable).\n");
 		gEngfuncs.Con_Printf("Usage: cl_viewmodel_fov [1-179] or 0 to disable and use default_fov's FOV.\n");
+		return;
+	}
+
+	if (g_flRenderFOV != gHUD.default_fov->value) {
+		// Weapon is zoomed in - don't change the viewmodel FOV
 		return;
 	}
 

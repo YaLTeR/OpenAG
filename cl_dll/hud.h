@@ -630,8 +630,9 @@ private:
 	wrect_t *m_rgrcRects;	/*[HUD_SPRITE_COUNT]*/
 	char *m_rgszSpriteNames; /*[HUD_SPRITE_COUNT][MAX_SPRITE_NAME_LENGTH]*/
 
-	struct cvar_s *default_fov;
 public:
+	struct cvar_s *default_fov;
+
 	HSPRITE GetSprite( int index ) 
 	{
 		return (index < 0) ? 0 : m_rghSprites[index];
