@@ -2094,7 +2094,7 @@ void CStudioModelRenderer::SetViewmodelFovProjection( void )
 	glMatrixMode (GL_PROJECTION);
 	glLoadIdentity();
 	GLfloat w, h;
-	GLfloat _near = 1.0f;
+	GLfloat _near = 3.0f;
 	GLfloat _far = 4096.0f;
 	float fovY = m_pCvarViewmodelFov->value;
 	float aspect = (float)ScreenWidth / (float)ScreenHeight;
