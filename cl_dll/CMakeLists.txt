@@ -78,6 +78,8 @@ add_sources(
 	hud_vote.h
 	hud_watermark.cpp
 	hud_watermark.h
+	hud_oldscoreboard.cpp
+	hud_oldscoreboard.h
 	hudgl.cpp
 	hudgl.h
 	in_camera.cpp

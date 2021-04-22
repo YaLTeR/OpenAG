@@ -99,6 +99,7 @@ struct HUDLIST {
 #include "hud_debug.h"
 #include "hud_location.h"
 #include "hud_nextmap.h"
+#include "hud_oldscoreboard.h"
 #include "hud_playerid.h"
 #include "hud_scores.h"
 #include "hud_settings.h"
@@ -605,6 +606,7 @@ public:
 	int DrawHudString(int x, int y, int iMaxX, const char *szString, int r, int g, int b );
 	int DrawHudStringReverse( int xpos, int ypos, int iMinX, const char *szString, int r, int g, int b );
 	int DrawHudNumberString( int xpos, int ypos, int iMinX, int iNumber, int r, int g, int b );
+	int DrawHudNumberStringFixed( int xpos, int ypos, int iNumber, int r, int g, int b );
 	int GetNumWidth(int iNumber, int iFlags);
 
 	int DrawHudStringCentered(int x, int y, const char* string, int r, int g, int b);
@@ -685,6 +687,7 @@ public:
 	CHudTimer		m_Timer;
 	CHudVote		m_Vote;
 	CHudWatermark	m_Watermark;
+	CHudOldScoreboard m_OldScoreBoard;
 
 	CRainbow m_Rainbow;
 

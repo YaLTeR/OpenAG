@@ -1403,8 +1403,21 @@ void TeamFortressViewport::ShowScoreBoard( void )
 		// No Scoreboard in single-player
 		if ( gEngfuncs.GetMaxClients() > 1 )
 		{
-			m_pScoreBoard->Open();
-			UpdateCursorState();
+			// The user can change the scoreboard style while the scoreboard is being "drawn" (e.g. when togglescores is on)
+			// Therefore make sure to close/hide the other one first
+			if (CVAR_GET_FLOAT("cl_old_scoreboard") == 1)
+			{
+				m_pScoreBoard->setVisible(false);
+				m_pScoreBoard->RebuildTeams(); // TODO: is this needed?
+				gHUD.m_OldScoreBoard.ShowScoreboard(true);
+				UpdateCursorState(); // just to be sure I guess
+			}
+			else
+			{
+				gHUD.m_OldScoreBoard.ShowScoreboard(false);
+				m_pScoreBoard->Open();
+				UpdateCursorState();
+			}
 		}
 	}
 }
@@ -1415,7 +1428,12 @@ void TeamFortressViewport::ShowScoreBoard( void )
 bool TeamFortressViewport::IsScoreBoardVisible( void )
 {
 	if (m_pScoreBoard)
-		return m_pScoreBoard->isVisible();
+	{
+		if (CVAR_GET_FLOAT("cl_old_scoreboard") == 1)
+			return gHUD.m_OldScoreBoard.IsVisible();
+		else
+			return m_pScoreBoard->isVisible();
+	}
 
 	return false;
 }
@@ -1428,6 +1446,14 @@ void TeamFortressViewport::HideScoreBoard( void )
 	// Prevent removal of scoreboard during intermission
 	if ( gHUD.m_iIntermission )
 		return;
+
+	// The user can change the scoreboard style while the scoreboard is being "drawn" (e.g. when togglescores is on)
+	// Therefore hide both of them so that we are sure we aren't drawing both of them
+
+	if ( CVAR_GET_FLOAT("cl_old_scoreboard") == 1 )
+	{
+		gHUD.m_OldScoreBoard.ShowScoreboard(false);
+	}
 
 	if (m_pScoreBoard)
 	{
