@@ -45,7 +45,7 @@ OpenAG is an open-source client of the Half-Life promod Adrenaline Gamer, comple
 
 ## Linux
 ### GNOME Builder
-1. Set up FlatHub by following the [guide](https://flatpak.org/setup/) for your distribution.
+1. Set up Flathub by following the [guide](https://flatpak.org/setup/) for your distribution.
 1. Install [GNOME Builder](https://flathub.org/apps/details/org.gnome.Builder).
 1. Open GNOME Builder.
 1. Press the Clone Repository button, enter `https://github.com/YaLTeR/OpenAG.git` and press Clone Project. Wait until it finishes.
