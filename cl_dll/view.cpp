@@ -78,6 +78,12 @@ qboolean	v_resetCamera = 1;
 
 vec3_t ev_punchangle;
 
+// Used in model rendering code for view model attachment reprojection
+Vector g_vViewOrigin;
+Vector g_vViewForward;
+Vector g_vViewRight;
+Vector g_vViewUp;
+
 cvar_t	*scr_ofsx;
 cvar_t	*scr_ofsy;
 cvar_t	*scr_ofsz;
@@ -1703,6 +1709,12 @@ void CL_DLLEXPORT V_CalcRefdef( struct ref_params_s *pparams )
 	{
 		V_CalcNormalRefdef ( pparams );
 	}
+
+	// Save view data for viewmodel renderer
+	g_vViewOrigin = pparams->vieworg;
+	g_vViewForward = pparams->forward;
+	g_vViewRight = pparams->right;
+	g_vViewUp = pparams->up;
 
 /*
 // Example of how to overlay the whole screen with red at 50 % alpha

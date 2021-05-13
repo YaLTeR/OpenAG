@@ -50,6 +50,9 @@ public:
 
 	// Find final attachment points
 	virtual void StudioCalcAttachments ( void );
+
+	// Reprojects attachments of the viewmodel if FOV is changed
+	virtual void StudioAdjustViewmodelAttachments(Vector &vOrigin);
 	
 	// Save bone matrices and names
 	virtual void StudioSaveBones( void );

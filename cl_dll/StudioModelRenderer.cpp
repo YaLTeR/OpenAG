@@ -37,6 +37,10 @@
 
 extern cvar_t *tfc_newmodels;
 extern float g_flRenderFOV;
+extern Vector g_vViewOrigin;
+extern Vector g_vViewForward;
+extern Vector g_vViewRight;
+extern Vector g_vViewUp;
 
 extern extra_player_info_t  g_PlayerExtraInfo[MAX_PLAYERS+1];
 
@@ -1990,7 +1994,40 @@ void CStudioModelRenderer::StudioCalcAttachments( void )
 	for (i = 0; i < m_pStudioHeader->numattachments; i++)
 	{
 		VectorTransform( pattachment[i].org, (*m_plighttransform)[pattachment[i].bone],  m_pCurrentEntity->attachment[i] );
+
+		if (IEngineStudio.IsHardware() && // OpenGL mode
+			m_pCurrentEntity == gEngfuncs.GetViewModel() && // attachments of viewmodel
+			m_pCvarViewmodelFov->value != 0.0f && // viewmodel FOV is changed
+			g_flRenderFOV == gHUD.default_fov->value) // weapon is not zoomed in
+		{
+			// Adjust attachment positions to account for different viewmodel FOV.
+			// Otherwise weapon effects (sprites, beams) will be drawn in incorrect position.
+			StudioAdjustViewmodelAttachments(m_pCurrentEntity->attachment[i]);
+		}
 	}
+}
+
+void CStudioModelRenderer::StudioAdjustViewmodelAttachments(Vector &vOrigin)
+{
+	float worldx = tan(g_flRenderFOV * M_PI / 360.0);
+	float viewx = tan(m_pCvarViewmodelFov->value * M_PI / 360.0);
+
+	// aspect ratio cancels out, so only need one factor
+	// the difference between the screen coordinates of the 2 systems is the ratio
+	// of the coefficients of the projection matrices (tan (fov/2) is that coefficient)
+	float factor = worldx / viewx;
+
+	// Get the coordinates in the viewer's space.
+	Vector tmp = vOrigin - g_vViewOrigin;
+	Vector vTransformed(DotProduct(g_vViewRight, tmp), DotProduct(g_vViewUp, tmp), DotProduct(g_vViewForward, tmp));
+
+	// Now squash X and Y.
+	vTransformed.x *= factor;
+	vTransformed.y *= factor;
+
+	// Transform back to world space.
+	Vector vOut = (g_vViewRight * vTransformed.x) + (g_vViewUp * vTransformed.y) + (g_vViewForward * vTransformed.z);
+	vOrigin = g_vViewOrigin + vOut;
 }
 
 /*
