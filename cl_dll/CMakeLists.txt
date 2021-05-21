@@ -44,6 +44,8 @@ add_sources(
 	hud_crosshairs.h
 	hud_ctf.cpp
 	hud_ctf.h
+	hud_customtimer.cpp
+	hud_customtimer.h
 	hud_debug.cpp
 	hud_debug.h
 	hud_location.cpp
