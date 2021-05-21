@@ -94,6 +94,7 @@ struct HUDLIST {
 
 #include "hud_countdown.h"
 #include "hud_crosshairs.h"
+#include "hud_customtimer.h"
 #include "hud_ctf.h"
 #include "hud_debug.h"
 #include "hud_location.h"
@@ -671,6 +672,7 @@ public:
 	CHudCountdown	m_Countdown;
 	CHudCrosshairs	m_Crosshairs;
 	CHudCTF			m_CTF;
+	CHudCustomTimer m_CustomTimer;
 	CHudDebug		m_Debug;
 	CHudLocation	m_Location;
 	CHudNextMap		m_NextMap;
