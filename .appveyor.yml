@@ -1,0 +1,38 @@
+version: '{build}-{branch}'
+
+skip_commits:
+  files:
+    - '*.bat'
+    - '*.md'
+    - '.github/**'
+    - '.travis.yml'
+    - 'LICENSE*'
+
+skip_branch_with_pr: true
+
+image: macos-mojave
+
+clone_depth: 1
+
+environment:
+  DEVELOPER_DIR: /Applications/Xcode-9.4.1.app/Contents/Developer
+
+configuration: [Release, Debug]
+
+before_build:
+  - |
+    git submodule update --init --recursive --depth 1 -j $(sysctl -n hw.activecpu)
+    cmake -DCMAKE_BUILD_TYPE=$CONFIGURATION -B build
+
+build_script:
+  - |
+    cd build
+    make
+
+test: off
+
+on_success:
+  - |
+    if [[ "$CONFIGURATION" = "Release" ]]; then
+      appveyor PushArtifact client.dylib
+    fi
