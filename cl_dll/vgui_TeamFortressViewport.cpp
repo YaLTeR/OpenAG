@@ -1414,7 +1414,6 @@ void TeamFortressViewport::ShowScoreBoard( void )
 			{
 				gHUD.m_OldScoreBoard.ShowScoreboard(false);
 				m_pScoreBoard->Open();
-				UpdateCursorState();
 			}
 			UpdateCursorState(); // just to be sure I guess
 		}

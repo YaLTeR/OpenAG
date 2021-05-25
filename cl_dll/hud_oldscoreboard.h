@@ -26,6 +26,7 @@ private:
 
 	cvar_t *m_pCvarOldScoreboard;
 	cvar_t *m_pCvarOldScoreboardWidth;
+	cvar_t *m_pCvarOldScoreboardColorsTags;
 
 	float m_WidthScale;
 };

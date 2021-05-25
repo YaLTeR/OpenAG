@@ -32,15 +32,16 @@
 #define ROW_RANGE_MAX ( ScreenHeight - 50 )
 #define ROW_TOP 40
 
-#define TEAM_NO				0
-#define TEAM_YES			1
-#define TEAM_SPECTATORS		2
-#define TEAM_BLANK			3
+#define TEAM_NO             0
+#define TEAM_YES            1
+#define TEAM_SPECTATORS     2
+#define TEAM_BLANK          3
 
 int CHudOldScoreboard::Init(void)
 {
 	m_pCvarOldScoreboard = CVAR_CREATE("cl_old_scoreboard", "0", FCVAR_ARCHIVE);
 	m_pCvarOldScoreboardWidth = CVAR_CREATE("cl_old_scoreboard_width", DEFAULT_WIDTH, FCVAR_ARCHIVE);
+	m_pCvarOldScoreboardColorsTags = CVAR_CREATE("cl_old_scoreboard_colortags", "0", FCVAR_ARCHIVE);
 
 	m_iFlags = 0;
 
@@ -84,7 +85,6 @@ void CHudOldScoreboard::ShowScoreboard(bool bShow)
 
 int CHudOldScoreboard::Draw(float fTime)
 {
-	gEngfuncs.Con_Printf("m_iFlags = %d\n", m_iFlags);
 	// Let users use 320 even on Linux, if they really want to
 	if (m_pCvarOldScoreboardWidth->value < 320.0f || m_pCvarOldScoreboardWidth->value > ScreenWidth)
 	{
@@ -249,10 +249,8 @@ int CHudOldScoreboard::Draw(float fTime)
 			}
 
 			char szName[128];
-			char colorlessName[128];
 			int specoffset = 0;
 			snprintf(szName, ARRAYSIZE(szName), "%s", pl_info->name);
-			color_tags::strip_color_tags(colorlessName, szName, ARRAYSIZE(colorlessName));
 
 			// If this player is a spectator we need to also fit " (S)" in, let's prepare for that
 			if (g_IsSpectator[scoreboard->m_iSortedRows[iRow]])
@@ -266,22 +264,25 @@ int CHudOldScoreboard::Draw(float fTime)
 			}
 
 			// cut off the name if it'd overlap score
-			while ( gHUD.GetHudStringWidth(colorlessName) + nameoffset + NAME_RANGE_MIN > KILLS_RANGE_MIN )
+			while ( gHUD.GetHudStringWidthWithColorTags(szName) + nameoffset + NAME_RANGE_MIN + specoffset > KILLS_RANGE_MIN )
 			{
-				colorlessName[strlen(colorlessName) - 1] = '\0';
+				szName[strlen(szName) - 1] = '\0';
 			}
 
 			// Now that we have space for it, add the (S)
 			if (g_IsSpectator[scoreboard->m_iSortedRows[iRow]])
 			{
-				auto len = strlen(colorlessName);
-				colorlessName[len - 1] = ')';
-				colorlessName[len - 2] = 'S';
-				colorlessName[len - 3] = '(';
-				colorlessName[len - 4] = ' ';
+				auto len = strlen(szName);
+				szName[len - 1] = ')';
+				szName[len - 2] = 'S';
+				szName[len - 3] = '(';
+				szName[len - 4] = ' ';
 			}
 
-			gHUD.DrawHudStringWithColorTags(xpos + nameoffset, ypos, colorlessName, r, g, b);
+			if (m_pCvarOldScoreboardColorsTags->value == 0.0f)
+				color_tags::strip_color_tags(szName, szName, ARRAYSIZE(szName));
+
+			gHUD.DrawHudStringWithColorTags(xpos + nameoffset, ypos, szName, r, g, b);
 
 			// draw kills (right to left)
 			xpos = KILLS_RANGE_MAX + xpos_rel;
