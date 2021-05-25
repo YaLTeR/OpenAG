@@ -24,13 +24,10 @@ private:
 
 	icon_flagstatus_t m_IconFlagScore;
 
-	bool m_bShowScoreboard;
-
 	cvar_t *m_pCvarOldScoreboard;
 	cvar_t *m_pCvarOldScoreboardWidth;
 
 	float m_WidthScale;
-
 };
 
 #endif //OLD_SCOREBOARD_H

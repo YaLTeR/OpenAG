@@ -11,7 +11,6 @@
 // Those who play on killed-off 32bit Apple don't deserve old_scoreboard looking good
 // as I am too lazy to build & test in a MacOS, sorry.
 #ifdef LINUX
-	#define ROW_GAP (gHUD.m_scrinfo.iCharHeight - 5)
 	#define ROW_RANGE_MIN (gHUD.m_scrinfo.iCharHeight + 3)
 
 	/* The scoreboard's default width is set to 380 on Linux
@@ -24,12 +23,12 @@
 	#define DEFAULT_WIDTH "380"
 	#define DEFAULT_WIDTH_NUM 380
 #else
-	#define ROW_GAP  (gHUD.m_scrinfo.iCharHeight - 5)
 	#define ROW_RANGE_MIN (gHUD.m_scrinfo.iCharHeight + 2)
 	#define DEFAULT_WIDTH "320"
 	#define DEFAULT_WIDTH_NUM 320
 #endif // LINUX
 
+#define ROW_GAP (gHUD.m_scrinfo.iCharHeight - 5)
 #define ROW_RANGE_MAX ( ScreenHeight - 50 )
 #define ROW_TOP 40
 
@@ -43,7 +42,6 @@ int CHudOldScoreboard::Init(void)
 	m_pCvarOldScoreboard = CVAR_CREATE("cl_old_scoreboard", "0", FCVAR_ARCHIVE);
 	m_pCvarOldScoreboardWidth = CVAR_CREATE("cl_old_scoreboard_width", DEFAULT_WIDTH, FCVAR_ARCHIVE);
 
-	m_bShowScoreboard = false;
 	m_iFlags = 0;
 
 	gHUD.AddHudElem(this);
@@ -52,7 +50,7 @@ int CHudOldScoreboard::Init(void)
 
 int CHudOldScoreboard::VidInit(void)
 {
-	m_iFlags |= HUD_ACTIVE;
+	m_iFlags &= ~HUD_ACTIVE; // m_iFlags |= HUD_ACTIVE;
 	m_iFlags |= HUD_INTERMISSION; // is always drawn during an intermission
 
 	int m_iSprite = 0;
@@ -60,37 +58,40 @@ int CHudOldScoreboard::VidInit(void)
 	m_IconFlagScore.spr = gHUD.GetSprite(m_iSprite);
 	m_IconFlagScore.rc = gHUD.GetSpriteRect(m_iSprite);
 	m_WidthScale = m_pCvarOldScoreboardWidth->value / 320.0f;
-	m_bShowScoreboard = false;
 
 	return 1;
 }
 
 void CHudOldScoreboard::Reset(void)
 {
-
 }
 
 bool CHudOldScoreboard::IsVisible()
 {
-	return m_bShowScoreboard;
+	return m_iFlags & HUD_ACTIVE;
 }
 
 void CHudOldScoreboard::ShowScoreboard(bool bShow)
 {
 	if (bShow && gViewPort && gViewPort->m_pScoreBoard)
+	{
 		gViewPort->m_pScoreBoard->RebuildTeams();
-	m_bShowScoreboard = bShow;
+		m_iFlags |= HUD_ACTIVE;
+	}
+	else
+		m_iFlags &= ~HUD_ACTIVE;
 }
 
 int CHudOldScoreboard::Draw(float fTime)
 {
+	gEngfuncs.Con_Printf("m_iFlags = %d\n", m_iFlags);
 	// Let users use 320 even on Linux, if they really want to
 	if (m_pCvarOldScoreboardWidth->value < 320.0f || m_pCvarOldScoreboardWidth->value > ScreenWidth)
 	{
 		gEngfuncs.Con_Printf("Invalid cl_oldscoreboard_width value (%d) ", (int)m_pCvarOldScoreboardWidth->value);
-		gEngfuncs.Con_Printf("(minimum = %d, maximum = %d (current screen width)\n", 320, ScreenWidth);
+		gEngfuncs.Con_Printf("(minimum = %d, maximum = %d (current screen width))\n", 320, ScreenWidth);
 		gEngfuncs.Con_Printf("Resetting to default: %s\n", DEFAULT_WIDTH);
-		m_pCvarOldScoreboardWidth->value = (float)DEFAULT_WIDTH_NUM;
+		gEngfuncs.Cvar_SetValue("cl_old_scoreboard_width", DEFAULT_WIDTH_NUM);
 	}
 
 	if (!IsVisible())
@@ -111,7 +112,6 @@ int CHudOldScoreboard::Draw(float fTime)
 	int DIVIDER_POS     = 180 * m_WidthScale;
 	int DEATHS_RANGE_MIN = 190 * m_WidthScale; // og 185
 	int DEATHS_RANGE_MAX = 220 * m_WidthScale;
-	// int PING_RANGE_MIN  = 245 * m_WidthScale;
 	int PING_RANGE_MAX  = 295 * m_WidthScale;
 	int END = 315 * m_WidthScale;
 
@@ -133,7 +133,7 @@ int CHudOldScoreboard::Draw(float fTime)
 		gHUD.DrawHudString(xpos, ypos, NAME_RANGE_MAX + xpos_rel, CHudTextMessage::BufferedLocaliseTextString("#TEAMS"), r, g, b);
 
 	// can't use #SCORE as RightAligned is not a friend with BufferedLocaliseTextString for some reason, sorry
-	gHUD.DrawHudStringRightAligned( KILLS_RANGE_MAX + xpos_rel, ypos, CHudTextMessage::BufferedLocaliseTextString("Score"), r, g, b);
+	gHUD.DrawHudStringRightAligned(KILLS_RANGE_MAX + xpos_rel, ypos, CHudTextMessage::BufferedLocaliseTextString("Score"), r, g, b);
 
 	gHUD.DrawHudStringCentered(DIVIDER_POS + xpos_rel, ypos, "/", r, g, b);
 
@@ -146,7 +146,7 @@ int CHudOldScoreboard::Draw(float fTime)
 	list_slot += 1.5;
 	ypos = ROW_TOP + ROW_RANGE_MIN + (list_slot * ROW_GAP);
 	xpos = NAME_RANGE_MIN + xpos_rel;
-	FillRGBA( xpos, ypos, PING_RANGE_MAX, 1, r, g, b, 255); // draw the seperator line
+	FillRGBA(xpos, ypos, PING_RANGE_MAX, 1, r, g, b, 255); // draw the seperator line
 
 	list_slot += 0.8;
 
@@ -245,7 +245,7 @@ int CHudOldScoreboard::Draw(float fTime)
 			{
 				r = g = b = 255;
 				// overlay the background in blue, then draw the score text over it
-				FillRGBA( NAME_RANGE_MIN + xpos_rel - 5, ypos + 5, PING_RANGE_MAX - 5, ROW_GAP, 0, 0, 255, 70);
+				FillRGBA(NAME_RANGE_MIN + xpos_rel - 5, ypos + 5, PING_RANGE_MAX - 5, ROW_GAP, 0, 0, 255, 70);
 			}
 
 			char szName[128];
@@ -274,10 +274,11 @@ int CHudOldScoreboard::Draw(float fTime)
 			// Now that we have space for it, add the (S)
 			if (g_IsSpectator[scoreboard->m_iSortedRows[iRow]])
 			{
-				colorlessName[strlen(colorlessName) - 1] = ')';
-				colorlessName[strlen(colorlessName) - 2] = 'S';
-				colorlessName[strlen(colorlessName) - 3] = '(';
-				colorlessName[strlen(colorlessName) - 4] = ' ';
+				auto len = strlen(colorlessName);
+				colorlessName[len - 1] = ')';
+				colorlessName[len - 2] = 'S';
+				colorlessName[len - 3] = '(';
+				colorlessName[len - 4] = ' ';
 			}
 
 			gHUD.DrawHudStringWithColorTags(xpos + nameoffset, ypos, colorlessName, r, g, b);
@@ -298,7 +299,7 @@ int CHudOldScoreboard::Draw(float fTime)
 			// Why 25: 320 (default width in the original AG) - 295 (PING_RANGE_MAX) = 25
 			xpos = m_pCvarOldScoreboardWidth->value + xpos_rel - (m_pCvarOldScoreboardWidth->value - PING_RANGE_MAX);
 			static char buf[64];
-			sprintf(buf, "%d/%d", (int)pl_info->ping, (int)pl_info->packetloss);
+			snprintf(buf, ARRAYSIZE(buf), "%d/%d", (int)pl_info->ping, (int)pl_info->packetloss);
 			gHUD.DrawHudStringRightAligned(xpos , ypos, buf, r, g, b);
 
 			list_slot++;

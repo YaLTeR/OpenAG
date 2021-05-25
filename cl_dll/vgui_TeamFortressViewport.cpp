@@ -1405,12 +1405,10 @@ void TeamFortressViewport::ShowScoreBoard( void )
 		{
 			// The user can change the scoreboard style while the scoreboard is being "drawn" (e.g. when togglescores is on)
 			// Therefore make sure to close/hide the other one first
-			if (CVAR_GET_FLOAT("cl_old_scoreboard") == 1)
+			if (CVAR_GET_FLOAT("cl_old_scoreboard") != 0)
 			{
 				m_pScoreBoard->setVisible(false);
-				m_pScoreBoard->RebuildTeams(); // TODO: is this needed?
 				gHUD.m_OldScoreBoard.ShowScoreboard(true);
-				UpdateCursorState(); // just to be sure I guess
 			}
 			else
 			{
@@ -1418,6 +1416,7 @@ void TeamFortressViewport::ShowScoreBoard( void )
 				m_pScoreBoard->Open();
 				UpdateCursorState();
 			}
+			UpdateCursorState(); // just to be sure I guess
 		}
 	}
 }
@@ -1429,7 +1428,7 @@ bool TeamFortressViewport::IsScoreBoardVisible( void )
 {
 	if (m_pScoreBoard)
 	{
-		if (CVAR_GET_FLOAT("cl_old_scoreboard") == 1)
+		if (CVAR_GET_FLOAT("cl_old_scoreboard") != 0)
 			return gHUD.m_OldScoreBoard.IsVisible();
 		else
 			return m_pScoreBoard->isVisible();
@@ -1447,17 +1446,10 @@ void TeamFortressViewport::HideScoreBoard( void )
 	if ( gHUD.m_iIntermission )
 		return;
 
-	// The user can change the scoreboard style while the scoreboard is being "drawn" (e.g. when togglescores is on)
-	// Therefore hide both of them so that we are sure we aren't drawing both of them
-
-	if ( CVAR_GET_FLOAT("cl_old_scoreboard") == 1 )
-	{
-		gHUD.m_OldScoreBoard.ShowScoreboard(false);
-	}
-
 	if (m_pScoreBoard)
 	{
 		m_pScoreBoard->setVisible(false);
+		gHUD.m_OldScoreBoard.ShowScoreboard(false);
 
 		GetClientVoiceMgr()->StopSquelchMode();
 
