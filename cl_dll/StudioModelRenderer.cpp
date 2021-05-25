@@ -2117,7 +2117,7 @@ void CStudioModelRenderer::SetViewmodelFovProjection( void )
 {
 	if(m_pCvarViewmodelFov->value < 1 || m_pCvarViewmodelFov->value > 179)
 	{
-		m_pCvarViewmodelFov->value = 0.0;
+		gEngfuncs.Cvar_SetValue("cl_viewmodel_fov", 0);
 		gEngfuncs.Con_Printf("Invalid cl_viewmodel_fov value (minimum 1, maximum 179, 0 to disable). Resetting to 0 (disable).\n");
 		gEngfuncs.Con_Printf("Usage: cl_viewmodel_fov [1-179] or 0 to disable and use default_fov's FOV.\n");
 		return;
