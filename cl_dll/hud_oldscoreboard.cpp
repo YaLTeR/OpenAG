@@ -85,17 +85,12 @@ void CHudOldScoreboard::ShowScoreboard(bool bShow)
 
 int CHudOldScoreboard::Draw(float fTime)
 {
-	// Let users use 320 even on Linux, if they really want to
-	if (m_pCvarOldScoreboardWidth->value < 320.0f || m_pCvarOldScoreboardWidth->value > ScreenWidth)
-	{
-		gEngfuncs.Con_Printf("Invalid cl_oldscoreboard_width value (%d) ", (int)m_pCvarOldScoreboardWidth->value);
-		gEngfuncs.Con_Printf("(minimum = %d, maximum = %d (current screen width))\n", 320, ScreenWidth);
-		gEngfuncs.Con_Printf("Resetting to default: %s\n", DEFAULT_WIDTH);
-		gEngfuncs.Cvar_SetValue("cl_old_scoreboard_width", DEFAULT_WIDTH_NUM);
-	}
-
 	if (!IsVisible())
 		return 1;
+
+	// Let users use 320 even on Linux, if they really want to
+	int width = max(min((int)m_pCvarOldScoreboardWidth->value, ScreenWidth), 320);
+	m_WidthScale = (float)width / 320.0f;
 
 	/*
 	 * X positions, relative to the side of the scoreboard
@@ -103,8 +98,6 @@ int CHudOldScoreboard::Draw(float fTime)
 	 * And yes, the original scoreboard isn't perfectly centered,
 	 * even that is preserved :)
 	 */
-	m_WidthScale = m_pCvarOldScoreboardWidth->value / 320.0f;
-
 	int NAME_RANGE_MIN = 20 * m_WidthScale;
 	int NAME_RANGE_MAX = 145 * m_WidthScale;
 	int KILLS_RANGE_MIN = 130 * m_WidthScale;
@@ -121,7 +114,7 @@ int CHudOldScoreboard::Draw(float fTime)
 	int xpos = 0;
 	int ypos = 0;
 	float list_slot = 0;
-	int xpos_rel = (ScreenWidth - (int)m_pCvarOldScoreboardWidth->value) / 2; // scale the scoreboard based on the cvar
+	int xpos_rel = (ScreenWidth - width) / 2; // scale the scoreboard based on the cvar
 
 	// print the heading line
 	ypos = ROW_TOP + ROW_RANGE_MIN + (list_slot * ROW_GAP);
@@ -140,7 +133,7 @@ int CHudOldScoreboard::Draw(float fTime)
 	gHUD.DrawHudString(DEATHS_RANGE_MIN + xpos_rel, ypos, ScreenWidth, CHudTextMessage::BufferedLocaliseTextString("#DEATHS"), r, g, b);
 
 	// can't use #LATENCY as RightAligned is not a friend with BufferedLocaliseTextString for some reason, sorry
-	xpos = m_pCvarOldScoreboardWidth->value + xpos_rel - (m_pCvarOldScoreboardWidth->value - END);
+	xpos = width + xpos_rel - (width - END);
 	gHUD.DrawHudStringRightAligned(xpos, ypos, "Ping/loss", r, g, b);
 
 	list_slot += 1.5;
@@ -298,7 +291,7 @@ int CHudOldScoreboard::Draw(float fTime)
 
 			// draw ping & packetloss
 			// Why 25: 320 (default width in the original AG) - 295 (PING_RANGE_MAX) = 25
-			xpos = m_pCvarOldScoreboardWidth->value + xpos_rel - (m_pCvarOldScoreboardWidth->value - PING_RANGE_MAX);
+			xpos = width + xpos_rel - (width - PING_RANGE_MAX);
 			static char buf[64];
 			snprintf(buf, ARRAYSIZE(buf), "%d/%d", (int)pl_info->ping, (int)pl_info->packetloss);
 			gHUD.DrawHudStringRightAligned(xpos , ypos, buf, r, g, b);

@@ -14,7 +14,7 @@ public:
 	void Reset( void );
 
 	bool IsVisible( );
-	void ShowScoreboard( bool bShow = true );
+	void ShowScoreboard( bool bShow );
 private:
 	typedef struct
 	{
