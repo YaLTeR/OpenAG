@@ -21,11 +21,9 @@
 	 * LINUX = Trebuchet MS = 11x10
 	 */
 	#define DEFAULT_WIDTH "380"
-	#define DEFAULT_WIDTH_NUM 380
 #else
 	#define ROW_RANGE_MIN (gHUD.m_scrinfo.iCharHeight + 2)
 	#define DEFAULT_WIDTH "320"
-	#define DEFAULT_WIDTH_NUM 320
 #endif // LINUX
 
 #define ROW_GAP (gHUD.m_scrinfo.iCharHeight - 5)
@@ -41,7 +39,6 @@ int CHudOldScoreboard::Init(void)
 {
 	m_pCvarOldScoreboard = CVAR_CREATE("cl_old_scoreboard", "0", FCVAR_ARCHIVE);
 	m_pCvarOldScoreboardWidth = CVAR_CREATE("cl_old_scoreboard_width", DEFAULT_WIDTH, FCVAR_ARCHIVE);
-	m_pCvarOldScoreboardColorsTags = CVAR_CREATE("cl_old_scoreboard_colortags", "0", FCVAR_ARCHIVE);
 
 	m_iFlags = 0;
 
@@ -271,9 +268,6 @@ int CHudOldScoreboard::Draw(float fTime)
 				szName[len - 3] = '(';
 				szName[len - 4] = ' ';
 			}
-
-			if (m_pCvarOldScoreboardColorsTags->value == 0.0f)
-				color_tags::strip_color_tags(szName, szName, ARRAYSIZE(szName));
 
 			gHUD.DrawHudStringWithColorTags(xpos + nameoffset, ypos, szName, r, g, b);
 
