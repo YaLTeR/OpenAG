@@ -6,6 +6,7 @@
 #include "vgui_TeamFortressViewport.h"
 #include "hud_oldscoreboard.h"
 #include "vgui_ScorePanel.h"
+#include "steam_id.h"
 
 // Y positions
 // Those who play on killed-off 32bit Apple don't deserve old_scoreboard looking good
@@ -240,7 +241,14 @@ int CHudOldScoreboard::Draw(float fTime)
 
 			char szName[128];
 			int specoffset = 0;
-			snprintf(szName, ARRAYSIZE(szName), "%s", pl_info->name);
+			const char* name = nullptr;
+
+			if (steam_id::is_showing_real_names())
+				name = steam_id::get_real_name(scoreboard->m_iSortedRows[iRow] - 1).c_str();
+			if (!name || name[0] == '\0')
+				name = pl_info->name;
+
+			snprintf(szName, ARRAYSIZE(szName), "%s", name);
 
 			// If this player is a spectator we need to also fit " (S)" in, let's prepare for that
 			if (g_IsSpectator[scoreboard->m_iSortedRows[iRow]])
