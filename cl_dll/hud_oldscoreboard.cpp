@@ -29,7 +29,6 @@
 
 #define ROW_GAP (gHUD.m_scrinfo.iCharHeight - 5)
 #define ROW_RANGE_MAX ( ScreenHeight - 50 )
-#define ROW_TOP 40
 
 #define TEAM_NO             0
 #define TEAM_YES            1
@@ -85,6 +84,11 @@ int CHudOldScoreboard::Draw(float fTime)
 {
 	if (!IsVisible())
 		return 1;
+
+	// This is now calculated so that the HLKreedz timer is not in the way on ANY resolution
+	// Since the Y pos of the timer is changed with different resolution
+	// It's also calculated dynamically since one can change the ScreenHeight by resizing the window during game
+	int ROW_TOP = (ScreenHeight / 320.0f) * 30.0f;
 
 	// Let users use 320 even on Linux, if they really want to
 	int width = max(min((int)m_pCvarOldScoreboardWidth->value, ScreenWidth), 320);
