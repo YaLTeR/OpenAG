@@ -260,8 +260,8 @@ int CHudOldScoreboard::Draw(float fTime)
 				std::string spec_str(" (S)");
 				for( char& c : spec_str )
 				{
-					auto width = gHUD.m_scrinfo.charWidths[ static_cast<unsigned char>(c) ];
-					specoffset += width;
+					auto cwidth = gHUD.m_scrinfo.charWidths[ static_cast<unsigned char>(c) ];
+					specoffset += cwidth;
 				}
 			}
 
@@ -273,13 +273,7 @@ int CHudOldScoreboard::Draw(float fTime)
 
 			// Now that we have space for it, add the (S)
 			if (g_IsSpectator[scoreboard->m_iSortedRows[iRow]])
-			{
-				auto len = strlen(szName);
-				szName[len - 1] = ')';
-				szName[len - 2] = 'S';
-				szName[len - 3] = '(';
-				szName[len - 4] = ' ';
-			}
+				strcat(szName, " (S)");
 
 			gHUD.DrawHudStringWithColorTags(xpos + nameoffset, ypos, szName, r, g, b);
 
