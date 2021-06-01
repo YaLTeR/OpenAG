@@ -84,11 +84,12 @@ void CHud::Think(void)
 	{  // only let players adjust up in fov,  and only if they are not overriden by something else
 		m_iFOV = max( default_fov->value, 90 );  
 	}
-	
-	if ( gEngfuncs.IsSpectateOnly() )
+
+	// Don't change the FOV for HLTV to a constant, use the updated value like when in a normal game
+	/*if ( gEngfuncs.IsSpectateOnly() )
 	{
-		m_iFOV = gHUD.m_Spectator.GetFOV();	// default_fov->value;
-	}
+		m_iFOV = gHUD.m_Spectator.GetFOV();
+	}*/
 
 	Bench_CheckStart();
 }

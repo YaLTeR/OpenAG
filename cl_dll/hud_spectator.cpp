@@ -173,7 +173,7 @@ int CHudSpectator::Init()
 	m_flNextObserverInput = 0.0f;
 	m_zoomDelta	= 0.0f;
 	m_moveDelta = 0.0f;
-	m_FOV = 90.0f;
+	m_FOV = gHUD.m_iFOV;
 	m_chatEnabled = (gHUD.m_SayText.m_HUD_saytext->value!=0);
 	iJumpSpectator	= 0;
 
@@ -2023,7 +2023,7 @@ void CHudSpectator::Reset()
 
 	memset( &m_OverviewEntities, 0, sizeof(m_OverviewEntities));
 
-	m_FOV = 90.0f;
+	m_FOV = gHUD.m_iFOV;
 
 	m_IsInterpolating = false;
 
