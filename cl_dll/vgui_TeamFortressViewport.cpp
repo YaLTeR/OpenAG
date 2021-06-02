@@ -1403,8 +1403,19 @@ void TeamFortressViewport::ShowScoreBoard( void )
 		// No Scoreboard in single-player
 		if ( gEngfuncs.GetMaxClients() > 1 )
 		{
-			m_pScoreBoard->Open();
-			UpdateCursorState();
+			// The user can change the scoreboard style while the scoreboard is being "drawn" (e.g. when togglescores is on)
+			// Therefore make sure to close/hide the other one first
+			if (CVAR_GET_FLOAT("cl_old_scoreboard") != 0)
+			{
+				m_pScoreBoard->setVisible(false);
+				gHUD.m_OldScoreBoard.ShowScoreboard(true);
+			}
+			else
+			{
+				gHUD.m_OldScoreBoard.ShowScoreboard(false);
+				m_pScoreBoard->Open();
+			}
+			UpdateCursorState(); // just to be sure I guess
 		}
 	}
 }
@@ -1415,7 +1426,12 @@ void TeamFortressViewport::ShowScoreBoard( void )
 bool TeamFortressViewport::IsScoreBoardVisible( void )
 {
 	if (m_pScoreBoard)
-		return m_pScoreBoard->isVisible();
+	{
+		if (CVAR_GET_FLOAT("cl_old_scoreboard") != 0)
+			return gHUD.m_OldScoreBoard.IsVisible();
+		else
+			return m_pScoreBoard->isVisible();
+	}
 
 	return false;
 }
@@ -1432,6 +1448,7 @@ void TeamFortressViewport::HideScoreBoard( void )
 	if (m_pScoreBoard)
 	{
 		m_pScoreBoard->setVisible(false);
+		gHUD.m_OldScoreBoard.ShowScoreboard(false);
 
 		GetClientVoiceMgr()->StopSquelchMode();
 
