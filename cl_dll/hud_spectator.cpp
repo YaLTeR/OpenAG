@@ -1948,16 +1948,28 @@ void CHudSpectator::CheckSettings()
 	}
 
 	// HL/TFC has no oberserver corsshair, so set it client side
-	if ( (g_iUser1 == OBS_IN_EYE) || (g_iUser1 == OBS_ROAMING) ) 
+	// Soup: For first person, leave the crosshair alone
+	// The game gives it to us elsewhere, so don't replace it here
+	// Commenting out instead of deletion for posterity
+	if ( g_iUser1 == OBS_IN_EYE )
+	{
+		/* m_crosshairRect.left	 = 24;
+		m_crosshairRect.top	 = 0;
+		m_crosshairRect.right	 = 48;
+		m_crosshairRect.bottom = 24;
+
+		SetCrosshair( m_hCrosshair, m_crosshairRect, 255, 255, 255 ); */
+	}
+	else if ( g_iUser1 == OBS_ROAMING ) // set the 9mm handgun crosshair for Free look
 	{
 		m_crosshairRect.left	 = 24;
 		m_crosshairRect.top	 = 0;
 		m_crosshairRect.right	 = 48;
 		m_crosshairRect.bottom = 24;
-					
+
 		SetCrosshair( m_hCrosshair, m_crosshairRect, 255, 255, 255 );
 	}
-	else
+	else // other observer modes don't have a crosshair
 	{
 		memset( &m_crosshairRect,0,sizeof(m_crosshairRect) );
 		SetCrosshair( 0, m_crosshairRect, 0, 0, 0 );
