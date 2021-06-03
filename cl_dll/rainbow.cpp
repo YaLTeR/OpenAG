@@ -109,8 +109,8 @@ int CRainbow::DrawString(int x, int y, const char *str, int r, int g, int b)
 
 int CRainbow::DrawStringReverse(int x, int y, const char *str, int r, int g, int b)
 {
-    // Calc string width by drawing outside the screen
-    int width = gEngfuncs.pfnDrawString(ScreenWidth + 1, y, str, r, g, b);
+    // Get string width
+    int width = gHUD.GetHudStringWidth(str);
 
     // Draw it shifted to the left by width pixels
     return x + DrawString(x - width, y, str, r, g, b);
