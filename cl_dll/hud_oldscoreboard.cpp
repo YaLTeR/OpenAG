@@ -217,6 +217,9 @@ int CHudOldScoreboard::Draw(float fTime)
 			hud_player_info_t* pl_info = &g_PlayerInfoList[sorted];
 			extra_player_info_t* pl_info_extra = &g_PlayerExtraInfo[sorted];
 
+			if (pl_info->name == NULL)
+				continue;
+
 			ypos = ROW_TOP + ROW_RANGE_MIN + (list_slot * ROW_GAP);
 
 			// check we haven't drawn too far down
