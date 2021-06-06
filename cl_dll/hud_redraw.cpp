@@ -466,6 +466,9 @@ int CHud::DrawHudStringWithColorTags(int x, int y, char* string, int default_r, 
 			b = default_b;
 		}
 
+		if ((r + g + b) == 0)
+			r = g = b = 90;
+
 		x += gEngfuncs.pfnDrawString(x, y, string, r, g, b);
 	});
 
