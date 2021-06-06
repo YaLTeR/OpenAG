@@ -43,6 +43,8 @@ void CHud::Think(void)
 	m_scrinfo.iSize = sizeof(m_scrinfo);
 	GetScreenInfo(&m_scrinfo);
 
+	m_Rainbow.Think();
+
 	int newfov;
 	HUDLIST *pList = m_pHudList;
 
@@ -82,11 +84,12 @@ void CHud::Think(void)
 	{  // only let players adjust up in fov,  and only if they are not overriden by something else
 		m_iFOV = max( default_fov->value, 90 );  
 	}
-	
-	if ( gEngfuncs.IsSpectateOnly() )
+
+	// Don't change the FOV for HLTV to a constant, use the updated value like when in a normal game
+	/*if ( gEngfuncs.IsSpectateOnly() )
 	{
-		m_iFOV = gHUD.m_Spectator.GetFOV();	// default_fov->value;
-	}
+		m_iFOV = gHUD.m_Spectator.GetFOV();
+	}*/
 
 	Bench_CheckStart();
 }
@@ -100,7 +103,8 @@ int CHud :: Redraw( float flTime, int intermission )
 	m_flTime = flTime;
 	m_flTimeDelta = (double)m_flTime - m_fOldTime;
 	static float m_flShotTime = 0;
-	
+	static float m_flStopTime = 0;
+
 	// Clock was reset, reset delta
 	if ( m_flTimeDelta < 0 )
 		m_flTimeDelta = 0;
@@ -127,6 +131,9 @@ int CHud :: Redraw( float flTime, int intermission )
 			// Take a screenshot if the client's got the cvar set
 			if ( CVAR_GET_FLOAT( "hud_takesshots" ) != 0 )
 				m_flShotTime = flTime + 1.0;	// Take a screenshot in a second
+
+			if ( m_pCvarAutostop->value > 0.0f )
+				m_flStopTime = flTime + 3.0; // Stop demo recording in three seconds
 		}
 	}
 
@@ -134,6 +141,12 @@ int CHud :: Redraw( float flTime, int intermission )
 	{
 		gEngfuncs.pfnClientCmd("snapshot\n");
 		m_flShotTime = 0;
+	}
+
+	if (m_flStopTime && m_flStopTime < flTime)
+	{
+		gEngfuncs.pfnClientCmd("stop");
+		m_flStopTime = 0;
 	}
 
 	m_iIntermission = intermission;
@@ -185,6 +198,9 @@ int CHud :: Redraw( float flTime, int intermission )
 		{
 			if (m_Crosshairs.m_iFlags & HUD_ACTIVE)
 				m_Crosshairs.Draw(flTime);
+
+			if (m_Speedometer.m_iFlags & HUD_ACTIVE)
+				m_Speedometer.Draw(flTime);
 
 			if (gHUD.m_pCvarDrawDeathNoticesAlways->value != 0.0f
 				&& m_DeathNotice.m_iFlags & HUD_ACTIVE)
@@ -276,6 +292,13 @@ int CHud :: DrawHudNumberString( int xpos, int ypos, int iMinX, int iNumber, int
 	sprintf( szString, "%d", iNumber );
 	return DrawHudStringReverse( xpos, ypos, iMinX, szString, r, g, b );
 
+}
+
+int CHud :: DrawHudNumberStringFixed( int xpos, int ypos, int iNumber, int r, int g, int b )
+{
+	char szString[32];
+	sprintf( szString, "%d", iNumber );
+	return DrawHudStringRightAligned( xpos, ypos, szString, r, g, b );
 }
 
 // draws a string from right to left (right-aligned)

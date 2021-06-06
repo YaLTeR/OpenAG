@@ -44,6 +44,8 @@ add_sources(
 	hud_crosshairs.h
 	hud_ctf.cpp
 	hud_ctf.h
+	hud_customtimer.cpp
+	hud_customtimer.h
 	hud_debug.cpp
 	hud_debug.h
 	hud_location.cpp
@@ -76,6 +78,8 @@ add_sources(
 	hud_vote.h
 	hud_watermark.cpp
 	hud_watermark.h
+	hud_oldscoreboard.cpp
+	hud_oldscoreboard.h
 	hudgl.cpp
 	hudgl.h
 	in_camera.cpp
@@ -87,6 +91,8 @@ add_sources(
 	kbutton.h
 	menu.cpp
 	message.cpp
+	rainbow.cpp
+	rainbow.h
 	saytext.cpp
 	status_icons.cpp
 	statusbar.cpp
@@ -120,6 +126,8 @@ add_sources(
 	vgui_SpectatorPanel.h
 	vgui_TeamFortressViewport.cpp
 	vgui_teammenu.cpp
+	vgui_UnicodeTextImage.cpp
+	vgui_UnicodeTextImage.h
 	view.cpp
 	view.h
 	voice_status.cpp

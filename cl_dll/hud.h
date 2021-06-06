@@ -94,10 +94,12 @@ struct HUDLIST {
 
 #include "hud_countdown.h"
 #include "hud_crosshairs.h"
+#include "hud_customtimer.h"
 #include "hud_ctf.h"
 #include "hud_debug.h"
 #include "hud_location.h"
 #include "hud_nextmap.h"
+#include "hud_oldscoreboard.h"
 #include "hud_playerid.h"
 #include "hud_scores.h"
 #include "hud_settings.h"
@@ -107,6 +109,7 @@ struct HUDLIST {
 #include "hud_timer.h"
 #include "hud_vote.h"
 #include "hud_watermark.h"
+#include "rainbow.h"
 
 
 //
@@ -586,6 +589,9 @@ public:
 	cvar_t  *m_pCvarStealMouse;
 	cvar_t	*m_pCvarDraw;
 	cvar_t	*m_pCvarDrawDeathNoticesAlways;
+	cvar_t	*m_pCvarAutostop;
+	cvar_t	*m_pCvarViewheightMode;
+	cvar_t	*m_pCvarHideCorpses;
 
 	int m_iFontHeight;
 
@@ -600,6 +606,7 @@ public:
 	int DrawHudString(int x, int y, int iMaxX, const char *szString, int r, int g, int b );
 	int DrawHudStringReverse( int xpos, int ypos, int iMinX, const char *szString, int r, int g, int b );
 	int DrawHudNumberString( int xpos, int ypos, int iMinX, int iNumber, int r, int g, int b );
+	int DrawHudNumberStringFixed( int xpos, int ypos, int iNumber, int r, int g, int b );
 	int GetNumWidth(int iNumber, int iFlags);
 
 	int DrawHudStringCentered(int x, int y, const char* string, int r, int g, int b);
@@ -626,8 +633,9 @@ private:
 	wrect_t *m_rgrcRects;	/*[HUD_SPRITE_COUNT]*/
 	char *m_rgszSpriteNames; /*[HUD_SPRITE_COUNT][MAX_SPRITE_NAME_LENGTH]*/
 
-	struct cvar_s *default_fov;
 public:
+	struct cvar_s *default_fov;
+
 	HSPRITE GetSprite( int index ) 
 	{
 		return (index < 0) ? 0 : m_rghSprites[index];
@@ -666,6 +674,7 @@ public:
 	CHudCountdown	m_Countdown;
 	CHudCrosshairs	m_Crosshairs;
 	CHudCTF			m_CTF;
+	CHudCustomTimer m_CustomTimer;
 	CHudDebug		m_Debug;
 	CHudLocation	m_Location;
 	CHudNextMap		m_NextMap;
@@ -678,6 +687,9 @@ public:
 	CHudTimer		m_Timer;
 	CHudVote		m_Vote;
 	CHudWatermark	m_Watermark;
+	CHudOldScoreboard m_OldScoreBoard;
+
+	CRainbow m_Rainbow;
 
 	void Init( void );
 	void VidInit( void );

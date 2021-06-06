@@ -19,12 +19,12 @@
 //
 
 #include "hud.h"
+#include <ctime>
 #include "cl_util.h"
 #include "parsemsg.h"
 
 #include <string.h>
 #include <stdio.h>
-#include <malloc.h> // _alloca
 
 #include "vgui_TeamFortressViewport.h"
 #include "discord_integration.h"
@@ -58,7 +58,7 @@ int CHudSayText :: Init( void )
 	InitHUDData();
 
 	m_HUD_saytext =			gEngfuncs.pfnRegisterVariable( "hud_saytext", "1", 0 );
-	m_HUD_saytext_time =	gEngfuncs.pfnRegisterVariable( "hud_saytext_time", "5", 0 );
+	m_HUD_saytext_time =	gEngfuncs.pfnRegisterVariable( "hud_saytext_time", "5", FCVAR_ARCHIVE );
 	m_HUD_saytext_sound =	gEngfuncs.pfnRegisterVariable( "hud_saytext_sound", "0", FCVAR_ARCHIVE );
 
 	m_iFlags |= HUD_INTERMISSION; // is always drawn during an intermission
@@ -82,7 +82,6 @@ int CHudSayText :: VidInit( void )
 
 int ScrollTextUp( void )
 {
-	ConsolePrint( g_szLineBuffer[0] ); // move the first line into the console buffer
 	g_szLineBuffer[MAX_LINES][0] = 0;
 	memmove( g_szLineBuffer[0], g_szLineBuffer[1], sizeof(g_szLineBuffer) - sizeof(g_szLineBuffer[0]) ); // overwrite the first line
 	memmove( &g_pflNameColors[0], &g_pflNameColors[1], sizeof(g_pflNameColors) - sizeof(g_pflNameColors[0]) );
@@ -196,7 +195,7 @@ static void convert_locations(char* dest, const char* src, size_t count, int pla
 			auto loc_len = strlen(loc);
 			auto bytes_to_copy = min(loc_len, count - i - 1);
 
-			strncpy(&dest[i], loc, bytes_to_copy);
+			memcpy(&dest[i], loc, bytes_to_copy);
 			i += bytes_to_copy;
 
 			if (i + 1 == count)
@@ -259,6 +258,15 @@ void CHudSayText :: SayTextPrint( const char *pszBuf, int iBufSize, int clientIn
 	}
 
 	convert_locations( g_szLineBuffer[i], pszBuf, MAX_CHARS_PER_LINE, clientIndex );
+
+	char timestamp[16];
+	std::time_t curtime = std::time(nullptr);
+	auto written = std::strftime(timestamp, sizeof(timestamp), "[%H:%M:%S] ", std::localtime(&curtime));
+
+	if(written > 0)
+		ConsolePrint( timestamp );
+
+	ConsolePrint( g_szLineBuffer[i] );
 
 	// make sure the text fits in one line
 	EnsureTextFitsInOneLineAndWrapIfHaveTo( i );

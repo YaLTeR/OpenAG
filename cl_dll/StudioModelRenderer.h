@@ -50,6 +50,9 @@ public:
 
 	// Find final attachment points
 	virtual void StudioCalcAttachments ( void );
+
+	// Reprojects attachments of the viewmodel if FOV is changed
+	virtual void StudioAdjustViewmodelAttachments(Vector &vOrigin);
 	
 	// Save bone matrices and names
 	virtual void StudioSaveBones( void );
@@ -85,7 +88,7 @@ public:
 	virtual void StudioRenderModel ( void );
 
 	// Finalize rendering
-	virtual void StudioRenderFinal (void);
+	virtual void StudioRenderFinal ( void );
 	
 	// GL&D3D vs. Software renderer finishing functions
 	virtual void StudioRenderFinal_Software ( void );
@@ -100,6 +103,9 @@ public:
 
 	// Process movement of player
 	virtual void StudioProcessGait ( entity_state_t *pplayer );
+
+	// Calculate the viewmodel fov and set the OpenGL projection matrix
+	virtual void SetViewmodelFovProjection ( void );
 
 public:
 
@@ -124,7 +130,8 @@ public:
 	cvar_t			*m_pCvarDeveloper;
 	// Draw entities bone hit boxes, etc?
 	cvar_t			*m_pCvarDrawEntities;
-
+	// Change viewmodel FOV
+	cvar_t			*m_pCvarViewmodelFov;
 	// The entity which we are currently rendering.
 	cl_entity_t		*m_pCurrentEntity;		
 

@@ -1,0 +1,41 @@
+{
+    "app-id": "pro.openag.OpenAG",
+    "runtime": "org.freedesktop.Sdk",
+    "runtime-version": "19.08",
+    "command": "",
+    "sdk": "org.freedesktop.Sdk",
+    "sdk-extensions": [
+        "org.freedesktop.Sdk.Compat.i386",
+        "org.freedesktop.Sdk.Extension.toolchain-i386"
+    ],
+    "build-options": {
+        "append-path": "/usr/lib/sdk/toolchain-i386/bin",
+        "env": {
+            "CC": "i686-unknown-linux-gnu-gcc",
+            "CXX": "i686-unknown-linux-gnu-g++"
+        }
+    },
+    "modules": [
+        {
+            "name": "client",
+            "buildsystem": "cmake-ninja",
+            "builddir": true,
+            "no-make-install": true,
+            "post-install": [
+                "cp client.so /app/"
+            ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://github.com/Tencent/rapidjson/archive/v1.1.0.tar.gz",
+                    "sha256": "bf7ced29704a1e696fbccf2a2b4ea068e7774fa37f6d7dd4039d0787f8bed98e",
+                    "dest": "external/discord-rpc/thirdparty/rapidjson"
+                },
+                {
+                    "type": "dir",
+                    "path": "../../"
+                }
+            ]
+        }
+    ]
+}

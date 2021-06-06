@@ -78,6 +78,12 @@ qboolean	v_resetCamera = 1;
 
 vec3_t ev_punchangle;
 
+// Used in model rendering code for view model attachment reprojection
+Vector g_vViewOrigin;
+Vector g_vViewForward;
+Vector g_vViewRight;
+Vector g_vViewUp;
+
 cvar_t	*scr_ofsx;
 cvar_t	*scr_ofsy;
 cvar_t	*scr_ofsz;
@@ -90,6 +96,9 @@ cvar_t	*cl_bob;
 cvar_t	*cl_bobup;
 cvar_t	*cl_waterdist;
 cvar_t	*cl_chasedist;
+cvar_t	*cl_viewmodel_ofs_right;
+cvar_t	*cl_viewmodel_ofs_forward;
+cvar_t	*cl_viewmodel_ofs_up;
 
 // These cvars are not registered (so users can't cheat), so set the ->value field directly
 // Register these cvars in V_Init() if needed for easy tweaking
@@ -401,6 +410,8 @@ V_CalcViewRoll
 Roll is induced by movement and damage
 ==============
 */
+extern cvar_t *cl_viewrollangle;
+extern cvar_t *cl_viewrollspeed;
 void V_CalcViewRoll ( struct ref_params_s *pparams )
 {
 	float		side;
@@ -409,6 +420,7 @@ void V_CalcViewRoll ( struct ref_params_s *pparams )
 	viewentity = gEngfuncs.GetEntityByIndex( pparams->viewentity );
 	if ( !viewentity )
 		return;
+	pparams->viewangles[ROLL] += V_CalcRoll (pparams->viewangles, pparams->simvel, cl_viewrollangle->value, cl_viewrollspeed->value ) * 4;
 
 	side = V_CalcRoll ( viewentity->angles, pparams->simvel, pparams->movevars->rollangle, pparams->movevars->rollspeed );
 
@@ -500,6 +512,10 @@ void V_CalcNormalRefdef ( struct ref_params_s *pparams )
 
 	vec3_t camAngles, camForward, camRight, camUp;
 	cl_entity_t *pwater;
+
+	float forward_offset = cl_viewmodel_ofs_forward->value;
+	float right_offset = cl_viewmodel_ofs_right->value;
+	float up_offset = cl_viewmodel_ofs_up->value;
 
 	V_DriftPitch ( pparams );
 
@@ -648,6 +664,21 @@ void V_CalcNormalRefdef ( struct ref_params_s *pparams )
 	view->origin[2] += ( waterOffset );
 	VectorAdd( view->origin, pparams->viewheight, view->origin );
 
+	// Change the origin from which the camera is looking at the viewmodel
+	// This does not change the angles of the viewmodel camera
+	// This does not the player's angles & origin
+	extern cvar_t* cl_righthand;
+	if (cl_righthand->value != 0.0)
+	{
+		right_offset *= -1;
+	}
+	for ( i = 0; i < 3; i++ )
+	{
+		view->origin[i] += forward_offset * pparams->forward[i] +
+				right_offset * pparams->right[i] +
+				up_offset * pparams->up[i];
+	}
+
 	// Let the viewmodel shake at about 10% of the amplitude
 	gEngfuncs.V_ApplyShake( view->origin, view->angles, 0.9 );
 
@@ -661,6 +692,7 @@ void V_CalcNormalRefdef ( struct ref_params_s *pparams )
 	view->angles[YAW]   -= bob * 0.5;
 	view->angles[ROLL]  -= bob * 1;
 	view->angles[PITCH] -= bob * 0.3;
+	VectorCopy(view->angles, view->curstate.angles);
 
 	// pushing the view origin down off of the same X/Z plane as the ent's origin will give the
 	// gun a very nice 'shifting' effect when the player looks up/down. If there is a problem
@@ -1432,13 +1464,24 @@ int V_FindViewModelByWeaponModel(int weaponindex)
 		int len = strlen( weaponModel->name );
 		int i = 0;
 
-		while ( modelmap[i] != NULL )
+		while ( modelmap[i][0] != NULL )
 		{
 			if ( !strnicmp( weaponModel->name, modelmap[i][0], len ) )
 			{
 				return gEngfuncs.pEventAPI->EV_FindModelIndex( modelmap[i][1] );
 			}
 			i++;
+		}
+
+		// Model name not found in the modelmap array (possible for WeaponMod weapons).
+		// Construct view model name based on player model name.
+		char buf[128];
+		safe_strcpy(buf, weaponModel->name, sizeof(buf));
+		if (!strncmp(buf, "models/p_", 9))
+		{
+			// Replace "models/p_" with "models/v_"
+			buf[7] = 'v';
+			return gEngfuncs.pEventAPI->EV_FindModelIndex(buf);
 		}
 
 		return 0;
@@ -1499,7 +1542,25 @@ void V_CalcSpectatorRefdef ( struct ref_params_s * pparams )
 //		if ( gEngfuncs.IsSpectateOnly() )
 //#endif
 		{
-			V_GetInEyePos( g_iUser2, pparams->simorg, pparams->cl_viewangles );
+			if ( gHUD.m_pCvarViewheightMode->value != 0.0f && ( gHUD.m_Spectator.m_pip->value == INSET_IN_EYE || g_iUser1 == OBS_IN_EYE ) )
+			{
+				// In the latest HLSDK some observer stuff is performed serverside which ends up
+				// adding some extra viewheight when spectating in first person mode, so use
+				// cl_viewheight_mode 1 to avoid the extra viewheight
+
+				// Get eye position and angles
+				VectorCopy ( ent->origin, pparams->simorg );
+				VectorCopy ( ent->angles, pparams->cl_viewangles );
+
+				pparams->cl_viewangles[PITCH]*=-3.0f;	// see CL_ProcessEntityUpdate()
+
+				if ( ent->curstate.solid == SOLID_NOT )
+					pparams->cl_viewangles[ROLL] = 80;	// dead view angle
+			}
+			else
+			{
+				V_GetInEyePos( g_iUser2, pparams->simorg, pparams->cl_viewangles );
+			}
 
 			pparams->health = 1;
 
@@ -1649,6 +1710,12 @@ void CL_DLLEXPORT V_CalcRefdef( struct ref_params_s *pparams )
 		V_CalcNormalRefdef ( pparams );
 	}
 
+	// Save view data for viewmodel renderer
+	g_vViewOrigin = pparams->vieworg;
+	g_vViewForward = pparams->forward;
+	g_vViewRight = pparams->right;
+	g_vViewUp = pparams->up;
+
 /*
 // Example of how to overlay the whole screen with red at 50 % alpha
 #define SF_TEST
@@ -1718,6 +1785,10 @@ void V_Init (void)
 	cl_bobup			= gEngfuncs.pfnRegisterVariable( "cl_bobup","0.5", 0 );
 	cl_waterdist		= gEngfuncs.pfnRegisterVariable( "cl_waterdist","4", 0 );
 	cl_chasedist		= gEngfuncs.pfnRegisterVariable( "cl_chasedist","112", 0 );
+
+	cl_viewmodel_ofs_right		= gEngfuncs.pfnRegisterVariable( "cl_viewmodel_ofs_right","0", FCVAR_ARCHIVE ); // x = right
+	cl_viewmodel_ofs_forward	= gEngfuncs.pfnRegisterVariable( "cl_viewmodel_ofs_forward","0", FCVAR_ARCHIVE ); // y = forward
+	cl_viewmodel_ofs_up		    = gEngfuncs.pfnRegisterVariable( "cl_viewmodel_ofs_up","0", FCVAR_ARCHIVE ); // z = up
 }
 
 

@@ -5,7 +5,7 @@
 #include <string>
 #include <unordered_set>
 
-#include <discord-rpc.h>
+#include <discord_rpc.h>
 
 #include "hud.h"
 #include "cl_util.h"
@@ -254,7 +254,7 @@ namespace discord_integration
 		// Time of the last update.
 		double last_update_time;
 
-		void handle_ready()
+		void handle_ready(const DiscordUser*)
 		{
 			gEngfuncs.Con_Printf("Connected to Discord.\n");
 		}
@@ -284,7 +284,7 @@ namespace discord_integration
 			EngineClientCmd(temp.get());
 		}
 
-		void handle_joinRequest(const DiscordJoinRequest* request)
+		void handle_joinRequest(const DiscordUser* request)
 		{
 			Discord_Respond(request->userId, DISCORD_REPLY_YES);
 		}

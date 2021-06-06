@@ -1,10 +1,16 @@
 cmake_minimum_required(VERSION 3.3)
+
+# Set the SDK according to what discord-rpc uses as the lowest common denominator.
+# Must be a cache variable: https://stackoverflow.com/a/34208904
+set(CMAKE_OSX_DEPLOYMENT_TARGET "10.10" CACHE STRING "Minimum OS X deployment version")
+
 project(OpenAG)
 
 include("CMake/helpers.cmake")
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # Set up some compiler-related things
 if(MSVC)
@@ -36,19 +42,44 @@ find_package(Git)
 if(GIT_FOUND)
 	message(STATUS "Found git at ${GIT_EXECUTABLE}")
 	execute_process(COMMAND "${GIT_EXECUTABLE}" show -s --format=%ct
+			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 			OUTPUT_VARIABLE CURRENT_VERSION
-			OUTPUT_STRIP_TRAILING_WHITESPACE)
-	set(CURRENT_VERSION "${CURRENT_VERSION}ull")
+			OUTPUT_STRIP_TRAILING_WHITESPACE
+			RESULT_VARIABLE CURRENT_VERSION_RESULT)
+
+	if(CURRENT_VERSION_RESULT EQUAL "0")
+		set(CURRENT_VERSION "${CURRENT_VERSION}ull")
+		message(STATUS "Set current version to ${CURRENT_VERSION}")
+	else()
+		set(CURRENT_VERSION UINT64_MAX)
+		message(WARNING "Could not get current version from git; update checking will be disabled")
+	endif()
 else(GIT_FOUND)
 	set(CURRENT_VERSION UINT64_MAX)
+	message(WARNING "Could not find git; update checking will be disabled")
 endif(GIT_FOUND)
 
 configure_file(cl_dll/current_version.h.in current_version.h)
 
 # Add discord-rpc
-set(BUILD_EXAMPLES OFF)
+set(BUILD_EXAMPLES OFF CACHE BOOL "build discord-rpc examples" FORCE)
 set(CLANG_FORMAT_SUFFIX "-dummy")
 add_subdirectory(external/discord-rpc)
+
+if(MSVC)
+	target_compile_options(discord-rpc PRIVATE
+		/wd4191 # 'reinterpret_cast': unsafe conversion from 'FARPROC' to 'RegSetKeyValueW_T'
+		/wd4571 # Informational: catch(...) semantics changed since Visual C++ 7.1; structured exceptions (SEH) are no longer caught
+		/wd4623 # 'std::_UInt_is_zero': default constructor was implicitly defined as deleted
+		/wd5039 # '_Thrd_start': pointer or reference to potentially throwing function passed to extern C function under -EHc. Undefined behavior may occur if this function throws an exception.
+		/wd5045 # "Compiler will insert Spectre mitigation if /Qspectre is enabled"
+		)
+else(MSVC)
+	if(NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+		target_compile_options(discord-rpc PRIVATE
+			$<$<COMPILE_LANGUAGE:CXX>:-Wno-class-memaccess>)
+	endif(NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+endif(MSVC)
 
 # Collect the source files
 add_subdirectory(cl_dll)
@@ -87,14 +118,11 @@ if(MSVC)
 		/wd4018 # Signed/unsigned mismatch
 		/wd4838 # Conversion from double to float
 		/wd4996 # The POSIX name for this item is deprecated
-
-		# Treat warnings as errors
-		/WX)
+		)
 else(MSVC)
 	target_compile_options(client PRIVATE
 		# High warning level and treat warnings as errors
 		-Wall
-		-Werror
 
 		# Disable some warnings which would take too much effort to fix
 		-Wno-parentheses
@@ -120,6 +148,8 @@ else(MSVC)
 	else(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 		target_compile_options(client PRIVATE
 			-Wno-unused-but-set-variable
+			-Wno-stringop-truncation
+			-Wno-format-truncation
 			$<$<COMPILE_LANGUAGE:CXX>:-Wno-class-memaccess>)
 	endif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 
@@ -167,11 +197,20 @@ elseif(UNIX)
 			${MAC_OPENGL}
 			${CMAKE_SOURCE_DIR}/linux/libSDL2-2.0.0.dylib
 			${CMAKE_SOURCE_DIR}/linux/release/vgui.dylib)
+		target_compile_definitions(client PRIVATE
+			GL_SILENCE_DEPRECATION)
 	else(APPLE)
 		# I wasn't able to do this in any other way.
 		# Things like imported targets result in linking with relative path.
-		set_property(TARGET client PROPERTY LINK_FLAGS
-			"-L${CMAKE_SOURCE_DIR}/linux/release -l:vgui.so")
+		set(VGUI_LINK_FLAGS "-L${CMAKE_SOURCE_DIR}/linux/release -l:vgui.so")
+
+		# --push-state isn't supported on older compilers. I tried checking for support
+		# using CheckCXXCompilerFlag and CheckCXXSourceCompiles, but they were reporting
+		# success on Travis while the flag was still giving an error. Thus, I will set
+		# --no-as-needed for all compilers.
+		set(VGUI_LINK_FLAGS "-Wl,--no-as-needed ${VGUI_LINK_FLAGS}")
+
+		set_property(TARGET client PROPERTY LINK_FLAGS ${VGUI_LINK_FLAGS})
 	endif(APPLE)
 endif(WIN32)
 

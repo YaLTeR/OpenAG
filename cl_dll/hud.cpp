@@ -88,6 +88,8 @@ extern client_sprite_t *GetSpriteList(client_sprite_t *pList, const char *psz, i
 extern cvar_t *sensitivity;
 cvar_t *cl_lw = NULL;
 cvar_t *cl_righthand = nullptr;
+cvar_t *cl_viewrollangle;
+cvar_t *cl_viewrollspeed;
 
 void ShutdownInput (void);
 
@@ -299,6 +301,44 @@ void __CmdFunc_Append()
 	EngineClientCmd(gEngfuncs.Cmd_Argv(1));
 }
 
+void __CmdFunc_Writemap()
+{
+	FILE* saved_maps;
+	char map_name[64];
+	char map_name_to_check[64];
+
+	get_map_name(map_name, ARRAYSIZE(map_name));
+
+	if (map_name[0])
+	{
+		saved_maps = fopen("saved_maps.txt", "r+");
+
+		if (saved_maps)
+		{
+			while (fgets(map_name_to_check, ARRAYSIZE(map_name_to_check), saved_maps))
+			{
+				map_name_to_check[strlen(map_name_to_check) - 1] = '\0';
+
+				if (!strcmp(map_name, map_name_to_check))
+				{
+					gEngfuncs.Con_Printf("Current map is already in saved_maps.txt\n");
+					fclose(saved_maps);
+					return;
+				}
+			}
+		}
+		else
+		{           
+			saved_maps = fopen("saved_maps.txt", "a");
+			if(!saved_maps)
+				return;
+		}
+
+		fprintf(saved_maps, "%s\n", map_name);
+		fclose(saved_maps);
+	}
+}
+
 // TFFree Command Menu Message Handlers
 int __MsgFunc_ValClass(const char *pszName, int iSize, void *pbuf)
 {
@@ -427,6 +467,7 @@ void CHud :: Init( void )
 
 	HOOK_COMMAND( "agrecord", Agrecord );
 	HOOK_COMMAND( "append", Append );
+	HOOK_COMMAND( "writemap", Writemap );
 	EngineClientCmd("alias zpecial \"append _zpecial\"");
 
 	force_model::hook_commands();
@@ -452,6 +493,8 @@ void CHud :: Init( void )
 
 	// VGUI Menus
 	HOOK_MESSAGE( VGUIMenu );
+	cl_viewrollangle = CVAR_CREATE ( "cl_viewrollangle", "0", FCVAR_CLIENTDLL | FCVAR_ARCHIVE );
+	cl_viewrollspeed = CVAR_CREATE ( "cl_viewrollspeed", "300", FCVAR_CLIENTDLL | FCVAR_ARCHIVE );
 
 	HOOK_MESSAGE( CheatCheck );
 	HOOK_MESSAGE( WhString );
@@ -473,10 +516,13 @@ void CHud :: Init( void )
 	m_iFOV = 0;
 
 	CVAR_CREATE( "zoom_sensitivity_ratio", "1.2", 0 );
-	default_fov = CVAR_CREATE( "default_fov", "90", 0 );
+	default_fov = CVAR_CREATE( "default_fov", "90", FCVAR_ARCHIVE );
 	m_pCvarStealMouse = CVAR_CREATE( "hud_capturemouse", "1", FCVAR_ARCHIVE );
 	m_pCvarDraw = CVAR_CREATE( "hud_draw", "1", FCVAR_ARCHIVE );
 	m_pCvarDrawDeathNoticesAlways = CVAR_CREATE( "cl_draw_deathnotices_always", "0", FCVAR_ARCHIVE );
+	m_pCvarAutostop = CVAR_CREATE("cl_autostop", "0", FCVAR_ARCHIVE);
+	m_pCvarViewheightMode = CVAR_CREATE("cl_viewheight_mode", "0", FCVAR_ARCHIVE);
+	m_pCvarHideCorpses = CVAR_CREATE("cl_hidecorpses", "0", FCVAR_ARCHIVE);
 	m_pCvarColor = CVAR_CREATE( "hud_color", "", FCVAR_ARCHIVE );
 	cl_lw = gEngfuncs.pfnGetCvarPointer( "cl_lw" );
 
@@ -498,6 +544,7 @@ void CHud :: Init( void )
 	// In case we get messages before the first update -- time will be valid
 	m_flTime = 1.0;
 
+	m_Rainbow.Init();
 	m_Ammo.Init();
 	m_Health.Init();
 	m_SayText.Init();
@@ -515,6 +562,7 @@ void CHud :: Init( void )
 	m_Countdown.Init();
 	m_Crosshairs.Init();
 	m_CTF.Init();
+	m_CustomTimer.Init();
 	m_Debug.Init();
 	m_Location.Init();
 	m_NextMap.Init();
@@ -527,6 +575,7 @@ void CHud :: Init( void )
 	m_Timer.Init();
 	m_Vote.Init();
 	m_Watermark.Init();
+	m_OldScoreBoard.Init();
 	GetClientVoiceMgr()->Init(&g_VoiceStatusHelper, (vgui::Panel**)&gViewPort);
 
 	m_Menu.Init();
@@ -679,6 +728,7 @@ void CHud :: VidInit( void )
 	m_Countdown.VidInit();
 	m_Crosshairs.VidInit();
 	m_CTF.VidInit();
+	m_CustomTimer.VidInit();
 	m_Debug.VidInit();
 	m_Location.VidInit();
 	m_NextMap.VidInit();
@@ -691,6 +741,7 @@ void CHud :: VidInit( void )
 	m_Timer.VidInit();
 	m_Vote.VidInit();
 	m_Watermark.VidInit();
+	m_OldScoreBoard.VidInit();
 	GetClientVoiceMgr()->VidInit();
 }
 
@@ -872,5 +923,4 @@ float CHud::GetSensitivity( void )
 {
 	return m_flMouseSensitivity;
 }
-
 

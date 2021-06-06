@@ -2,3 +2,4 @@
 	path = external/discord-rpc
 	url = https://github.com/YaLTeR/discord-rpc.git
 	branch = xp
+	shallow = true

@@ -19,6 +19,7 @@
 
 #include<VGUI_LineBorder.h>
 
+#include <cmath>
 #include "hud.h"
 #include "cl_util.h"
 #include "const.h"
@@ -61,8 +62,8 @@ public:
 SBColumnInfo g_ColumnInfo[NUM_COLUMNS] =
 {
 	{NULL,			24,			Label::a_east},		// tracker column
-	{NULL,			140,		Label::a_east},		// name
-	{"SteamID",		56,			Label::a_east},		// class
+	{NULL,			136,		Label::a_east},		// name
+	{"SteamID",		60,			Label::a_east},		// class
 	{"#SCORE",		40,			Label::a_east},
 	{"#DEATHS",		46,			Label::a_east},
 	{"#LATENCY",	46,			Label::a_east},
@@ -97,10 +98,27 @@ void ScorePanel::HitTestPanel::internalMousePressed(MouseCode code)
 ScorePanel::ScorePanel(int x,int y,int wide,int tall) : Panel(x,y,wide,tall)
 {
 	CSchemeManager *pSchemes = gViewPort->GetSchemeManager();
+	SchemeHandle_t hScheme = pSchemes->getSchemeHandle("Scoreboard Text");
 	SchemeHandle_t hTitleScheme = pSchemes->getSchemeHandle("Scoreboard Title Text");
 	SchemeHandle_t hSmallScheme = pSchemes->getSchemeHandle("Scoreboard Small Text");
+	Font *sfont = pSchemes->getFont(hScheme);
 	Font *tfont = pSchemes->getFont(hTitleScheme);
 	Font *smallfont = pSchemes->getFont(hSmallScheme);
+
+	if (ScreenHeight > 768)
+	{
+		// Scale fonts for high-resolutions screens
+		m_UFont = UnicodeTextImage::createFont(pSchemes->getFontName(hScheme), std::round(YRES(10)), 300);
+		m_UTitleFont = UnicodeTextImage::createFont(pSchemes->getFontName(hTitleScheme), std::round(YRES(16)), 700);
+		m_USmallFont = UnicodeTextImage::createFont(pSchemes->getFontName(hSmallScheme), std::round(YRES(8)), 400);
+	}
+	else
+	{
+		// Use font sizes from the scheme for low resolutions (640x480, 800x600, 1024x768)
+		m_UFont = UnicodeTextImage::createFont(pSchemes->getFontName(hScheme), sfont->getTall(), 300);
+		m_UTitleFont = UnicodeTextImage::createFont(pSchemes->getFontName(hTitleScheme), tfont->getTall(), 700);
+		m_USmallFont = UnicodeTextImage::createFont(pSchemes->getFontName(hSmallScheme), smallfont->getTall(), 400);
+	}
 
 	setBgColor(0, 0, 0, 96);
 	m_pCurrentHighlightLabel = NULL;
@@ -117,6 +135,14 @@ ScorePanel::ScorePanel(int x,int y,int wide,int tall) : Panel(x,y,wide,tall)
 	m_TitleLabel.setBgColor( 0, 0, 0, 255 );
 	m_TitleLabel.setFgColor( Scheme::sc_primary1 );
 	m_TitleLabel.setContentAlignment( vgui::Label::a_west );
+
+	if (!UnicodeTextImage::shouldFallback())
+	{
+		m_pTitleImage = new UnicodeTextImage();
+		m_pTitleImage->setFont(m_UTitleFont, tfont);
+		m_pTitleImage->setColor(Scheme::sc_primary1);
+		m_TitleLabel.setImage(m_pTitleImage);
+	}
 
 	LineBorder *border = new LineBorder(Color(60, 60, 60, 128));
 	setBorder(border);
@@ -168,7 +194,7 @@ ScorePanel::ScorePanel(int x,int y,int wide,int tall) : Panel(x,y,wide,tall)
 
 		m_HeaderLabels[i].setBgColor(0,0,0,255);
 		m_HeaderLabels[i].setFgColor(Scheme::sc_primary1);
-		m_HeaderLabels[i].setFont(smallfont);
+		m_HeaderLabels[i].setFont(m_USmallFont, smallfont);
 		m_HeaderLabels[i].setContentAlignment(g_ColumnInfo[i].m_Alignment);
 
 		int yres = 12;
@@ -249,6 +275,9 @@ ScorePanel::~ScorePanel()
 #endif
 	if (m_pFlagIcon)
 		delete m_pFlagIcon;
+
+	m_TitleLabel.setImage(nullptr);
+	delete m_pTitleImage;
 #ifdef POSIX
 #pragma GCC diagnostic pop
 #endif
@@ -285,7 +314,11 @@ void ScorePanel::Update()
 	// {
 		char sz[MAX_SERVERNAME_LENGTH + 16];
 		sprintf(sz, "%s", gViewPort->m_szServerName );
-		m_TitleLabel.setText(sz);
+
+		if (!m_pTitleImage->shouldFallback())
+			m_pTitleImage->setText(sz);
+		else
+			m_TitleLabel.setText(sz);
 	// }
 
 	m_iRows = 0;
@@ -612,7 +645,7 @@ void ScorePanel::FillGrid()
 			pLabel->setVisible(true);
 			pLabel->setText2("");
 			pLabel->setImage(NULL);
-			pLabel->setFont(sfont);
+			pLabel->setFont(m_UFont, sfont);
 			pLabel->setTextOffset(0, 0);
 			
 			int rowheight = 13;
@@ -655,7 +688,7 @@ void ScorePanel::FillGrid()
 					rowheight = YRES(rowheight);
 				}
 				pLabel->setSize(pLabel->getWide(), rowheight);
-				pLabel->setFont(tfont);
+				pLabel->setFont(m_UTitleFont, tfont);
 
 				pGridRow->SetRowUnderline(	0,
 											true,
@@ -677,7 +710,7 @@ void ScorePanel::FillGrid()
 					rowheight = YRES(rowheight);
 				}
 				pLabel->setSize(pLabel->getWide(), rowheight);
-				pLabel->setFont(tfont);
+				pLabel->setFont(m_UTitleFont, tfont);
 
 				pGridRow->SetRowUnderline(0, true, YRES(3), 100, 100, 100, 0);
 
@@ -768,7 +801,7 @@ void ScorePanel::FillGrid()
 						}
 
 						pLabel->setText2(sz2);
-						pLabel->setFont2(smallfont);
+						pLabel->setFont2(m_USmallFont, smallfont);
 					}
 					break;
 				case COLUMN_VOICE:
@@ -988,8 +1021,8 @@ void ScorePanel::mousePressed(MouseCode code, Panel* panel)
 					// remove mute
 					GetClientVoiceMgr()->SetPlayerBlockedState(iPlayer, false);
 
-					sprintf( string1, CHudTextMessage::BufferedLocaliseTextString( "#Unmuted" ), pl_info->name );
-					sprintf( string, "%c** %s\n", HUD_PRINTTALK, string1 );
+					snprintf( string1, sizeof(string1), CHudTextMessage::BufferedLocaliseTextString( "#Unmuted" ), pl_info->name );
+					snprintf( string, sizeof(string), "%c** %s\n", HUD_PRINTTALK, string1 );
 
 					gHUD.m_TextMessage.MsgFunc_TextMsg(NULL, strlen(string)+1, string );
 				}
@@ -1001,9 +1034,9 @@ void ScorePanel::mousePressed(MouseCode code, Panel* panel)
 					// mute the player
 					GetClientVoiceMgr()->SetPlayerBlockedState(iPlayer, true);
 
-					sprintf( string1, CHudTextMessage::BufferedLocaliseTextString( "#Muted" ), pl_info->name );
-					sprintf( string2, "%s", CHudTextMessage::BufferedLocaliseTextString( "#No_longer_hear_that_player" ) );
-					sprintf( string, "%c** %s %s\n", HUD_PRINTTALK, string1, string2 );
+					snprintf( string1, sizeof(string1), CHudTextMessage::BufferedLocaliseTextString( "#Muted" ), pl_info->name );
+					snprintf( string2, sizeof(string2), "%s", CHudTextMessage::BufferedLocaliseTextString( "#No_longer_hear_that_player" ) );
+					snprintf( string, sizeof(string), "%c** %s %s\n", HUD_PRINTTALK, string1, string2 );
 
 					gHUD.m_TextMessage.MsgFunc_TextMsg(NULL, strlen(string)+1, string );
 				}

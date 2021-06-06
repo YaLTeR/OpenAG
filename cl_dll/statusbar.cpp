@@ -145,7 +145,8 @@ void CHudStatusBar :: ParseStatusString( int line_num )
 							gEngfuncs.pfnGetPlayerInfo( indexval, &g_PlayerInfoList[indexval] );
 							if ( g_PlayerInfoList[indexval].name != NULL )
 							{
-								strncpy( szRepString, g_PlayerInfoList[indexval].name, MAX_PLAYER_NAME_LENGTH );
+								strncpy( szRepString, g_PlayerInfoList[indexval].name, MAX_PLAYER_NAME_LENGTH - 1 );
+								szRepString[MAX_PLAYER_NAME_LENGTH - 1] = '\0';
 								m_pflNameColors[line_num] = GetClientColor( indexval );
 							}
 							else

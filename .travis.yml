@@ -1,39 +1,23 @@
 language: cpp
-dist: trusty
-sudo: false
-os:
-  - linux
-  - osx
+os: osx
 
 env:
   - CONFIGURATION=Debug
   - CONFIGURATION=Release
 
-compiler:
-  - clang
-  - gcc
-
-matrix:
-  exclude:
-    - os: osx
-      compiler: gcc
-
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - g++-6
-      - g++-6-multilib
-      - linux-libc-dev:i386
-      - ninja-build
-
-before_install:
-  - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then brew install ninja; fi
-  - if [ "${CC}" = "gcc" ]; then export CC=gcc-6 CXX=g++-6; fi
-
 script:
   - mkdir build
   - cd build
-  - cmake -G Ninja -DCMAKE_BUILD_TYPE="${CONFIGURATION}" ..
-  - ninja
+  - cmake -DCMAKE_BUILD_TYPE="${CONFIGURATION}" ..
+  - make
+
+deploy:
+  provider: releases
+  file: client.dylib
+  skip_cleanup: true
+  draft: true
+  on:
+    tags: true
+    condition: $CONFIGURATION = Release
+  api_key:
+    secure: "SGx2fPSxBr95VJbLW/oFOS5NaW+ZFjamP4r2lAuJMGeTPt9MxSP/QGxtTRXu9qfVAjb2Lxum8tY2+g4GvSwkhNEAbt2lcsALk2tGQsPe1BCSUtaS5VyuvuryvYn6KgcfACTz6Hx2i7wrPpzF2kRr7VTOHmBxb16Iwe74QKbAQfKXusoolHfIqZ8rSO0J7QAQr+FV7oJ0W/z1mZtvL1Amum6kLBjdNMJCu3+svryhmc4Zy7Brtm+hdabbuArCtneE7sgcsAt4fWmmVX7MUZABSi4kpqyHBsMNoVmkk3ZxbHQj54Z3vN8Gqf6khcS6KnNuEL3qrMfc8XNAbg65IrvpE7oJKKubSMGiFsDPaNIMdlX8yHxhQ7MlV/fdjPCO9E1fYCdt3vr5piDWIZIsOu50NCyXWd4LqXkOX24PZ6gdAa6sE8AVP8VXuYuh+pL/TQcdoa61Qh/c2Q1a7wG+1HWNxCubdWNz55xeRmUQwfPfOalt4gFpFypYrAAlYOvJrE7ba+nEjLwrea6MXhmw78NJEOtTXFuiLkj+PSEP9f61GwBXWBkT8K4SEoGmaThylzwe30WNhvAiSD91LpmZn7i+r9SYvs+Fa8u3VQlVx00GE8N8aaULz4pcMUF2fmS8M5A2vqLFqt+UrC5jLy0ptnHNC1evkrgIRER48hC8m7TUQHs="
