@@ -14,7 +14,8 @@ namespace color_tags {
 			{ 0,   255, 255 },
 			{ 255, 0,   255 },
 			{ 136, 136, 136 },
-			{ 255, 255, 255 }
+			{ 255, 255, 255 },
+			{ 0,   0,   0 }
 		};
 	}
 
@@ -77,7 +78,7 @@ namespace color_tags {
 				string = temp + 2;
 				temp = temp + 2;
 
-				if (color_index == '0' || color_index == '9') {
+				if (color_index == '0') {
 					custom_color = false;
 				} else {
 					custom_color = true;
