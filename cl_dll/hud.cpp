@@ -90,6 +90,7 @@ cvar_t *cl_lw = NULL;
 cvar_t *cl_righthand = nullptr;
 cvar_t *cl_viewrollangle;
 cvar_t *cl_viewrollspeed;
+cvar_t *cl_bob_angled;
 
 void ShutdownInput (void);
 
@@ -495,6 +496,7 @@ void CHud :: Init( void )
 	HOOK_MESSAGE( VGUIMenu );
 	cl_viewrollangle = CVAR_CREATE ( "cl_viewrollangle", "0", FCVAR_CLIENTDLL | FCVAR_ARCHIVE );
 	cl_viewrollspeed = CVAR_CREATE ( "cl_viewrollspeed", "300", FCVAR_CLIENTDLL | FCVAR_ARCHIVE );
+	cl_bob_angled = CVAR_CREATE ( "cl_bob_angled", "0", FCVAR_CLIENTDLL | FCVAR_ARCHIVE );
 
 	HOOK_MESSAGE( CheatCheck );
 	HOOK_MESSAGE( WhString );
