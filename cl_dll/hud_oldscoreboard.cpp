@@ -218,7 +218,10 @@ int CHudOldScoreboard::Draw(float fTime)
 			extra_player_info_t* pl_info_extra = &g_PlayerExtraInfo[sorted];
 
 			if (pl_info->name == NULL)
+			{
+				gViewPort->m_pScoreBoard->RebuildTeams();
 				continue;
+			}
 
 			ypos = ROW_TOP + ROW_RANGE_MIN + (list_slot * ROW_GAP);
 
