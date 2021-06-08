@@ -70,7 +70,9 @@ void CStudioModelRenderer::Init( void )
 	m_pCvarHiModels			= IEngineStudio.GetCvar( "cl_himodels" );
 	m_pCvarDeveloper		= IEngineStudio.GetCvar( "developer" );
 	m_pCvarDrawEntities		= IEngineStudio.GetCvar( "r_drawentities" );
-	m_pCvarViewmodelFov		= gEngfuncs.pfnRegisterVariable( "cl_viewmodel_fov","0", FCVAR_ARCHIVE );
+	m_pCvarViewmodelFov		= gEngfuncs.pfnRegisterVariable( "cl_viewmodel_fov", "0", FCVAR_ARCHIVE );
+	m_pCvarViewmodelNoIdle		= gEngfuncs.pfnRegisterVariable( "cl_viewmodel_disable_idle", "0", FCVAR_ARCHIVE );
+	m_pCvarViewmodelNoEquip		= gEngfuncs.pfnRegisterVariable( "cl_viewmodel_disable_equip", "0", FCVAR_ARCHIVE );
 
 	m_pChromeSprite			= IEngineStudio.GetChromeSprite();
 
@@ -816,6 +818,28 @@ void CStudioModelRenderer::StudioSetupBones ( void )
 	}
 
 	pseqdesc = (mstudioseqdesc_t *)((byte *)m_pStudioHeader + m_pStudioHeader->seqindex) + m_pCurrentEntity->curstate.sequence;
+	if (m_pCurrentEntity == gEngfuncs.GetViewModel())
+	{
+		if (m_pCvarViewmodelNoIdle->value != 0.0f)
+		{
+			if (strstr(pseqdesc->label, "idle") != NULL || strstr(pseqdesc->label, "fidget") != NULL)
+			{
+				m_pCurrentEntity->curstate.frame = 0; // set current state to first frame
+				m_pCurrentEntity->curstate.framerate = 0; // don't animate at all
+			}
+		}
+		if (m_pCvarViewmodelNoEquip->value != 0.0f)
+		{
+			if (strstr(pseqdesc->label, "holster") != NULL || strstr(pseqdesc->label, "draw") != NULL ||
+			    strstr(pseqdesc->label, "deploy") != NULL)
+			{
+				m_pCurrentEntity->curstate.sequence = 0; // instead set to idle sequence
+				pseqdesc = (mstudioseqdesc_t *)((byte *)m_pStudioHeader + m_pStudioHeader->seqindex) + m_pCurrentEntity->curstate.sequence;
+				pseqdesc->numframes = 1;
+				pseqdesc->fps = 1;
+			}
+		}
+	}
 
 	// always want new gait sequences to start on frame zero
 /*	if ( m_pPlayerInfo )
