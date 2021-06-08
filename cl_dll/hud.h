@@ -593,6 +593,7 @@ public:
 	cvar_t	*m_pCvarAutostop;
 	cvar_t	*m_pCvarViewheightMode;
 	cvar_t	*m_pCvarHideCorpses;
+	cvar_t	*m_pCvarHudAlpha;
 
 	int m_iFontHeight;
 
@@ -604,6 +605,7 @@ public:
 	int DrawHudNumber(int x, int y, int iFlags, int iNumber, int r, int g, int b);
 	int DrawHudNumber(int x, int y, int number, int r, int g, int b);
 	int DrawHudNumberCentered(int x, int y, int number, int r, int g, int b);
+	void GetHudColorsWithAlpha(int &r, int &g, int &b);
 	int DrawHudString(int x, int y, int iMaxX, const char *szString, int r, int g, int b );
 	int DrawHudStringReverse( int xpos, int ypos, int iMinX, const char *szString, int r, int g, int b );
 	int DrawHudNumberString( int xpos, int ypos, int iMinX, int iNumber, int r, int g, int b );
