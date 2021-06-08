@@ -132,6 +132,10 @@ public:
 	cvar_t			*m_pCvarDrawEntities;
 	// Change viewmodel FOV
 	cvar_t			*m_pCvarViewmodelFov;
+	// Disable viewmodel idle/fidget animations on viewmodels
+	cvar_t			*m_pCvarViewmodelNoIdle;
+	// Disable viewmodel draw/holster/deploy animations on viewmodels
+	cvar_t			*m_pCvarViewmodelNoEquip;
 	// The entity which we are currently rendering.
 	cl_entity_t		*m_pCurrentEntity;		
 
