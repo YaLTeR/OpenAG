@@ -526,7 +526,7 @@ void CHud :: Init( void )
 	m_pCvarViewheightMode = CVAR_CREATE("cl_viewheight_mode", "0", FCVAR_ARCHIVE);
 	m_pCvarHideCorpses = CVAR_CREATE("cl_hidecorpses", "0", FCVAR_ARCHIVE);
 	m_pCvarColor = CVAR_CREATE( "hud_color", "", FCVAR_ARCHIVE );
-	m_pCvarHudAlpha = CVAR_CREATE( "hud_alpha", "auto", FCVAR_ARCHIVE );
+	m_pCvarHudAlpha = CVAR_CREATE( "hud_alpha", "", FCVAR_ARCHIVE );
 
 	cl_lw = gEngfuncs.pfnGetCvarPointer( "cl_lw" );
 

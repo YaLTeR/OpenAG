@@ -283,16 +283,14 @@ void CHud::UpdateDefaultHUDColor()
 
 void CHud :: GetHudColorsWithAlpha( int &r, int &g, int &b )
 {
-	auto a = 255;
-	if ( m_pCvarHudAlpha->string && m_pCvarHudAlpha->string[0] )
+	int a;
+	if ( sscanf(m_pCvarHudAlpha->string, "%d", &a) == 1)
 	{
-		if ( strcmp(m_pCvarHudAlpha->string, "auto") )
-		{
-			a = m_pCvarHudAlpha->value;
-
-			a = (int) max(a, 1);
-			a = (int) min(a, 255);
-		}
+		a = m_pCvarHudAlpha->value;
+		a = (int) max(a, 1);
+		a = (int) min(a, 255);
+	} else {
+		a = 255;
 	}
 
 	ScaleColors( r, g, b, a );
