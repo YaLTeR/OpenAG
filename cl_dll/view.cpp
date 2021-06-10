@@ -669,7 +669,7 @@ void V_CalcNormalRefdef ( struct ref_params_s *pparams )
 	// This does not change the angles of the viewmodel camera
 	// This does not the player's angles & origin
 	extern cvar_t* cl_righthand;
-	if (cl_righthand->value != 0.0)
+	if (cl_righthand->value > 0.0f)
 	{
 		right_offset *= -1;
 	}
