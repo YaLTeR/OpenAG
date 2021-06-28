@@ -48,6 +48,8 @@ add_sources(
 	hud_customtimer.h
 	hud_debug.cpp
 	hud_debug.h
+	hud_jumpspeed.cpp
+	hud_jumpspeed.h
 	hud_location.cpp
 	hud_location.h
 	hud_msg.cpp
