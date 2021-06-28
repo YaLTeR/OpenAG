@@ -13,6 +13,7 @@ int CHudJumpspeed::Init()
 	m_iFlags = HUD_ACTIVE;
 
 	hud_jumpspeed = CVAR_CREATE("hud_jumpspeed", "0", FCVAR_ARCHIVE);
+	hud_jumpspeed_below_cross = CVAR_CREATE("hud_jumpspeed_below_cross", "0", FCVAR_ARCHIVE);
 
 	gHUD.AddHudElem(this);
 	return 0;
@@ -33,7 +34,7 @@ int CHudJumpspeed::Draw(float flTime)
 	UnpackRGB(r, g, b, gHUD.m_iDefaultHUDColor);
 
 	int y;
-	if (CVAR_GET_FLOAT("hud_speedometer_below_cross") != 0.0f)
+	if (hud_jumpspeed_below_cross->value != 0.0f)
 		y = ScreenHeight / 2 + gHUD.m_iFontHeight / 2 + gHUD.m_iFontHeight;
 	else
 		y = ScreenHeight - gHUD.m_iFontHeight - gHUD.m_iFontHeight / 2 - gHUD.m_iFontHeight;
