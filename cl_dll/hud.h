@@ -97,6 +97,7 @@ struct HUDLIST {
 #include "hud_customtimer.h"
 #include "hud_ctf.h"
 #include "hud_debug.h"
+#include "hud_jumpspeed.h"
 #include "hud_location.h"
 #include "hud_nextmap.h"
 #include "hud_oldscoreboard.h"
@@ -682,6 +683,7 @@ public:
 	CHudScores	m_Scores;
 	CHudSettings	m_Settings;
 	CHudSpeedometer	m_Speedometer;
+	CHudJumpspeed   m_Jumpspeed;
 	CHudSuddenDeath		m_SuddenDeath;
 	CHudTimeout		m_Timeout;
 	CHudTimer		m_Timer;

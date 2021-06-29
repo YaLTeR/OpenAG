@@ -565,6 +565,7 @@ void CHud :: Init( void )
 	m_Crosshairs.Init();
 	m_CTF.Init();
 	m_CustomTimer.Init();
+	m_Jumpspeed.Init();
 	m_Debug.Init();
 	m_Location.Init();
 	m_NextMap.Init();
@@ -732,6 +733,7 @@ void CHud :: VidInit( void )
 	m_CTF.VidInit();
 	m_CustomTimer.VidInit();
 	m_Debug.VidInit();
+	m_Jumpspeed.VidInit();
 	m_Location.VidInit();
 	m_NextMap.VidInit();
 	m_PlayerId.VidInit();
