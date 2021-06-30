@@ -2224,7 +2224,7 @@ bool TeamFortressViewport::SlotInput( int iSlot )
 int	TeamFortressViewport::KeyInput( int down, int keynum, const char *pszCurrentBinding )
 {
 	// Enter gets out of Spectator Mode by bringing up the Team Menu
-	if (m_iUser1 && gEngfuncs.Con_IsVisible() == false )
+	if (m_iUser1 && gEngfuncs.Con_IsVisible() == false && !gEngfuncs.IsSpectateOnly() )
 	{
 		if ( down && (keynum == K_ENTER || keynum == K_KP_ENTER) )
 			ShowVGUIMenu( MENU_TEAM );
