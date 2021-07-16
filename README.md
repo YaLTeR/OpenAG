@@ -27,7 +27,7 @@ OpenAG is an open-source client of the Half-Life promod Adrenaline Gamer, comple
 1. You can build the project using CMake→Build All. To find the built client.dll, go to CMake→Cache (x86-Debug Only)→Open Cache Folder→OpenAG.
 
 ### Visual Studio 2022 Preview
-1. Install the [Visual Studio 2022 preview.](https://visualstudio.microsoft.com/vs/preview/vs2022/#download-preview). In the Visual Studio Installer, select **Desktop Development for C++.**
+1. Install the [Visual Studio 2022 preview.](https://visualstudio.microsoft.com/vs/preview/vs2022/#download-preview) In the Visual Studio Installer, select **Desktop Development for C++.**
 2. Open Visual Studio.
 3. On the starting screen, click "Clone or check out code."
 4. Enter `https://github.com/YaLTeR/OpenAG.git` and press the Clone button. Wait for the process to finish.
