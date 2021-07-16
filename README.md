@@ -8,8 +8,8 @@ OpenAG is an open-source client of the Half-Life promod Adrenaline Gamer, comple
 
 # Building
 ## Windows
-### Visual Studio 2019
-1. Install [Visual Studio 2019](https://my.visualstudio.com/Downloads?q=Visual%20Studio%20Community%202019). In the Visual Studio Installer, select Desktop Development for C++.
+### Visual Studio 2019 & Visual Studio 2022
+1. Install [Visual Studio 2019](https://my.visualstudio.com/Downloads?q=Visual%20Studio%20Community%202019) or [Visual Studio 2022](https://visualstudio.microsoft.com/vs/preview/vs2022/#download-preview). In the Visual Studio Installer, select Desktop Development for C++.
 1. Open Visual Studio.
 1. On the starting screen, click "Clone or check out code".
 1. Enter `https://github.com/YaLTeR/OpenAG.git` and press the Clone button. Wait for the process to finish.
@@ -25,13 +25,6 @@ OpenAG is an open-source client of the Half-Life promod Adrenaline Gamer, comple
 
     Enter `https://github.com/YaLTeR/OpenAG.git` and press the Clone button. Wait for the process to finish.
 1. You can build the project using CMake→Build All. To find the built client.dll, go to CMake→Cache (x86-Debug Only)→Open Cache Folder→OpenAG.
-
-### Visual Studio 2022 Preview
-1. Install the [Visual Studio 2022 preview.](https://visualstudio.microsoft.com/vs/preview/vs2022/#download-preview) In the Visual Studio Installer, select **Desktop Development for C++.**
-2. Open Visual Studio.
-3. On the starting screen, click "Clone or check out code."
-4. Enter `https://github.com/YaLTeR/OpenAG.git` and press the Clone button. Wait for the process to finish.
-5. You can build the project using Build→Build All. To find the built client.dll, go to Project→CMake Cache (x86-Debug Only)→Open in Explorer.
 
 ### Manually using Git and CMake
 1. Install Visual Studio 2017 or above, Git and CMake. Make sure to add them to PATH.
