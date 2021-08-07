@@ -26,6 +26,11 @@
 #include "pm_shared.h"
 
 #define IS_FIRSTPERSON_SPEC ( g_iUser1 == OBS_IN_EYE || (g_iUser1 && (gHUD.m_Spectator.m_pip->value == INSET_IN_EYE)) )
+
+extern cvar_t *cl_viewmodel_ofs_right;
+extern cvar_t *cl_viewmodel_ofs_forward;
+extern cvar_t *cl_viewmodel_ofs_up;
+
 /*
 =================
 GetEntity
@@ -182,6 +187,10 @@ void EV_GetDefaultShellInfo( event_args_t *args, float *origin, float *velocity,
 
 	if (bIsFirstPerson)
 	{
+		rightScale += cl_viewmodel_ofs_right->value;
+		forwardScale += cl_viewmodel_ofs_forward->value;
+		upScale += cl_viewmodel_ofs_up->value;
+
 		if (cl_righthand->value > 0.0f)
 		{
 			fR *= -1;
