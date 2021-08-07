@@ -51,6 +51,9 @@ public:
 	// Find final attachment points
 	virtual void StudioCalcAttachments ( void );
 
+	// Returns whether StudioAdjustViewmodelAttachments needs to be called for the viewmodel
+	virtual bool NeedAdjustViewmodelAdjustments();
+
 	// Reprojects attachments of the viewmodel if FOV is changed
 	virtual void StudioAdjustViewmodelAttachments(Vector &vOrigin);
 	

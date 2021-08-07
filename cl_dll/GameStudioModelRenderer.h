@@ -10,6 +10,10 @@
 #if defined( _WIN32 )
 #pragma once
 #endif
+#include "com_model.h"
+#include "studio.h"
+#include "r_studioint.h"
+#include "StudioModelRenderer.h"
 
 /*
 ====================

@@ -2019,16 +2019,20 @@ void CStudioModelRenderer::StudioCalcAttachments( void )
 	{
 		VectorTransform( pattachment[i].org, (*m_plighttransform)[pattachment[i].bone],  m_pCurrentEntity->attachment[i] );
 
-		if (IEngineStudio.IsHardware() && // OpenGL mode
-			m_pCurrentEntity == gEngfuncs.GetViewModel() && // attachments of viewmodel
-			m_pCvarViewmodelFov->value != 0.0f && // viewmodel FOV is changed
-			g_flRenderFOV == gHUD.default_fov->value) // weapon is not zoomed in
+		if (m_pCurrentEntity == gEngfuncs.GetViewModel() && NeedAdjustViewmodelAdjustments())
 		{
 			// Adjust attachment positions to account for different viewmodel FOV.
 			// Otherwise weapon effects (sprites, beams) will be drawn in incorrect position.
 			StudioAdjustViewmodelAttachments(m_pCurrentEntity->attachment[i]);
 		}
 	}
+}
+
+bool CStudioModelRenderer::NeedAdjustViewmodelAdjustments()
+{
+	return IEngineStudio.IsHardware() && // OpenGL mode
+		m_pCvarViewmodelFov->value != 0.0f && // viewmodel FOV is changed.
+		g_flRenderFOV == gHUD.default_fov->value; // weapon is not zoomed in
 }
 
 void CStudioModelRenderer::StudioAdjustViewmodelAttachments(Vector &vOrigin)
