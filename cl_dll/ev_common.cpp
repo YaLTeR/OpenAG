@@ -175,8 +175,19 @@ void EV_GetDefaultShellInfo( event_args_t *args, float *origin, float *velocity,
 	}
 
 	extern cvar_t* cl_righthand;
-	fR = (cl_righthand->value > 0.0f ? -1 : 1) * gEngfuncs.pfnRandomFloat( 50, 70 );
+	fR = gEngfuncs.pfnRandomFloat( 50, 70 );
 	fU = gEngfuncs.pfnRandomFloat( 100, 150 );
+
+	bool bIsFirstPerson = EV_IsPlayer(idx) && EV_IsLocal(idx);
+
+	if (bIsFirstPerson)
+	{
+		if (cl_righthand->value > 0.0f)
+		{
+			fR *= -1;
+			rightScale *= -1;
+		}
+	}
 
 	for ( i = 0; i < 3; i++ )
 	{
