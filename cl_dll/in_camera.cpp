@@ -15,6 +15,7 @@
 #include "camera.h"
 #include "in_defs.h"
 #include "Exports.h"
+#include "pm_shared.h"
 
 #include "port.h"
 
@@ -63,6 +64,7 @@ cvar_t	*c_maxyaw;
 cvar_t	*c_minyaw;
 cvar_t	*c_maxdistance;
 cvar_t	*c_mindistance;
+cvar_t	*dem_forcehltv_local_model;
 
 // pitch, yaw, dist
 vec3_t cam_ofs;
@@ -499,6 +501,8 @@ void CAM_Init( void )
 	c_minyaw				= gEngfuncs.pfnRegisterVariable ( "c_minyaw",   "-135.0", 0 );
 	c_maxdistance			= gEngfuncs.pfnRegisterVariable ( "c_maxdistance",   "200.0", 0 );
 	c_mindistance			= gEngfuncs.pfnRegisterVariable ( "c_mindistance",   "30.0", 0 );
+
+	dem_forcehltv_local_model = gEngfuncs.pfnRegisterVariable ( "dem_forcehltv_local_model", "0", 0 );
 }
 
 void CAM_ClearStates( void )
@@ -597,6 +601,9 @@ void CAM_EndDistance(void)
 int CL_DLLEXPORT CL_IsThirdPerson( void )
 {
 //	RecClCL_IsThirdPerson();
+
+	if (dem_forcehltv_local_model->value != 0.0f && gEngfuncs.IsSpectateOnly() && g_iUser1 != OBS_IN_EYE)
+		return 1;
 
 	return (cam_thirdperson ? 1 : 0) || (g_iUser1 && (g_iUser2 == gEngfuncs.GetLocalPlayer()->index) );
 }
