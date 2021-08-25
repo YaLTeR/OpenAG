@@ -202,7 +202,9 @@ int CHudHealth::Draw(float flTime)
 		a = 255;
 		
 	GetPainColor( r, g, b );
-	ScaleColors(r, g, b, a );
+	gHUD.GetHudColorsWithAlpha(r, g, b, a); // order is important here
+
+	// ScaleColors(r, g, b, a );
 
 	// Only draw health if we have the suit.
 	if (gHUD.m_iWeaponBits & (1<<(WEAPON_SUIT)))
@@ -226,6 +228,8 @@ int CHudHealth::Draw(float flTime)
 		int iWidth = HealthWidth/10;
 
 		UnpackRGB(r, g, b, gHUD.m_iDefaultHUDColor);
+
+		gHUD.GetHudColorsWithAlpha(r, g, b, a);
 		FillRGBA(x, y, iWidth, iHeight, r, g, b, a);
 	}
 

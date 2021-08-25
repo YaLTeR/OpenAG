@@ -152,6 +152,8 @@ void CHudMessage::MessageScanNextChar( void )
 
 	if (gHUD.m_Rainbow.IsEnabled())
 		gHUD.m_Rainbow.GetRainbowColor(m_parms.x, m_parms.y, srcRed, srcGreen, srcBlue);
+	else
+		gHUD.GetHudColorsWithAlpha(srcRed, srcGreen, srcBlue);
 
 	switch( m_parms.pMessage->effect )
 	{

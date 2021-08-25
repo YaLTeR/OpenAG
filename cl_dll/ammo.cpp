@@ -871,7 +871,9 @@ int CHudAmmo::Draw(float flTime)
 
 	UnpackRGB(r,g,b, gHUD.m_iDefaultHUDColor);
 
-	ScaleColors(r, g, b, a );
+	gHUD.GetHudColorsWithAlpha(r, g, b, a);
+
+	//ScaleColors(r, g, b, a );
 
 	// Does this weapon have a clip?
 	y = ScreenHeight - gHUD.m_iFontHeight - gHUD.m_iFontHeight/2;
@@ -883,12 +885,14 @@ int CHudAmmo::Draw(float flTime)
 		if (gWR.HasAmmo(m_pWeapon))
 		{
 			UnpackRGB(r, g, b, gHUD.m_iDefaultHUDColor);
-			ScaleColors(r, g, b, 192);
+			// ScaleColors(r, g, b, 192);
+			gHUD.GetHudColorsWithAlpha(r, g, b, 192);
 		}
 		else
 		{
 			UnpackRGB(r, g, b, RGB_REDISH);
-			ScaleColors(r, g, b, 128);
+			// ScaleColors(r, g, b, 128);
+			gHUD.GetHudColorsWithAlpha(r, g, b, 128);
 		}
 
 		SPR_Set(m_pWeapon->hInactive, r, g, b);
@@ -919,14 +923,15 @@ int CHudAmmo::Draw(float flTime)
 			x += AmmoWidth/2;
 
 			UnpackRGB(r,g,b, gHUD.m_iDefaultHUDColor);
+			gHUD.GetHudColorsWithAlpha(r, g, b, a); // used for both number and bar
 
 			// draw the | bar
 			FillRGBA(x, y, iBarWidth, gHUD.m_iFontHeight, r, g, b, a);
 
-			x += iBarWidth + AmmoWidth/2;;
+			x += iBarWidth + AmmoWidth/2;
 
 			// GL Seems to need this
-			ScaleColors(r, g, b, a );
+			// ScaleColors(r, g, b, a );
 			x = gHUD.DrawHudNumber(x, y, iFlags | DHN_3DIGITS, gWR.CountAmmo(pw->iAmmoType), r, g, b);		
 
 
@@ -1074,7 +1079,8 @@ int CHudAmmo::DrawWList(float flTime)
 		else
 			a = 192;
 
-		ScaleColors(r, g, b, 255);
+		//ScaleColors(r, g, b, 255);
+		gHUD.GetHudColorsWithAlpha(r, g, b);
 		SPR_Set(gHUD.GetSprite(m_HUD_bucket0 + i), r, g, b );
 
 		// make active slot wide enough to accomodate gun pictures
