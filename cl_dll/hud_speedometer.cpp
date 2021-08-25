@@ -34,7 +34,7 @@ int CHudSpeedometer::Draw(float time)
 	if (hud_speedometer_below_cross->value != 0)
 		y = ScreenHeight / 2 + gHUD.m_iFontHeight / 2;
 	else
-		y = ScreenHeight - gHUD.m_iFontHeight - gHUD.m_iFontHeight / 2;
+		y = ScreenHeight - gHUD.m_iFontHeight - gHUD.m_iFontHeight / 2 - gHUD.m_iFontHeight;
 
 	gHUD.DrawHudNumberCentered(ScreenWidth / 2, y, speed, r, g, b);
 

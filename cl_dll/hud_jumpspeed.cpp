@@ -37,7 +37,7 @@ int CHudJumpspeed::Draw(float flTime)
 	if (hud_jumpspeed_below_cross->value != 0.0f)
 		y = ScreenHeight / 2 + gHUD.m_iFontHeight / 2 + gHUD.m_iFontHeight;
 	else
-		y = ScreenHeight - gHUD.m_iFontHeight - gHUD.m_iFontHeight / 2 - gHUD.m_iFontHeight;
+		y = ScreenHeight - gHUD.m_iFontHeight - gHUD.m_iFontHeight / 2;
 
 	// Can be negative if we went back in time (for example, loaded a save).
 	double timeDelta = std::fmax(flTime - lastTime, 0.0f);
