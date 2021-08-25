@@ -34,19 +34,10 @@ int CHudJumpspeed::Draw(float flTime)
 	UnpackRGB(r, g, b, gHUD.m_iDefaultHUDColor);
 
 	int y;
-	if (hud_jumpspeed_below_cross->value == 0.0f)
-	{
-		y = ScreenHeight - gHUD.m_iFontHeight - gHUD.m_iFontHeight / 2;
-	}
+	if (hud_jumpspeed_below_cross->value != 0.0f)
+		y = ScreenHeight / 2 + gHUD.m_iFontHeight / 2 + gHUD.m_iFontHeight;
 	else
-	{
-		int yoffset = 0;
-
-		if (CVAR_GET_FLOAT("hud_speedometer") != 0 && CVAR_GET_FLOAT("hud_speedometer_below_cross") != 0)
-			yoffset = gHUD.m_iFontHeight;
-
-		y = ScreenHeight / 2 + gHUD.m_iFontHeight / 2 + yoffset;
-	}
+		y = ScreenHeight - gHUD.m_iFontHeight - gHUD.m_iFontHeight / 2;
 
 	// Can be negative if we went back in time (for example, loaded a save).
 	double timeDelta = std::fmax(flTime - lastTime, 0.0f);
