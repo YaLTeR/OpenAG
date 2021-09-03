@@ -205,6 +205,10 @@ int CHud :: Redraw( float flTime, int intermission )
 			if (gHUD.m_pCvarDrawDeathNoticesAlways->value != 0.0f
 				&& m_DeathNotice.m_iFlags & HUD_ACTIVE)
 				m_DeathNotice.Draw(flTime);
+				
+			if (gHUD.m_pCvarDrawMessagesAlways->value != 0.0f
+				&& m_Message.m_iFlags & HUD_ACTIVE)
+				m_Message.Draw(flTime);
 		}
 	}
 
