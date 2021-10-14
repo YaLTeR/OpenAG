@@ -831,7 +831,8 @@ void CStudioModelRenderer::StudioSetupBones ( void )
 		if (m_pCvarViewmodelNoEquip->value != 0.0f)
 		{
 			if (strstr(pseqdesc->label, "holster") != NULL || strstr(pseqdesc->label, "draw") != NULL ||
-			    strstr(pseqdesc->label, "deploy") != NULL)
+			    strstr(pseqdesc->label, "deploy") != NULL || strstr(pseqdesc->label, "up") != NULL ||
+			    strstr(pseqdesc->label, "down") != NULL)
 			{
 				m_pCurrentEntity->curstate.sequence = 0; // instead set to idle sequence
 				pseqdesc = (mstudioseqdesc_t *)((byte *)m_pStudioHeader + m_pStudioHeader->seqindex) + m_pCurrentEntity->curstate.sequence;
