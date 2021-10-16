@@ -3,16 +3,20 @@ name: CI
 on:
   push:
     paths-ignore:
+      - '.gitattributes'
       - '.github/*'
       - '.github/*_TEMPLATE/**'
+      - '.gitignore'
       - '*.bat'
       - '*.yml'
       - '*.md'
       - 'LICENSE*'
   pull_request:
     paths-ignore:
+      - '.gitattributes'
       - '.github/*'
       - '.github/*_TEMPLATE/**'
+      - '.gitignore'
       - '*.bat'
       - '*.yml'
       - '*.md'
@@ -23,31 +27,34 @@ on:
 
 jobs:
   build-windows:
-    runs-on: windows-2019
+    name: Build (Windows, ${{ matrix.config.toolset }}, ${{ matrix.configuration }})
+    runs-on: ${{ matrix.config.runs-on }}
     env:
       POWERSHELL_TELEMETRY_OPTOUT: 1
     strategy:
       fail-fast: false
       matrix:
-        toolset: [v141_xp, v142]
+        config:
+          - {runs-on: windows-2019, toolset: v141_xp}
+          - {runs-on: windows-2022, toolset: v143}
         configuration: [Release, Debug]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: CMake generate
-        run: cmake -T ${{ matrix.toolset }} -A Win32 -B build
+        run: cmake -T ${{ matrix.config.toolset }} -A Win32 -B build
       - name: Build
         run: cmake --build build -j $env:NUMBER_OF_PROCESSORS --config ${{ matrix.configuration }}
-      - uses: actions/upload-artifact@v2
-        if: matrix.toolset == 'v141_xp'
+      - uses: actions/upload-artifact@v3
+        if: matrix.config.toolset == 'v141_xp'
         with:
           name: openag-${{ runner.os }}-${{ matrix.configuration }}
           path: build\${{ matrix.configuration }}\client.dll
           if-no-files-found: error
 
   build-linux-gcc:
-    name: build-linux (gcc-${{ matrix.gcc-ver }}, ${{ matrix.configuration }})
+    name: Build (Linux, gcc-${{ matrix.gcc-ver }}, ${{ matrix.configuration }})
     runs-on: ubuntu-18.04
     strategy:
       fail-fast: false
@@ -58,7 +65,7 @@ jobs:
       CC: gcc-${{ matrix.gcc-ver }}
       CXX: g++-${{ matrix.gcc-ver }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Setup
@@ -71,7 +78,7 @@ jobs:
       - name: Build
         working-directory: build
         run: ninja
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         if: matrix.gcc-ver == '11'
         with:
           name: openag-${{ runner.os }}-${{ matrix.configuration }}
@@ -79,26 +86,25 @@ jobs:
           if-no-files-found: error
 
   build-linux-clang:
-    name: build-linux (clang-${{ matrix.clang-ver }}, ${{ matrix.configuration }})
+    name: Build (Linux, clang-${{ matrix.clang-ver }}, ${{ matrix.configuration }})
     runs-on: ubuntu-18.04
     strategy:
       fail-fast: false
       matrix:
-        clang-ver: [3.9, 12]
+        clang-ver: [3.9, 14]
         configuration: [Release, Debug]
     env:
       CC: clang-${{ matrix.clang-ver }}
       CXX: clang++-${{ matrix.clang-ver }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Setup
         run: |
-          if [ '${{ matrix.clang-ver }}' -ge '11' ]; then
+          if [ ${{ matrix.clang-ver }} -eq 14 ]; then
             wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-            sudo add-apt-repository 'deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-11 main'
-            sudo add-apt-repository 'deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-12 main'
+            sudo add-apt-repository 'deb https://apt.llvm.org/bionic/ llvm-toolchain-bionic-${{ matrix.clang-ver }} main'
           fi
           sudo apt-get update
           sudo apt-get install -y clang-${{ matrix.clang-ver }} g++-multilib libgl-dev ninja-build rapidjson-dev
