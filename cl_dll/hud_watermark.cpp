@@ -22,7 +22,7 @@ int CHudWatermark::VidInit()
 
 int CHudWatermark::Draw(float time)
 {
-	if (refresh_draw_until) {
+	if (refresh_draw_until || (draw_until > gHUD.m_flTime + 15.0f)) {
 		refresh_draw_until = false;
 		draw_until = gHUD.m_flTime + 15.0f;
 	}
