@@ -51,7 +51,11 @@ public:
 private:
 	vec3_t		m_vPlayerPos[MAX_PLAYERS];
 
+	HSPRITE m_VoiceHeadModel;
+
     bool IsTeamMate(cl_entity_t *localPlayer, int playerId);
+
+	void DrawScreenRectangle(triangleapi_s *pTriAPI, Vector2D corner1, Vector2D corner2);
 };
 
 #endif // SPECTATOR_H

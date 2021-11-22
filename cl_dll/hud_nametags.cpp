@@ -26,6 +26,9 @@
 #include "vgui_helpers.h"
 #include "vgui_loadtga.h"
 
+
+#include <GL/gl.h> // TOOD: REMOVE ME
+
 #ifdef _MSC_VER
 #pragma warning(disable: 4244)
 #endif
@@ -50,6 +53,7 @@ int CHudNameTags::Init()
 	m_hud_nametags_type	= gEngfuncs.pfnRegisterVariable("hud_nametags_type", "1", FCVAR_ARCHIVE);
 	m_hud_nametags_team_max_distance = gEngfuncs.pfnRegisterVariable("hud_nametags_team_max_distance", "1", FCVAR_ARCHIVE);
 
+	//struct model_s *hSpriteModel;
 	return 1;
 }
 
@@ -60,6 +64,8 @@ int CHudNameTags::VidInit()
 {
 	//m_iFlags &= ~HUD_ACTIVE;
 	//m_hsprPlayer = SPR_Load("sprites/ascii_table_test.spr");
+	m_VoiceHeadModel = SPR_Load("sprites/alphabet_single.spr"); //gEngfuncs.pfnSPR_Load("sprites/alphabet_test.spr"); //SPR_Load
+	//m_VoiceHeadModel = SPR_Load("sprites/320hud1.spr"); //gEngfuncs.pfnSPR_Load("sprites/alphabet_test.spr"); //SPR_Load
 	return 1;
 }
 
@@ -135,7 +141,7 @@ int CHudNameTags::Draw(float flTime)
 			continue;
 
 		// Don't show a nametag for dead or spectating players (ie: invisible entities).
-		if(ent->curstate.effects & EF_NODRAW)
+		if (ent->curstate.effects & EF_NODRAW)
 			continue;
 
 		VectorCopy(ent->origin, origin_above_target_head);
@@ -149,20 +155,18 @@ int CHudNameTags::Draw(float flTime)
 		x = XPROJECT(screen[0]);
 		y = YPROJECT(screen[1]);
 
-		color = GetClientColor( i+1 ); // team color
+		color = GetClientColor(i + 1); // team color
 
 		// draw the players name and health underneath
 		char colorless_name[256];
 		color_tags::strip_color_tags(colorless_name, g_PlayerInfoList[i + 1].name, ARRAYSIZE(colorless_name));
 
-		/*if(!strcmp(g_PlayerExtraInfo[localPlayer->index].teamname, g_PlayerExtraInfo[i + 1].teamname) && gHUD.m_Teamplay)
-			sprintf(string, "%s", colorless_name, health, armor, teammate);
-		else */ // For playerid msg
-			sprintf(string, "%s", colorless_name);
+		sprintf(string, "%s", colorless_name);
 
 		lx = strlen(string)*4; // 3 is avg. character length :)
 
 		VectorCopy(ent->origin, vecTargetPlayer);
+		vec3_t  point, up, right;
 		
 		// Since the nametag is above the player's head, let's somewhat try to see if we can see his head
 		if (ent->curstate.usehull == 1) 
@@ -180,28 +184,111 @@ int CHudNameTags::Draw(float flTime)
 			// Or if the gamemode is Kreedz
 			// Or if the localplayer is spectating
 			// TODO: V_GetInEyePos( g_iUser2, origin, angles );
+			float distanceToPlayer = Distance(trace->endpos, localPlayer->origin);
 
-			if (Distance(trace->endpos, localPlayer->origin) < m_hud_nametags_team_max_distance->value && IsTeamMate(localPlayer, i) ||
-				gEngfuncs.pDemoAPI->IsPlayingback() ||
-				!strcmp(gamemode, "Kreedz") ||
-				g_iUser1)
+			if (distanceToPlayer < m_hud_nametags_team_max_distance->value && IsTeamMate(localPlayer, i) ||
+				gEngfuncs.pDemoAPI->IsPlayingback() || !strcmp(gamemode, "Kreedz") || g_iUser1)
 			{
-				if(m_hud_nametags_type->value == 1) // Looks like chat HUD font
-				{
-					gHUD.DrawConsoleStringWithColorTags(
-						x - lx,
-						y,
-						string,
-						true,
-						color[0],
-						color[1],
-						color[2]
-					);
-				}
-				else // Looks like HUD font
-				{
-					gHUD.DrawHudStringCentered(x, y, string, r, g, b);
-				}
+				float screenPoints[3];
+				gEngfuncs.pTriAPI->WorldToScreen(origin_above_target_head, screenPoints);
+
+				screenPoints[0] = XPROJECT(screenPoints[0]);
+				screenPoints[1] = YPROJECT(screenPoints[1]);
+				screenPoints[2] = 0.0f;
+
+				gEngfuncs.Con_Printf("AHOJ\n");
+				// see R_DrawSpriteModel
+
+				// draws players sprite
+				auto origin = vecTargetPlayer;
+
+				Vector screen_point;
+				gEngfuncs.pTriAPI->WorldToScreen(origin, screen_point);
+
+				/*const Vector2D half_size(0.01875, 0.03333);
+
+				this->DrawScreenRectangle(
+						gEngfuncs.pTriAPI,
+						screen_point.Make2D() - half_size,
+						screen_point.Make2D() + half_size
+				);*/
+
+				//AngleVectors(ent->angles, right, up, NULL );
+
+				auto hSpriteModel = (struct model_s *)gEngfuncs.GetSpritePointer( m_VoiceHeadModel );
+
+				gEngfuncs.pTriAPI->SpriteTexture( hSpriteModel, 0 );
+				//gEngfuncs.pTriAPI->RenderMode( kRenderTransTexture );
+				gEngfuncs.pTriAPI->RenderMode( kRenderTransAdd );
+				gEngfuncs.pTriAPI->CullFace( TRI_NONE );
+				//glEnable(GL_TEXTURE_2D);
+				auto base = 100.0f;
+				auto scale = base / distanceToPlayer;
+				auto final_scale = base * scale ;
+				//VectorScale()
+//				auto x1 = 32.0f;
+//				auto x2 = 16.0f * 3.0f;
+//				auto a1 = (x1 - 1.0f) / (448 - 0); // 448 = width of the image
+//				auto a2 = (x2 - 1.0f) / (448 - 0);
+
+				gEngfuncs.pTriAPI->Begin ( TRI_QUADS );
+					for(int i = 0; i < sizeof(colorless_name) && colorless_name[i] != '\0'; i++)
+					{
+						char singleChar = colorless_name[i];
+						int letterAlphabetNumber = (int)singleChar - 97;
+
+						if ((int)singleChar < 97 && (int)singleChar > 122)
+						{
+							gEngfuncs.Con_Printf("Skipping character %c %i", singleChar, singleChar);
+							continue;
+						}
+
+						auto x1 = 16.0f * letterAlphabetNumber;
+						auto x2 = 16.0f * (letterAlphabetNumber + 1);
+						auto a1 = (x1 - 0.0f) / (448 - 0); // 448 = width of the image // left corner of rectangle
+						auto a2 = (x2 - 0.0f) / (448 - 0); // right corner of rectangle
+
+						gEngfuncs.Con_Printf("%f %f | distance = %f | final_scale = %f | a1 = %f | a2 = %f | char = %c | letter = %i | x1 = %f | x2 = %f\n",
+						                     screenPoints[0], screenPoints[1], distanceToPlayer, final_scale, a1, a2, singleChar, letterAlphabetNumber, x1, x2);
+
+						gEngfuncs.pTriAPI->TexCoord2f(a2, 0);
+						gEngfuncs.pTriAPI->Vertex3f(screenPoints[0], screenPoints[1], 0);
+						gEngfuncs.pTriAPI->TexCoord2f(a1, 0);
+						gEngfuncs.pTriAPI->Vertex3f(screenPoints[0] + 20, screenPoints[1], 0);
+						gEngfuncs.pTriAPI->TexCoord2f(a1, 1);
+						gEngfuncs.pTriAPI->Vertex3f(screenPoints[0] + 20, screenPoints[1] + 32, 0);
+						gEngfuncs.pTriAPI->TexCoord2f(a2, 1);
+						gEngfuncs.pTriAPI->Vertex3f(screenPoints[0], screenPoints[1] + 32, 0);
+
+					}
+				gEngfuncs.pTriAPI->End ();
+				gEngfuncs.pTriAPI->RenderMode( kRenderNormal );
+				/*
+				 * 	gEngfuncs.Con_Printf("%f %f | distance = %f | final_scale = %f | a1 = %f | a2 = %f\n",
+						                     screenPoints[0], screenPoints[1], distanceToPlayer, final_scale, a1, a2);
+						gEngfuncs.pTriAPI->TexCoord2f(a2, 0);
+						gEngfuncs.pTriAPI->Vertex3f(screenPoints[0], screenPoints[1], 0);
+						gEngfuncs.pTriAPI->TexCoord2f(a1, 0);
+						gEngfuncs.pTriAPI->Vertex3f(screenPoints[0] + 20, screenPoints[1], 0);
+						gEngfuncs.pTriAPI->TexCoord2f(a1, 1);
+						gEngfuncs.pTriAPI->Vertex3f(screenPoints[0] + 20, screenPoints[1] + 32, 0);
+						gEngfuncs.pTriAPI->TexCoord2f(a2, 1);
+						gEngfuncs.pTriAPI->Vertex3f(screenPoints[0], screenPoints[1] + 32, 0);
+				 *
+				 * /				gEngfuncs.pTriAPI->TexCoord2f (1, 0);
+//				gEngfuncs.pTriAPI->Vertex3f (screenPoints[0]+40, screenPoints[1]+40, 0);
+//				gEngfuncs.pTriAPI->TexCoord2f (0, 0);
+//				gEngfuncs.pTriAPI->Vertex3f (screenPoints[0]-40, screenPoints[1]-40, 0);
+//				gEngfuncs.pTriAPI->TexCoord2f (0, 1);
+//				gEngfuncs.pTriAPI->Vertex3f (screenPoints[0]-40, screenPoints[1]-40, 0);
+//				gEngfuncs.pTriAPI->TexCoord2f (1, 1);
+//				gEngfuncs.pTriAPI->Vertex3f (screenPoints[0]+40, screenPoints[1]+40, 0);
+
+				 *
+				 *
+				 *
+				 * */
+
 			}
 		}
 	}
@@ -218,6 +305,27 @@ bool CHudNameTags::IsActivePlayer(cl_entity_t * ent)
 			);
 }
 
+void CHudNameTags::DrawScreenRectangle(triangleapi_s *pTriAPI, Vector2D corner1, Vector2D corner2)
+{
+	Vector screen_points[4], world_points[4];
+	screen_points[0] = Vector(corner1.x, corner1.y, 0.0f);
+	screen_points[1] = Vector(corner1.x, corner2.y, 0.0f);
+	screen_points[2] = Vector(corner2.x, corner2.y, 0.0f);
+	screen_points[3] = Vector(corner2.x, corner1.y, 0.0f);
+
+	for (int i = 0; i < 4; ++i)
+		pTriAPI->ScreenToWorld(screen_points[i], world_points[i]);
+
+	pTriAPI->Begin(TRI_QUADS);
+
+	pTriAPI->Vertex3fv(world_points[0]);
+	pTriAPI->Vertex3fv(world_points[1]);
+	pTriAPI->Vertex3fv(world_points[2]);
+	pTriAPI->Vertex3fv(world_points[3]);
+
+	pTriAPI->End();
+}
+
 void CHudNameTags::Reset()
 {
 
@@ -228,6 +336,7 @@ void CHudNameTags::InitHUDData()
 	Reset();
 }
 
+// dont use rn
 int CHudNameTags::MsgFunc_PlayerId(const char* name, int size, void* buf)
 {
 	BEGIN_READ(buf, size);

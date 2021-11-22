@@ -590,7 +590,8 @@ bool CHudSpectator::GetDirectorCamera(vec3_t &position, vec3_t &angle)
 //-----------------------------------------------------------------------------
 int CHudSpectator::VidInit()
 {
-	m_hsprPlayer		= SPR_Load("sprites/iplayer.spr");
+	//m_hsprPlayer		= SPR_Load("sprites/iplayer.spr");
+	m_hsprPlayer		= SPR_Load("sprites/alphabet_single.spr"); // TODO: SOUP
 	m_hsprPlayerBlue	= SPR_Load("sprites/iplayerblue.spr");
 	m_hsprPlayerRed		= SPR_Load("sprites/iplayerred.spr");
 	m_hsprPlayerDead	= SPR_Load("sprites/iplayerdead.spr");
