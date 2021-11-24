@@ -201,6 +201,9 @@ int CHud :: Redraw( float flTime, int intermission )
 
 			if (m_Speedometer.m_iFlags & HUD_ACTIVE)
 				m_Speedometer.Draw(flTime);
+				
+			if (m_StrafeGuide.m_iFlags & HUD_ACTIVE)
+				m_StrafeGuide.Draw(flTime);
 
 			if (m_Jumpspeed.m_iFlags & HUD_ACTIVE)
 				m_Jumpspeed.Draw(flTime);

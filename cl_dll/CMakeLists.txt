@@ -69,6 +69,8 @@ add_sources(
 	hud_spectator.h
 	hud_speedometer.cpp
 	hud_speedometer.h
+	hud_strafeguide.cpp
+	hud_strafeguide.h
 	hud_suddendeath.cpp
 	hud_suddendeath.h
 	hud_timeout.cpp

@@ -574,6 +574,7 @@ void CHud :: Init( void )
 	m_Scores.Init();
 	m_Settings.Init();
 	m_Speedometer.Init();
+	m_StrafeGuide.Init();
 	m_SuddenDeath.Init();
 	m_Timeout.Init();
 	m_Timer.Init();
