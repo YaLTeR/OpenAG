@@ -1,10 +1,3 @@
-//========= Copyright � 1996-2001, Valve LLC, All rights reserved. ============
-//
-// Purpose: 
-//
-// $NoKeywords: $
-//=============================================================================
-
 #ifndef NAMETAGS_H
 #define NAMETAGS_H
 #pragma once
@@ -45,17 +38,15 @@ public:
 	int armor;
 	
 	cvar_t * 			m_hud_nametags;
-	cvar_t * 			m_hud_nametags_type;
 	cvar_t *            m_hud_nametags_team_max_distance;
 
 private:
 	vec3_t		m_vPlayerPos[MAX_PLAYERS];
 
-	HSPRITE m_VoiceHeadModel;
+	HSPRITE m_nameTagSprite;
 
-    bool IsTeamMate(cl_entity_t *localPlayer, int playerId);
-
-	void DrawScreenRectangle(triangleapi_s *pTriAPI, Vector2D corner1, Vector2D corner2);
+	bool IsTeamMate(cl_entity_t *localPlayer, int playerId);
+	bool ShouldDrawEvenIfPlayerIsNotTeamMate();
 };
 
 #endif // SPECTATOR_H
