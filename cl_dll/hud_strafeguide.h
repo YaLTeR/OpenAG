@@ -3,16 +3,19 @@
 
 class CHudStrafeGuide : public CHudBase
 {
-	double angles[6];
+	double angles[6] = {0.};
 	
-	char debug[256] = "";
+	std::complex<double> lastSimvel = 0.;
 	
 	cvar_t* hud_strafeguide;
+	cvar_t* hud_strafeguide_fov;
+	cvar_t* hud_strafeguide_height;
+	cvar_t* hud_strafeguide_size;
 	
 public:
 	virtual int Init();
 	virtual int VidInit();
 	virtual int Draw(float time);
 
-	void Update(struct playermove_s *ppmove);
+	void Update(struct ref_params_s *ppmove);
 };

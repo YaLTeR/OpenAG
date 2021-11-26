@@ -2,11 +2,8 @@
 
 #include "hud.h"
 #include "cl_util.h"
-#include "parsemsg.h"
-#include "hudgl.h"
 
 #include "pm_defs.h"
-#include "usercmd.h"
 #include "pm_movevars.h"
 
 enum border {
@@ -23,6 +20,9 @@ int CHudStrafeGuide::Init()
 	m_iFlags = HUD_ACTIVE;
 
 	hud_strafeguide = CVAR_CREATE("hud_strafeguide", "0", FCVAR_ARCHIVE);
+	hud_strafeguide_fov = CVAR_CREATE("hud_strafeguide_fov", "140", FCVAR_ARCHIVE);
+	hud_strafeguide_height = CVAR_CREATE("hud_strafeguide_height", "0", FCVAR_ARCHIVE);
+	hud_strafeguide_size = CVAR_CREATE("hud_strafeguide_size", "0", FCVAR_ARCHIVE);
 
 	gHUD.AddHudElem(this);
 	return 0;
@@ -33,16 +33,21 @@ int CHudStrafeGuide::VidInit()
 	return 1;
 }
 
-
-
 int CHudStrafeGuide::Draw(float time)
 {
 	if (hud_strafeguide->value == 0)
 		return 0;
 	
-	double fov = 140./ 2 / 180 * pi;
+	double fov = hud_strafeguide_fov->value / 2 / 180 * pi;
 	
-	int fontHeight = gHUD.m_iFontHeight;
+	int size = gHUD.m_iFontHeight;
+	int height = ScreenHeight / 2 - 2*size;
+	
+	if (hud_strafeguide_size->value != 0)
+		size = hud_strafeguide_size->value;
+	
+	if (hud_strafeguide_height->value != 0)
+		height = hud_strafeguide_height->value;
 	
 	for (int i = 0; i < 4; ++i) {
 		int r, g, b;
@@ -57,7 +62,7 @@ int CHudStrafeGuide::Draw(float time)
 		
 		double boxLeft  = -angles[i];
 		double boxRight = -angles[(i+1)%4];
-		if (boxLeft == boxRight)
+		if (std::abs(boxLeft-boxRight) < 1e-10)
 			continue;
 		
 		if (boxLeft > fov) {
@@ -70,6 +75,8 @@ int CHudStrafeGuide::Draw(float time)
 				continue;
 			boxRight = fov;
 		}
+		
+		
 		if (boxLeft  < -fov) boxLeft  = -fov;
 		if (boxRight >  fov) boxRight = fov;
 		
@@ -78,16 +85,11 @@ int CHudStrafeGuide::Draw(float time)
 		boxLeftI  += ScreenWidth / 2;
 		boxRightI += ScreenWidth / 2;
 		
-		FillRGBA(boxLeftI, ScreenHeight*.48, boxRightI-boxLeftI, fontHeight, r, g, b, 60);
+		FillRGBA(boxLeftI, height, boxRightI-boxLeftI, size, r, g, b, 60);
 	}
-	
-	ConsolePrint(debug);
-	sprintf(debug, "Angles: %f %f %f %f\n", angles[0], angles[1], angles[2], angles[3]);
-	ConsolePrint(debug);
 	
 	return 0;
 }
-
 
 static double angleReduce(double a)
 {
@@ -97,12 +99,11 @@ static double angleReduce(double a)
 	return tmp;
 }
 
-void CHudStrafeGuide::Update(struct playermove_s *ppmove)
+void CHudStrafeGuide::Update(struct ref_params_s *pparams)
 {
-	auto iUnit = std::complex<double>(0., 1.);
-	double frameTime = ppmove->frametime;
-	auto input = std::complex<double>(ppmove->cmd.forwardmove, ppmove->cmd.sidemove);
-	double viewAngle = ppmove->angles[1] / 180 * pi;
+	double frameTime = pparams->frametime;
+	auto input = std::complex<double>(pparams->cmd->forwardmove, pparams->cmd->sidemove);
+	double viewAngle = pparams->viewangles[1] / 180 * pi;
 	
 	if (std::norm(input) == 0) {
 		for (int i = 0; i < 4; ++i) {
@@ -114,30 +115,28 @@ void CHudStrafeGuide::Update(struct playermove_s *ppmove)
 		return;
 	}
 
-	//~ sprintf(debug, "angle %f lastangle %f input %f %f ftime %f rotvel %f\n", viewAngle, lastViewAngle, input.real(), input.imag(), frameTime, actualRotVel);
-	
-	auto velocity = std::complex<double>(ppmove->velocity[0], ppmove->velocity[1]);
+	std::complex<double> velocity = lastSimvel;
+	lastSimvel = std::complex<double>(pparams->simvel[0], pparams->simvel[1]);
 
+	bool onground = pparams->onground;
+	double accelCoeff = onground ? pparams->movevars->accelerate : pparams->movevars->airaccelerate;
+	double frictionCoeff = pparams->movevars->friction;
+	double speedCap = onground ? pparams->movevars->maxspeed : min(pparams->movevars->maxspeed, 30);
 	
-	bool onground = ppmove->onground;
-	double accelCoeff = onground ? ppmove->movevars->accelerate : ppmove->movevars->airaccelerate;
-	double frictionCoeff = ppmove->friction;
-	double speedCap = onground ? ppmove->maxspeed : min(ppmove->maxspeed, 30);
 	
-	
-	double inputAbs = min(std::abs(input), ppmove->maxspeed);
+	double inputAbs = min(std::abs(input), pparams->movevars->maxspeed);
 	input *= inputAbs / std::abs(input);
 	double uncappedAccel = accelCoeff * frictionCoeff * inputAbs * frameTime;
 	double velocityAbs = std::abs(velocity);
 	
-	if (velocityAbs == 0)
+	if (velocityAbs <= 2 * uncappedAccel)
 		angles[RED_GREEN] = pi;
 	else
 		angles[RED_GREEN] = std::acos(-uncappedAccel / velocityAbs / 2);
 	
 	if (velocityAbs <= speedCap)
 		angles[GREEN_WHITE] = 0;
-	else 
+	else
 		angles[GREEN_WHITE] = std::acos(speedCap / velocityAbs);
 	
 	angles[GREEN_RED] = -angles[RED_GREEN];
@@ -155,6 +154,4 @@ void CHudStrafeGuide::Update(struct playermove_s *ppmove)
 		angles[i] += velocityAngle + inputAngle - viewAngle;
 		angles[i] = angleReduce(angles[i]);
 	}
-	
-	sprintf(debug, "inp %f %f, vel %f %f, view %f\n", input.real(), input.imag(), velocity.real(), velocity.imag(), viewAngle);
 }

@@ -148,7 +148,7 @@ void CL_DLLEXPORT HUD_PlayerMove( struct playermove_s *ppmove, int server )
 {
 //	RecClClientMove(ppmove, server);
 
-	gHUD.m_StrafeGuide.Update(ppmove);
+	//~ gHUD.m_StrafeGuide.Update(ppmove);
 	PM_Move( ppmove, server );
 }
 
