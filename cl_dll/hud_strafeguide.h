@@ -8,7 +8,7 @@ class CHudStrafeGuide : public CHudBase
 	std::complex<double> lastSimvel = 0.;
 	
 	cvar_t* hud_strafeguide;
-	cvar_t* hud_strafeguide_fov;
+	cvar_t* hud_strafeguide_zoom;
 	cvar_t* hud_strafeguide_height;
 	cvar_t* hud_strafeguide_size;
 	

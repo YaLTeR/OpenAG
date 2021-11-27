@@ -13,14 +13,12 @@ enum border {
 	GREEN_RED
 };
 
-const float pi = std::acos(-1.);
-
 int CHudStrafeGuide::Init()
 {
 	m_iFlags = HUD_ACTIVE;
 
 	hud_strafeguide = CVAR_CREATE("hud_strafeguide", "0", FCVAR_ARCHIVE);
-	hud_strafeguide_fov = CVAR_CREATE("hud_strafeguide_fov", "140", FCVAR_ARCHIVE);
+	hud_strafeguide_zoom = CVAR_CREATE("hud_strafeguide_zoom", "1", FCVAR_ARCHIVE);
 	hud_strafeguide_height = CVAR_CREATE("hud_strafeguide_height", "0", FCVAR_ARCHIVE);
 	hud_strafeguide_size = CVAR_CREATE("hud_strafeguide_size", "0", FCVAR_ARCHIVE);
 
@@ -38,7 +36,8 @@ int CHudStrafeGuide::Draw(float time)
 	if (hud_strafeguide->value == 0)
 		return 0;
 	
-	double fov = hud_strafeguide_fov->value / 2 / 180 * pi;
+	double fov = gHUD.default_fov->value / 2 / 180 * M_PI;
+	fov /= hud_strafeguide_zoom->value;
 	
 	int size = gHUD.m_iFontHeight;
 	int height = ScreenHeight / 2 - 2*size;
@@ -93,9 +92,9 @@ int CHudStrafeGuide::Draw(float time)
 
 static double angleReduce(double a)
 {
-	double tmp = std::fmod(a, 2*pi);
-	if (tmp < 0) tmp += 2*pi;
-	if (tmp > M_PI) tmp -= 2*pi;
+	double tmp = std::fmod(a, 2*M_PI);
+	if (tmp < 0) tmp += 2*M_PI;
+	if (tmp > M_PI) tmp -= 2*M_PI;
 	return tmp;
 }
 
@@ -103,14 +102,14 @@ void CHudStrafeGuide::Update(struct ref_params_s *pparams)
 {
 	double frameTime = pparams->frametime;
 	auto input = std::complex<double>(pparams->cmd->forwardmove, pparams->cmd->sidemove);
-	double viewAngle = pparams->viewangles[1] / 180 * pi;
+	double viewAngle = pparams->viewangles[1] / 180 * M_PI;
 	
 	if (std::norm(input) == 0) {
 		for (int i = 0; i < 4; ++i) {
 			if (i < 2)
-				angles[i] = pi;
+				angles[i] = M_PI;
 			else
-				angles[i] = -pi;
+				angles[i] = -M_PI;
 		}
 		return;
 	}
@@ -120,24 +119,30 @@ void CHudStrafeGuide::Update(struct ref_params_s *pparams)
 
 	bool onground = pparams->onground;
 	double accelCoeff = onground ? pparams->movevars->accelerate : pparams->movevars->airaccelerate;
-	double frictionCoeff = pparams->movevars->friction;
-	double speedCap = onground ? pparams->movevars->maxspeed : min(pparams->movevars->maxspeed, 30);
+	//TODO: grab the entity friction from somewhere. pparams->movevars->friction is sv_friction
+	//just use the default 1 for now
+	double frictionCoeff = 1;
 	
+	double inputAbs = std::abs(input);
+	if (onground)
+		inputAbs = min(inputAbs, pparams->movevars->maxspeed);
+	else
+		inputAbs = min(inputAbs, 30);
 	
-	double inputAbs = min(std::abs(input), pparams->movevars->maxspeed);
 	input *= inputAbs / std::abs(input);
+	
 	double uncappedAccel = accelCoeff * frictionCoeff * inputAbs * frameTime;
 	double velocityAbs = std::abs(velocity);
 	
-	if (velocityAbs <= 2 * uncappedAccel)
-		angles[RED_GREEN] = pi;
+	if (uncappedAccel >= 2 * velocityAbs)
+		angles[RED_GREEN] = M_PI;
 	else
 		angles[RED_GREEN] = std::acos(-uncappedAccel / velocityAbs / 2);
 	
-	if (velocityAbs <= speedCap)
+	if (velocityAbs <= inputAbs)
 		angles[GREEN_WHITE] = 0;
 	else
-		angles[GREEN_WHITE] = std::acos(speedCap / velocityAbs);
+		angles[GREEN_WHITE] = std::acos(inputAbs / velocityAbs);
 	
 	angles[GREEN_RED] = -angles[RED_GREEN];
 	angles[WHITE_GREEN] = -angles[GREEN_WHITE];
