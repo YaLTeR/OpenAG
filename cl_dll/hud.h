@@ -418,6 +418,8 @@ struct message_parms_t
 
 class CHudTextMessage: public CHudBase
 {
+	std::vector<cvar_t*> ignored_message_types;
+
 public:
 	int Init( void );
 	static char *LocaliseTextString( const char *msg, char *dst_buffer, int buffer_size );
