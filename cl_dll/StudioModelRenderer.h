@@ -151,15 +151,6 @@ public:
 	// Pointer to header block for studio model data
 	studiohdr_t		*m_pStudioHeader;
 	
-	// Change viewmodel FOV
-	cvar_t			*m_pCvarViewmodelFov;
-
-	// Disable viewmodel idle/fidget animations on viewmodels
-	cvar_t			*m_pCvarViewmodelNoIdle;
-
-	// Disable viewmodel draw/holster/deploy animations on viewmodels
-	cvar_t			*m_pCvarViewmodelNoEquip;
-
 	// Pointers to current body part and submodel
 	mstudiobodyparts_t *m_pBodyPart;
 	mstudiomodel_t	*m_pSubModel;
@@ -204,6 +195,13 @@ public:
 	// Concatenated bone and light transforms
 	float			(*m_pbonetransform) [ MAXSTUDIOBONES ][ 3 ][ 4 ];
 	float			(*m_plighttransform)[ MAXSTUDIOBONES ][ 3 ][ 4 ];
+
+	// Change viewmodel FOV
+	cvar_t			*m_pCvarViewmodelFov;
+	// Disable viewmodel idle/fidget animations on viewmodels
+	cvar_t			*m_pCvarViewmodelNoIdle;
+	// Disable viewmodel draw/holster/deploy animations on viewmodels
+	cvar_t			*m_pCvarViewmodelNoEquip;
 };
 
 #endif // STUDIOMODELRENDERER_H

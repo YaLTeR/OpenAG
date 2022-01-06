@@ -28,6 +28,8 @@
 
 #include "vgui_TeamFortressViewport.h"
 
+cvar_t *m_pCvarHideCenterMessages;
+
 DECLARE_MESSAGE( m_TextMessage, TextMsg );
 
 int CHudTextMessage::Init(void)
@@ -36,6 +38,8 @@ int CHudTextMessage::Init(void)
 
 	ignored_message_types.push_back(CVAR_CREATE("cl_ignore_spawn_messages", "0", FCVAR_ARCHIVE));
 	ignored_message_types.push_back(CVAR_CREATE("cl_ignore_damage_messages", "0", FCVAR_ARCHIVE));
+
+	m_pCvarHideCenterMessages = CVAR_CREATE( "cl_hide_center_messages", "0", FCVAR_ARCHIVE );
 
 	gHUD.AddHudElem( this );
 
@@ -200,8 +204,10 @@ int CHudTextMessage::MsgFunc_TextMsg( const char *pszName, int iSize, void *pbuf
 	switch ( msg_dest )
 	{
 	case HUD_PRINTCENTER:
-		safe_sprintf( psz, MSG_BUF_SIZE, msg_text, sstr1, sstr2, sstr3, sstr4 );
-		CenterPrint( ConvertCRtoNL( psz ) );
+		if (m_pCvarHideCenterMessages->value == 0.0f) {
+			safe_sprintf( psz, MSG_BUF_SIZE, msg_text, sstr1, sstr2, sstr3, sstr4 );
+			CenterPrint( ConvertCRtoNL( psz ) );
+		} 
 		break;
 
 	case HUD_PRINTNOTIFY:
