@@ -36,8 +36,8 @@ int CHudStrafeGuide::Draw(float time)
 	if (hud_strafeguide->value == 0)
 		return 0;
 	
-	double fov = gHUD.default_fov->value / 2 / 180 * M_PI;
-	fov /= hud_strafeguide_zoom->value;
+	double fov  = gHUD.default_fov->value / 180 * M_PI / 2;
+	double zoom = hud_strafeguide_zoom->value;
 	
 	int size = gHUD.m_iFontHeight;
 	int height = ScreenHeight / 2 - 2*size;
@@ -59,32 +59,38 @@ int CHudStrafeGuide::Draw(float time)
 				r = 255; g = 0; b = 0; break;
 		}
 		
-		double boxLeft  = -angles[i];
-		double boxRight = -angles[(i+1)%4];
-		if (std::abs(boxLeft-boxRight) < 1e-10)
+		double boxLeftBase  = -angles[i];
+		double boxRightBase = -angles[(i+1)%4];
+		
+		if (std::abs(boxLeftBase - boxRightBase) < 1e-10)
+			continue;
+		if (boxLeftBase >= boxRightBase)
+			boxRightBase += 2 * M_PI;
+		if (std::abs(boxLeftBase - boxRightBase) < 1e-10)
 			continue;
 		
-		if (boxLeft > fov) {
-			if (boxRight < -fov || boxRight > boxLeft)
+		for (int iCopy = -8; iCopy <= 8; ++iCopy) {
+			double boxLeft  = boxLeftBase  + iCopy * 2 * M_PI;
+			double boxRight = boxRightBase + iCopy * 2 * M_PI;
+			boxLeft  *= zoom;
+			boxRight *= zoom;
+			
+			if (std::abs(boxLeft) > fov && std::abs(boxRight) > fov)
 				continue;
-			boxLeft = -fov;
+			
+			boxLeft  = boxLeft  > fov ? fov : boxLeft  < -fov ? -fov : boxLeft;
+			boxRight = boxRight > fov ? fov : boxRight < -fov ? -fov : boxRight;
+			
+			boxLeft  = std::tan(boxLeft ) / std::tan(fov);
+			boxRight = std::tan(boxRight) / std::tan(fov);
+			
+			int boxLeftI  = boxLeft / 1 * ScreenWidth / 2;
+			int boxRightI = boxRight/ 1 * ScreenWidth / 2;
+			boxLeftI  += ScreenWidth / 2;
+			boxRightI += ScreenWidth / 2;
+			
+			FillRGBA(boxLeftI, height, boxRightI-boxLeftI, size, r, g, b, 60);
 		}
-		else if (boxRight < -fov) {
-			if (boxLeft < boxRight)
-				continue;
-			boxRight = fov;
-		}
-		
-		
-		if (boxLeft  < -fov) boxLeft  = -fov;
-		if (boxRight >  fov) boxRight = fov;
-		
-		int boxLeftI  = boxLeft / fov * ScreenWidth / 2;
-		int boxRightI = boxRight/ fov * ScreenWidth / 2;
-		boxLeftI  += ScreenWidth / 2;
-		boxRightI += ScreenWidth / 2;
-		
-		FillRGBA(boxLeftI, height, boxRightI-boxLeftI, size, r, g, b, 60);
 	}
 	
 	return 0;
