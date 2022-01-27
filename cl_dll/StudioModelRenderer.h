@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2002, Valve LLC, All rights reserved. ============
+//========= Copyright Â© 1996-2002, Valve LLC, All rights reserved. ============
 //
 // Purpose: 
 //
@@ -133,12 +133,6 @@ public:
 	cvar_t			*m_pCvarDeveloper;
 	// Draw entities bone hit boxes, etc?
 	cvar_t			*m_pCvarDrawEntities;
-	// Change viewmodel FOV
-	cvar_t			*m_pCvarViewmodelFov;
-	// Disable viewmodel idle/fidget animations on viewmodels
-	cvar_t			*m_pCvarViewmodelNoIdle;
-	// Disable viewmodel draw/holster/deploy animations on viewmodels
-	cvar_t			*m_pCvarViewmodelNoEquip;
 	// The entity which we are currently rendering.
 	cl_entity_t		*m_pCurrentEntity;		
 
@@ -201,6 +195,13 @@ public:
 	// Concatenated bone and light transforms
 	float			(*m_pbonetransform) [ MAXSTUDIOBONES ][ 3 ][ 4 ];
 	float			(*m_plighttransform)[ MAXSTUDIOBONES ][ 3 ][ 4 ];
+
+	// Change viewmodel FOV
+	cvar_t			*m_pCvarViewmodelFov;
+	// Disable viewmodel idle/fidget animations on viewmodels
+	cvar_t			*m_pCvarViewmodelNoIdle;
+	// Disable viewmodel draw/holster/deploy animations on viewmodels
+	cvar_t			*m_pCvarViewmodelNoEquip;
 };
 
 #endif // STUDIOMODELRENDERER_H

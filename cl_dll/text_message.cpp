@@ -28,11 +28,18 @@
 
 #include "vgui_TeamFortressViewport.h"
 
+cvar_t *m_pCvarHideCenterMessages;
+
 DECLARE_MESSAGE( m_TextMessage, TextMsg );
 
 int CHudTextMessage::Init(void)
 {
 	HOOK_MESSAGE( TextMsg );
+
+	ignored_message_types.push_back(CVAR_CREATE("cl_ignore_spawn_messages", "0", FCVAR_ARCHIVE));
+	ignored_message_types.push_back(CVAR_CREATE("cl_ignore_damage_messages", "0", FCVAR_ARCHIVE));
+
+	m_pCvarHideCenterMessages = CVAR_CREATE( "cl_hide_center_messages", "0", FCVAR_ARCHIVE );
 
 	gHUD.AddHudElem( this );
 
@@ -155,6 +162,7 @@ char* ConvertCRtoNL( char *str )
 //   string: message parameter 2
 //   string: message parameter 3
 //   string: message parameter 4
+//   byte:   message type
 // any string that starts with the character '#' is a message name, and is used to look up the real message in titles.txt
 // the next (optional) one to four strings are parameters for that string (which can also be message names if they begin with '#')
 int CHudTextMessage::MsgFunc_TextMsg( const char *pszName, int iSize, void *pbuf )
@@ -186,11 +194,20 @@ int CHudTextMessage::MsgFunc_TextMsg( const char *pszName, int iSize, void *pbuf
 	if ( gViewPort && gViewPort->AllowedToPrintText() == FALSE )
 		return 1;
 
+	const auto type = READ_BYTE(); // -1 if absent
+	if (type >= 0 && type < ignored_message_types.size()
+		&& ignored_message_types[type]->value != 0.0f)
+	{
+		return 1;
+	}
+
 	switch ( msg_dest )
 	{
 	case HUD_PRINTCENTER:
-		safe_sprintf( psz, MSG_BUF_SIZE, msg_text, sstr1, sstr2, sstr3, sstr4 );
-		CenterPrint( ConvertCRtoNL( psz ) );
+		if (m_pCvarHideCenterMessages->value == 0.0f) {
+			safe_sprintf( psz, MSG_BUF_SIZE, msg_text, sstr1, sstr2, sstr3, sstr4 );
+			CenterPrint( ConvertCRtoNL( psz ) );
+		} 
 		break;
 
 	case HUD_PRINTNOTIFY:
