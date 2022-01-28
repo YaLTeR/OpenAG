@@ -1,3 +1,5 @@
+#define _USE_MATH_DEFINES
+#include <cmath>
 #include <complex>
 
 #include "hud.h"
@@ -75,7 +77,7 @@ int CHudStrafeGuide::Draw(float time)
 			boxLeft  *= zoom;
 			boxRight *= zoom;
 			
-			if (std::abs(boxLeft) > fov && std::abs(boxRight) > fov)
+			if (std::abs(boxLeft) > fov && std::abs(boxRight) > fov && boxRight * boxLeft > 0)
 				continue;
 			
 			boxLeft  = boxLeft  > fov ? fov : boxLeft  < -fov ? -fov : boxLeft;
