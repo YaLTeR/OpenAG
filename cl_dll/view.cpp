@@ -1699,6 +1699,7 @@ void CL_DLLEXPORT V_CalcRefdef( struct ref_params_s *pparams )
 //	RecClCalcRefdef(pparams);
 
 	gHUD.m_Speedometer.UpdateSpeed(pparams->simvel);
+	gHUD.m_StrafeGuide.Update(pparams);
 	gHUD.m_Jumpspeed.UpdateSpeed(pparams->simvel);
 
 	// intermission / finale rendering
