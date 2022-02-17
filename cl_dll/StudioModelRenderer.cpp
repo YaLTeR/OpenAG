@@ -2225,6 +2225,11 @@ void CStudioModelRenderer::StudioRenderFinal_Hardware( void )
 		gEngfuncs.pTriAPI->RenderMode( kRenderNormal );
 	}
 
+	if ( m_pCvarDrawEntities->value == 5 )
+	{
+		IEngineStudio.StudioDrawAbsBBox( );
+	}
+
 	IEngineStudio.RestoreRenderer();
 }
 
