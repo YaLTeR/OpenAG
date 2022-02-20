@@ -66,7 +66,6 @@ cvar_t	*cl_yawspeed;
 cvar_t	*cl_pitchspeed;
 cvar_t	*cl_anglespeedkey;
 cvar_t	*cl_vsmoothing;
-cvar_t  *cl_ducktap_priority;
 
 /*
 ===============================================================================
@@ -166,17 +165,12 @@ namespace autofuncs
 		static bool duck_was_pressed = false;
 		static bool should_release_duck;
 
-		if (cl_ducktap_priority->value != 0.0f)
-		{
-			if (in_duck.state & 1)
-				duck_was_pressed = true;
-			else
-				duck_was_pressed = false;
-
-			should_release_duck = (!player.onground && !player.inwater && player.walking && !duck_was_pressed);
-		}
+		if (in_duck.state & 1)
+			duck_was_pressed = true;
 		else
-			should_release_duck = (!player.onground && !player.inwater && player.walking);
+			duck_was_pressed = false;
+
+		should_release_duck = (!player.onground && !player.inwater && player.walking && !duck_was_pressed);
 
 		if (s_duck_was_down_last_frame && player.onground && !player.inwater && player.walking)
 			should_release_duck = true;
@@ -1085,7 +1079,6 @@ void InitInput (void)
 	cl_vsmoothing		= gEngfuncs.pfnRegisterVariable ( "cl_vsmoothing", "0.05", FCVAR_ARCHIVE );
 
 	autofuncs::cl_autojump = gEngfuncs.pfnRegisterVariable ( "cl_autojump", "1", FCVAR_ARCHIVE );
-	cl_ducktap_priority = gEngfuncs.pfnRegisterVariable ("cl_ducktap_priority", "0", FCVAR_ARCHIVE);
 
 	m_pitch			    = gEngfuncs.pfnRegisterVariable ( "m_pitch","0.022", FCVAR_ARCHIVE );
 	m_yaw				= gEngfuncs.pfnRegisterVariable ( "m_yaw","0.022", FCVAR_ARCHIVE );
