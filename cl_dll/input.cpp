@@ -9,6 +9,7 @@
 #include "camera.h"
 extern "C"
 {
+#include <pm_shared.h>
 #include "kbutton.h"
 }
 #include "cvardef.h"
@@ -34,6 +35,8 @@ extern cl_enginefunc_t gEngfuncs;
 
 // Defined in pm_math.c
 extern "C" float anglemod( float a );
+
+bool g_bDecentJumped = false;
 
 void IN_Init (void);
 void IN_Move ( float frametime, usercmd_t *cmd);
@@ -66,6 +69,8 @@ cvar_t	*cl_yawspeed;
 cvar_t	*cl_pitchspeed;
 cvar_t	*cl_anglespeedkey;
 cvar_t	*cl_vsmoothing;
+
+cvar_t	*cl_jumptype;
 
 /*
 ===============================================================================
@@ -883,7 +888,37 @@ int CL_ButtonBits( int bResetState )
  
 	if (in_jump.state & 3)
 	{
-		bits |= IN_JUMP;
+		if (cl_jumptype->value == 0.0f || autofuncs::cl_autojump->value != 0.0f)
+		{
+			bits |= IN_JUMP;
+		}
+		else
+		{
+			if (PM_GetOnGround())
+			{
+				if (!g_bDecentJumped)
+				{
+					bits |= IN_JUMP;
+				}
+				if (bResetState)
+				{
+					g_bDecentJumped = true;
+				}
+			}
+
+			else
+			{
+				if (PM_GetWaterLevel() == 2)
+				{
+					// Over the water, glide on the surface, but only if we are over deep water
+					bits |= IN_JUMP;
+				}
+			}
+		}
+	}
+	else
+	{
+		g_bDecentJumped = false;
 	}
 
 	if ( in_forward.state & 3 )
@@ -1077,6 +1112,8 @@ void InitInput (void)
 	cl_pitchdown		= gEngfuncs.pfnRegisterVariable ( "cl_pitchdown", "89", 0 );
 
 	cl_vsmoothing		= gEngfuncs.pfnRegisterVariable ( "cl_vsmoothing", "0.05", FCVAR_ARCHIVE );
+
+	cl_jumptype			= gEngfuncs.pfnRegisterVariable ( "cl_jumptype", "0", FCVAR_ARCHIVE );
 
 	autofuncs::cl_autojump = gEngfuncs.pfnRegisterVariable ( "cl_autojump", "1", FCVAR_ARCHIVE );
 

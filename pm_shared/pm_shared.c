@@ -132,6 +132,19 @@ static char grgchTextureType[CTEXTURESMAX];
 int g_onladder = 0;
 int g_slopebug_fix = 0;
 
+static int g_iOnGround;
+static int g_iWaterlevel;
+
+int PM_GetOnGround()
+{
+	return g_iOnGround;
+}
+
+int PM_GetWaterLevel()
+{
+	return g_iWaterlevel;
+}
+
 void PM_SwapTextures( int i, int j )
 {
 	char chTemp;
@@ -1524,6 +1537,8 @@ qboolean PM_CheckWater ()
 		}
 	}
 
+	g_iWaterlevel = pmove->waterlevel;
+
 	return pmove->waterlevel > 1;
 }
 
@@ -2737,6 +2752,11 @@ void PM_CheckFalling( void )
 	if ( pmove->onground != -1 ) 
 	{		
 		pmove->flFallVelocity = 0;
+		g_iOnGround = 1;	// Set flag for bunnyhop, to jump when touch the ground
+	}
+	else
+	{
+		g_iOnGround = 0;
 	}
 }
 
@@ -2993,6 +3013,7 @@ void PM_PlayerMove ( qboolean server )
 		if ( pLadder )
 		{
 			g_onladder = 1;
+			g_iOnGround = 1;	// allow to jump off
 		}
 	}
 
