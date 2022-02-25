@@ -162,22 +162,23 @@ namespace autofuncs
 	static void handle_ducktap(usercmd_t* cmd)
 	{
 		static bool s_duck_was_down_last_frame = false;
-		static bool duck_was_pressed = false;
 		static bool should_release_duck;
 
-		if (in_duck.state & 1)
-			duck_was_pressed = true;
-		else
-			duck_was_pressed = false;
+		bool duck_is_pressed = false;
 
-		should_release_duck = (!player.onground && !player.inwater && player.walking && !duck_was_pressed);
+		if (in_duck.state & 1)
+			duck_is_pressed = true;
+		else
+			duck_is_pressed = false;
+
+		should_release_duck = (!player.onground && !player.inwater && player.walking && !duck_is_pressed);
 
 		if (s_duck_was_down_last_frame && player.onground && !player.inwater && player.walking)
 			should_release_duck = true;
 
 		if (should_release_duck)
 		{
-			duck_was_pressed = false;
+			duck_is_pressed = false;
 			cmd->buttons &= ~IN_DUCK;
 			in_duck.state &= 0;
 		}
