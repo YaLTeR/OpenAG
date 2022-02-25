@@ -29,7 +29,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        toolset: [v141_xp, v141, v142]
+        toolset: [v141_xp, v142]
         configuration: [Release, Debug]
     steps:
       - uses: actions/checkout@v2
@@ -52,7 +52,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        gcc-ver: [6, 7, 8, 9, 10, 11]
+        gcc-ver: [6, 11]
         configuration: [Release, Debug]
     env:
       CC: gcc-${{ matrix.gcc-ver }}
@@ -84,7 +84,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        clang-ver: [3.9, '4.0', '5.0', '6.0', 7, 8, 9, 10, 11, 12] # #.0 is interpreted as integer without quotation marks
+        clang-ver: [3.9, 12]
         configuration: [Release, Debug]
     env:
       CC: clang-${{ matrix.clang-ver }}
