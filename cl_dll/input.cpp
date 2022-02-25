@@ -178,7 +178,6 @@ namespace autofuncs
 
 		if (should_release_duck)
 		{
-			duck_is_pressed = false;
 			cmd->buttons &= ~IN_DUCK;
 			in_duck.state &= 0;
 		}
