@@ -268,15 +268,13 @@ int CHudDeathNotice :: MsgFunc_DeathMsg( const char *pszName, int iSize, void *p
 	DEATHNOTICE_DISPLAY_TIME = CVAR_GET_FLOAT( "hud_deathnotice_time" );
 	rgDeathNoticeList[i].flDisplayTime = gHUD.m_flTime + DEATHNOTICE_DISPLAY_TIME;
 
-	const char *killsnd = m_pCvarKillSndPath->string;
-
 	// Play kill sound
 	if (g_PlayerInfoList[killer].thisplayer &&
 		!rgDeathNoticeList[i].iNonPlayerKill &&
 		!rgDeathNoticeList[i].iSuicide &&
 		m_pCvarKillSnd->value != 0.0f)
 	{
-		PlaySound(killsnd, 1.0f);
+		PlaySound(m_pCvarKillSndPath->string, m_pCvarKillSnd->value);
 	}
 
 	// Print to console
