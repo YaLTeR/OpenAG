@@ -269,7 +269,7 @@ int CHudDeathNotice :: MsgFunc_DeathMsg( const char *pszName, int iSize, void *p
 	rgDeathNoticeList[i].flDisplayTime = gHUD.m_flTime + DEATHNOTICE_DISPLAY_TIME;
 
 	// Play kill sound
-	if (g_PlayerInfoList[killer].thisplayer &&
+	if ((g_PlayerInfoList[killer].thisplayer || g_iUser2 == killer) &&
 		!rgDeathNoticeList[i].iNonPlayerKill &&
 		!rgDeathNoticeList[i].iSuicide &&
 		m_pCvarKillSnd->value > 0.0f)
