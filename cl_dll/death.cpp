@@ -272,7 +272,7 @@ int CHudDeathNotice :: MsgFunc_DeathMsg( const char *pszName, int iSize, void *p
 	if (g_PlayerInfoList[killer].thisplayer &&
 		!rgDeathNoticeList[i].iNonPlayerKill &&
 		!rgDeathNoticeList[i].iSuicide &&
-		m_pCvarKillSnd->value != 0.0f)
+		m_pCvarKillSnd->value > 0.0f)
 	{
 		PlaySound(m_pCvarKillSndPath->string, m_pCvarKillSnd->value);
 	}
