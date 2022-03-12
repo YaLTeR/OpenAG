@@ -196,7 +196,7 @@ int __MsgFunc_PlaySound(const char* name, int size, void* buf)
 		origin[i] = READ_COORD();
 
 	const auto sound = READ_STRING();
-	gEngfuncs.pfnPlaySoundByName(sound, 1);
+	gEngfuncs.pfnPlaySoundByName(sound, gHUD.m_pCvarPlayTeamSoundsVolume->value);
 
 	return 1;
 }
@@ -527,6 +527,7 @@ void CHud :: Init( void )
 	m_pCvarViewheightMode = CVAR_CREATE("cl_viewheight_mode", "0", FCVAR_ARCHIVE);
 	m_pCvarHideCorpses = CVAR_CREATE("cl_hidecorpses", "0", FCVAR_ARCHIVE);
 	m_pCvarColor = CVAR_CREATE( "hud_color", "", FCVAR_ARCHIVE );
+	m_pCvarPlayTeamSoundsVolume = CVAR_CREATE("cl_team_sounds_volume", "1.0", FCVAR_ARCHIVE);
 	cl_lw = gEngfuncs.pfnGetCvarPointer( "cl_lw" );
 	CVAR_CREATE("showtriggers", "0", 0);
 
