@@ -596,7 +596,7 @@ public:
 	cvar_t	*m_pCvarAutostop;
 	cvar_t	*m_pCvarViewheightMode;
 	cvar_t	*m_pCvarHideCorpses;
-	cvar_t	*m_pCvarIgnoreSoundMessages;
+	cvar_t	*m_pCvarPlayTeamSoundsVolume;
 
 	int m_iFontHeight;
 
