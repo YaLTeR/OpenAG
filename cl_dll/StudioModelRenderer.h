@@ -32,9 +32,6 @@ public:
 	virtual int StudioDrawModel ( int flags );
 	virtual int StudioDrawPlayer ( int flags, struct entity_state_s *pplayer );
 
-private:
-	virtual model_t* GetPlayerModel(int player_index);
-
 public:
 	// Local interfaces
 	//
@@ -50,12 +47,6 @@ public:
 
 	// Find final attachment points
 	virtual void StudioCalcAttachments ( void );
-
-	// Returns whether StudioAdjustViewmodelAttachments needs to be called for the viewmodel
-	virtual bool NeedAdjustViewmodelAdjustments();
-
-	// Reprojects attachments of the viewmodel if FOV is changed
-	virtual void StudioAdjustViewmodelAttachments(Vector &vOrigin);
 	
 	// Save bone matrices and names
 	virtual void StudioSaveBones( void );
@@ -109,6 +100,15 @@ public:
 
 	// Calculate the viewmodel fov and set the OpenGL projection matrix
 	virtual void SetViewmodelFovProjection ( void );
+
+	// Returns whether StudioAdjustViewmodelAttachments needs to be called for the viewmodel
+	virtual bool NeedAdjustViewmodelAdjustments();
+
+	// Reprojects attachments of the viewmodel if FOV is changed
+	virtual void StudioAdjustViewmodelAttachments(Vector &vOrigin);
+
+private:
+	virtual model_t* GetPlayerModel(int player_index);
 
 public:
 
