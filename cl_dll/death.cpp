@@ -51,6 +51,9 @@ float g_ColorGreen[3]	= { 0.6, 1.0, 0.6 };
 float g_ColorYellow[3]	= { 1.0, 0.7, 0.0 };
 float g_ColorGrey[3]	= { 0.8, 0.8, 0.8 };
 
+cvar_t *m_pCvarKillSnd;
+cvar_t *m_pCvarKillSndPath;
+
 float *GetClientColor( int clientIndex )
 {
 	switch ( g_PlayerExtraInfo[clientIndex].teamnumber )
@@ -74,6 +77,9 @@ int CHudDeathNotice :: Init( void )
 	HOOK_MESSAGE( DeathMsg );
 
 	CVAR_CREATE( "hud_deathnotice_time", "6", FCVAR_ARCHIVE );
+
+	m_pCvarKillSnd = CVAR_CREATE( "cl_killsound", "0", FCVAR_ARCHIVE );
+	m_pCvarKillSndPath = CVAR_CREATE( "cl_killsound_path", "buttons/bell1.wav", FCVAR_ARCHIVE );
 
 	return 1;
 }
@@ -262,6 +268,16 @@ int CHudDeathNotice :: MsgFunc_DeathMsg( const char *pszName, int iSize, void *p
 	DEATHNOTICE_DISPLAY_TIME = CVAR_GET_FLOAT( "hud_deathnotice_time" );
 	rgDeathNoticeList[i].flDisplayTime = gHUD.m_flTime + DEATHNOTICE_DISPLAY_TIME;
 
+	// Play kill sound
+	if ((g_PlayerInfoList[killer].thisplayer || g_iUser2 == killer) &&
+		!rgDeathNoticeList[i].iNonPlayerKill &&
+		!rgDeathNoticeList[i].iSuicide &&
+		m_pCvarKillSnd->value > 0.0f)
+	{
+		PlaySound(m_pCvarKillSndPath->string, m_pCvarKillSnd->value);
+	}
+
+	// Print to console
 	if (rgDeathNoticeList[i].iNonPlayerKill)
 	{
 		ConsolePrint( rgDeathNoticeList[i].szKiller );
