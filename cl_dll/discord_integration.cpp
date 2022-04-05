@@ -93,6 +93,7 @@ namespace discord_integration
 			"dyd_axn_plant"s,
 			"dyd_axn_sky"s,
 			"dyd_cosy_cupbhop_ez"s,
+			"e1m1"s,
 			"eden"s,
 			"elixir"s,
 			"endcamp"s,
