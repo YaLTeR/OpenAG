@@ -2,7 +2,7 @@
 #include <cstdint>
 #include <cstring>
 #include <memory>
-#include <string>
+#include <string.h>
 #include <unordered_set>
 
 #include <discord_rpc.h>
@@ -343,10 +343,21 @@ namespace discord_integration
 					get_map_name(map_name, ARRAYSIZE(map_name));
 					if (map_name[0])
 					{
-						if (maps_with_thumbnails.find(map_name) != maps_with_thumbnails.cend())
-							presence.largeImageKey = map_name;
+						char *temp = strdup(map_name); // make a copy
 
-						presence.largeImageText = map_name;
+						// adjust copy to lowercase
+						unsigned char *tptr = (unsigned char *)temp;
+						while(*tptr) {
+							*tptr = tolower(*tptr);
+							tptr++;
+						}
+
+						if (maps_with_thumbnails.find(temp) != maps_with_thumbnails.cend())
+							presence.largeImageKey = temp;
+
+						presence.largeImageText = temp;
+
+						free(temp);
 					}
 
 					// Get the server address.
