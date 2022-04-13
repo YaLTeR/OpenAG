@@ -2,7 +2,7 @@
 #include <cstdint>
 #include <cstring>
 #include <memory>
-#include <string.h>
+#include <string>
 #include <unordered_set>
 
 #include <discord_rpc.h>
@@ -40,7 +40,6 @@ namespace discord_integration
 			"bh_axn_tunnel"s,
 			"bhm_assault"s,
 			"bhm_ramp"s,
-			"bhop_MoLwiz"s,
 			"bhop_aeonflux"s,
 			"bhop_avantura"s,
 			"bhop_axn_project64"s,
@@ -58,6 +57,7 @@ namespace discord_integration
 			"bhop_maratona"s,
 			"bhop_medieval"s,
 			"bhop_minecraft_v1"s,
+			"bhop_molwiz"s,
 			"bhop_platinum"s,
 			"bhop_pool_day"s,
 			"bhop_river_wb"s,
