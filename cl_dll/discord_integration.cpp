@@ -343,21 +343,17 @@ namespace discord_integration
 					get_map_name(map_name, ARRAYSIZE(map_name));
 					if (map_name[0])
 					{
-						char *temp = strdup(map_name); // make a copy
-
-						// adjust copy to lowercase
-						unsigned char *tptr = (unsigned char *)temp;
-						while(*tptr) {
+						// adjust to lowercase
+						unsigned char *tptr = (unsigned char *)map_name;
+						while (*tptr) {
 							*tptr = tolower(*tptr);
 							tptr++;
 						}
 
-						if (maps_with_thumbnails.find(temp) != maps_with_thumbnails.cend())
-							presence.largeImageKey = temp;
+						if (maps_with_thumbnails.find(map_name) != maps_with_thumbnails.cend())
+							presence.largeImageKey = map_name;
 
-						presence.largeImageText = temp;
-
-						free(temp);
+						presence.largeImageText = map_name;
 					}
 
 					// Get the server address.
