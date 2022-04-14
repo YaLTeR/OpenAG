@@ -40,7 +40,6 @@ namespace discord_integration
 			"bh_axn_tunnel"s,
 			"bhm_assault"s,
 			"bhm_ramp"s,
-			"bhop_MoLwiz"s,
 			"bhop_aeonflux"s,
 			"bhop_avantura"s,
 			"bhop_axn_project64"s,
@@ -58,6 +57,7 @@ namespace discord_integration
 			"bhop_maratona"s,
 			"bhop_medieval"s,
 			"bhop_minecraft_v1"s,
+			"bhop_molwiz"s,
 			"bhop_platinum"s,
 			"bhop_pool_day"s,
 			"bhop_river_wb"s,
@@ -343,6 +343,13 @@ namespace discord_integration
 					get_map_name(map_name, ARRAYSIZE(map_name));
 					if (map_name[0])
 					{
+						// adjust to lowercase
+						unsigned char *tptr = (unsigned char *)map_name;
+						while (*tptr) {
+							*tptr = tolower(*tptr);
+							tptr++;
+						}
+
 						if (maps_with_thumbnails.find(map_name) != maps_with_thumbnails.cend())
 							presence.largeImageKey = map_name;
 
