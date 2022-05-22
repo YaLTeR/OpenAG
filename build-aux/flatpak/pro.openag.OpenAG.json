@@ -8,6 +8,7 @@
         "org.freedesktop.Sdk.Compat.i386",
         "org.freedesktop.Sdk.Extension.toolchain-i386"
     ],
+    "finish-args": [],
     "build-options": {
         "append-path": "/usr/lib/sdk/toolchain-i386/bin",
         "env": {
