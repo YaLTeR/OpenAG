@@ -22,6 +22,10 @@ public:
 	 */
 	void GetRainbowColor(int x, int y, int &r, int &g, int &b);
 
+	//! Disables rainbow color until PopDisable() is called.
+	void PushDisable();
+	void PopDisable();
+
 private:
 	/**
 	 * Function that draws an input string at input position with input color.
@@ -30,6 +34,7 @@ private:
 	using DrawStringFn = std::function<int(int x, int y, const char *buf, int r, int g, int b)>;
 
 	bool m_bIsEnabled = false;
+	int m_iDisableStack = 0;
 	float m_flSat = 100;
 	float m_flVal = 100;
 	cvar_t *m_pCvarRainbow = nullptr;

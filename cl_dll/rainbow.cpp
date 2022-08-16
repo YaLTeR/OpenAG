@@ -46,6 +46,9 @@ void CRainbow::Think()
 
 void CRainbow::GetRainbowColor(int x, int y, int &r, int &g, int &b)
 {
+    if (m_iDisableStack > 0)
+        return;
+
     float phase = m_pCvarRainbowSpeed->value * gHUD.m_flTime;
     phase += m_pCvarRainbowXPhase->value * x;
     phase += m_pCvarRainbowYPhase->value * y;
@@ -54,6 +57,17 @@ void CRainbow::GetRainbowColor(int x, int y, int &r, int &g, int &b)
         phase += 360;
 
     HSVtoRGB(phase, m_flSat, m_flVal, r, g, b);
+}
+
+void CRainbow::PushDisable()
+{
+    m_iDisableStack++;
+}
+
+void CRainbow::PopDisable()
+{
+    m_iDisableStack--;
+    assert(m_iDisableStack >= 0);
 }
 
 void CRainbow::HookFuncs()
@@ -120,6 +134,13 @@ int CRainbow::DrawStringReverse(int x, int y, const char *str, int r, int g, int
 
 int CRainbow::DrawConsoleString(int x, int y, const char *string)
 {
+    if (gHUD.m_Rainbow.m_iDisableStack > 0)
+    {
+        // pfnDrawConsoleString has weird color handling with con_color cvar
+        // Check in GetRainbowColor breaks text color
+        return gHUD.m_Rainbow.m_pfnDrawConsoleString(x, y, string);
+    }
+
     return x + DrawRainbowString(x, y, string, [](int x, int y, const char *str, int r, int g, int b) {
         gEngfuncs.pfnDrawSetTextColor(r * 255.f, g * 255.f, b * 255.f);
         return gHUD.m_Rainbow.m_pfnDrawConsoleString(x, y, str) - x;
