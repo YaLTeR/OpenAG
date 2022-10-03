@@ -34,7 +34,7 @@ int CHudCustomTimer::Draw(float time)
 	UnpackRGB(r, g, b, gHUD.m_iDefaultHUDColor);
 
 	FillRGBA((ScreenWidth / 2) - 50, (gHUD.m_scrinfo.iCharHeight * 4) - 6, (diff / m_flSeconds) * 100, 4, r, g, b, 210);
-	snprintf(str, sizeof(str), "Timer: %d", (int)diff);
+	snprintf(str, sizeof(str), "Timer: %.1f", diff);
 	gHUD.DrawHudStringCentered(ScreenWidth / 2, gHUD.m_scrinfo.iCharHeight * 4, str, r, g, b);
 
 	return 0;
