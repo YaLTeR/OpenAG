@@ -14,6 +14,7 @@
 #include "pm_shared.h"
 #include "bench.h"
 #include "Exports.h"
+#include "demo_api.h"
 
 #include "discord_integration.h"
 
@@ -62,6 +63,9 @@ int CL_DLLEXPORT HUD_AddEntity( int type, struct cl_entity_s *ent, const char *m
 	// in spectator mode:
 	// each frame every entity passes this function, so the overview hooks 
 	// it to filter the overview entities
+
+	if (gHUD.m_pCvarHideOtherPlayers->value > 0 && ent->player && gEngfuncs.pDemoAPI->IsPlayingback() && ent->index != g_iUser2)
+		return 0;
 
 	if ( g_iUser1 )
 	{
