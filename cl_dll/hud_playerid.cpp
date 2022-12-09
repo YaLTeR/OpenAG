@@ -51,7 +51,7 @@ int CHudPlayerId::Draw(float time)
 	else
 		sprintf(str, "%s", name);
 
-	if (CVAR_GET_FLOAT("hud_centerid"))
+	if (gHUD.hud_centerid->value)
 		gHUD.DrawHudStringCenteredWithColorTags(ScreenWidth / 2,
 		                                        ScreenHeight - ScreenHeight / 4,
 		                                        str,

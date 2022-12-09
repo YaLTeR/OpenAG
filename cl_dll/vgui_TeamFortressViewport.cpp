@@ -1405,7 +1405,7 @@ void TeamFortressViewport::ShowScoreBoard( void )
 		{
 			// The user can change the scoreboard style while the scoreboard is being "drawn" (e.g. when togglescores is on)
 			// Therefore make sure to close/hide the other one first
-			if (CVAR_GET_FLOAT("cl_old_scoreboard") != 0)
+			if (gHUD.m_pCvarOldScoreboard->value != 0)
 			{
 				m_pScoreBoard->setVisible(false);
 				gHUD.m_OldScoreBoard.ShowScoreboard(true);
@@ -1427,7 +1427,7 @@ bool TeamFortressViewport::IsScoreBoardVisible( void )
 {
 	if (m_pScoreBoard)
 	{
-		if (CVAR_GET_FLOAT("cl_old_scoreboard") != 0)
+		if (gHUD.m_pCvarOldScoreboard->value != 0)
 			return gHUD.m_OldScoreBoard.IsVisible();
 		else
 			return m_pScoreBoard->isVisible();

@@ -53,6 +53,7 @@ float g_ColorGrey[3]	= { 0.8, 0.8, 0.8 };
 
 cvar_t *m_pCvarKillSnd;
 cvar_t *m_pCvarKillSndPath;
+cvar_t *hud_deathnotice_time;
 
 float *GetClientColor( int clientIndex )
 {
@@ -76,7 +77,7 @@ int CHudDeathNotice :: Init( void )
 
 	HOOK_MESSAGE( DeathMsg );
 
-	CVAR_CREATE( "hud_deathnotice_time", "6", FCVAR_ARCHIVE );
+	hud_deathnotice_time = CVAR_CREATE( "hud_deathnotice_time", "6", FCVAR_ARCHIVE );
 
 	m_pCvarKillSnd = CVAR_CREATE( "cl_killsound", "0", FCVAR_ARCHIVE );
 	m_pCvarKillSndPath = CVAR_CREATE( "cl_killsound_path", "buttons/bell1.wav", FCVAR_ARCHIVE );
@@ -265,7 +266,7 @@ int CHudDeathNotice :: MsgFunc_DeathMsg( const char *pszName, int iSize, void *p
 
 	rgDeathNoticeList[i].iId = spr;
 
-	DEATHNOTICE_DISPLAY_TIME = CVAR_GET_FLOAT( "hud_deathnotice_time" );
+	DEATHNOTICE_DISPLAY_TIME = hud_deathnotice_time->value;
 	rgDeathNoticeList[i].flDisplayTime = gHUD.m_flTime + DEATHNOTICE_DISPLAY_TIME;
 
 	// Play kill sound

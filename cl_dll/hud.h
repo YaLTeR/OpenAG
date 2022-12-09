@@ -601,6 +601,14 @@ public:
 	cvar_t	*m_pCvarHideCorpses;
 	cvar_t	*m_pCvarHideOtherPlayers;
 	cvar_t	*m_pCvarPlayTeamSoundsVolume;
+	cvar_t  *m_pCvarOldScoreboard;
+
+	cvar_t  *hud_fastswitch;
+	cvar_t  *hud_drawhistory_time;
+	cvar_t  *zoom_sensitivity_ratio;
+	cvar_t  *hud_takesshots;
+	cvar_t  *hud_classautokill;
+	cvar_t  *hud_centerid;
 
 	int m_iFontHeight;
 
