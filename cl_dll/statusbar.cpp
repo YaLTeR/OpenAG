@@ -47,7 +47,7 @@ int CHudStatusBar :: Init( void )
 
 	Reset();
 
-	CVAR_CREATE( "hud_centerid", "0", FCVAR_ARCHIVE );
+	gHUD.hud_centerid = CVAR_CREATE( "hud_centerid", "0", FCVAR_ARCHIVE );
 
 	return 1;
 }

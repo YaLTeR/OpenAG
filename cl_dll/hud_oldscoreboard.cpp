@@ -37,7 +37,7 @@
 
 int CHudOldScoreboard::Init(void)
 {
-	m_pCvarOldScoreboard = CVAR_CREATE("cl_old_scoreboard", "0", FCVAR_ARCHIVE);
+	gHUD.m_pCvarOldScoreboard = CVAR_CREATE("cl_old_scoreboard", "0", FCVAR_ARCHIVE);
 	m_pCvarOldScoreboardWidth = CVAR_CREATE("cl_old_scoreboard_width", DEFAULT_WIDTH, FCVAR_ARCHIVE);
 
 	m_iFlags = 0;

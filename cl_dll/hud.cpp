@@ -504,8 +504,8 @@ void CHud :: Init( void )
 	HOOK_MESSAGE( CRC32 );
 	HOOK_MESSAGE( PlaySound );
 
-	CVAR_CREATE( "hud_classautokill", "1", FCVAR_ARCHIVE | FCVAR_USERINFO );		// controls whether or not to suicide immediately on TF class switch
-	CVAR_CREATE( "hud_takesshots", "0", FCVAR_ARCHIVE );		// controls whether or not to automatically take screenshots at the end of a round
+	hud_classautokill = CVAR_CREATE( "hud_classautokill", "1", FCVAR_ARCHIVE | FCVAR_USERINFO );		// controls whether or not to suicide immediately on TF class switch
+	hud_takesshots = CVAR_CREATE( "hud_takesshots", "0", FCVAR_ARCHIVE );		// controls whether or not to automatically take screenshots at the end of a round
 
 	// Implemented server-side, needs to be registered client-side.
 	CVAR_CREATE( "cl_autowepswitch", "1", FCVAR_ARCHIVE | FCVAR_USERINFO | FCVAR_CLIENTDLL );
@@ -517,7 +517,7 @@ void CHud :: Init( void )
 	m_iLogo = 0;
 	m_iFOV = 0;
 
-	CVAR_CREATE( "zoom_sensitivity_ratio", "1.2", 0 );
+	zoom_sensitivity_ratio = CVAR_CREATE( "zoom_sensitivity_ratio", "1.2", 0 );
 	default_fov = CVAR_CREATE( "default_fov", "90", FCVAR_ARCHIVE );
 	m_pCvarStealMouse = CVAR_CREATE( "hud_capturemouse", "1", FCVAR_ARCHIVE );
 	m_pCvarDraw = CVAR_CREATE( "hud_draw", "1", FCVAR_ARCHIVE );
@@ -863,7 +863,7 @@ int CHud::MsgFunc_SetFOV(const char *pszName,  int iSize, void *pbuf)
 	BEGIN_READ( pbuf, iSize );
 
 	int newfov = READ_BYTE();
-	int def_fov = CVAR_GET_FLOAT( "default_fov" );
+	int def_fov = default_fov->value;
 
 	//Weapon prediction already takes care of changing the fog. ( g_lastFOV ).
 	if ( cl_lw && cl_lw->value )
@@ -891,7 +891,7 @@ int CHud::MsgFunc_SetFOV(const char *pszName,  int iSize, void *pbuf)
 	else
 	{  
 		// set a new sensitivity that is proportional to the change from the FOV default
-		m_flMouseSensitivity = sensitivity->value * ((float)newfov / (float)def_fov) * CVAR_GET_FLOAT("zoom_sensitivity_ratio");
+		m_flMouseSensitivity = sensitivity->value * ((float)newfov / (float)def_fov) * zoom_sensitivity_ratio->value;
 	}
 
 	return 1;

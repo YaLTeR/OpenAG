@@ -311,7 +311,7 @@ int ClassButton::IsNotValid()
 #endif
 
 	// Only check current class if they've got autokill on
-	bool bAutoKill = CVAR_GET_FLOAT( "hud_classautokill" ) != 0;
+	bool bAutoKill = gHUD.hud_classautokill->value != 0;
 	if ( bAutoKill )
 	{	
 		// Is it the player's current class?
@@ -546,7 +546,7 @@ void CMenuHandler_StringCommandClassSelect::actionPerformed(Panel* panel)
 	// HAVE THE SERVER SAY "SORRY...YOU CAN'T BE THAT CLASS".
 
 #if !defined _TFC
-	bool bAutoKill = CVAR_GET_FLOAT( "hud_classautokill" ) != 0;
+	bool bAutoKill = gHUD.hud_classautokill->value != 0;
 	if ( bAutoKill && g_iPlayerClass != 0 )
 		gEngfuncs.pfnClientCmd("kill");
 #endif

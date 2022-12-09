@@ -27,6 +27,8 @@
 
 //DECLARE_MESSAGE( m_MOTD, MOTD );
 
+cvar_t *motd_display_time;
+
 int CHudMOTD::MOTD_DISPLAY_TIME;
 
 int CHudMOTD :: Init( void )
@@ -35,7 +37,7 @@ int CHudMOTD :: Init( void )
 
 	// HOOK_MESSAGE( MOTD );
 
-	CVAR_CREATE( "motd_display_time", "15", 0 );
+	motd_display_time = CVAR_CREATE( "motd_display_time", "15", 0 );
 
 	m_iFlags &= ~HUD_ACTIVE;  // start out inactive
 	m_szMOTD[0] = 0;
@@ -139,7 +141,7 @@ int CHudMOTD :: MsgFunc_MOTD( const char *pszName, int iSize, void *pbuf )
 	{
 		m_iFlags |= HUD_ACTIVE;
 
-		MOTD_DISPLAY_TIME = max( 10, CVAR_GET_FLOAT( "motd_display_time" ) );
+		MOTD_DISPLAY_TIME = max( 10, motd_display_time->value );
 
 		m_flActiveRemaining = MOTD_DISPLAY_TIME;
 
