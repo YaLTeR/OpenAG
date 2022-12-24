@@ -38,6 +38,9 @@ int CHudTextMessage::Init(void)
 
 	ignored_message_types.push_back(CVAR_CREATE("cl_ignore_spawn_messages", "0", FCVAR_ARCHIVE));
 	ignored_message_types.push_back(CVAR_CREATE("cl_ignore_damage_messages", "0", FCVAR_ARCHIVE));
+	ignored_message_types.push_back(CVAR_CREATE("cl_ignore_name_change_messages", "0", FCVAR_ARCHIVE));
+	ignored_message_types.push_back(CVAR_CREATE("cl_ignore_team_change_messages", "0", FCVAR_ARCHIVE));
+	ignored_message_types.push_back(CVAR_CREATE("cl_ignore_game_leave_messages", "0", FCVAR_ARCHIVE));
 
 	m_pCvarHideCenterMessages = CVAR_CREATE( "cl_hide_center_messages", "0", FCVAR_ARCHIVE );
 
