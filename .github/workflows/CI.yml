@@ -91,7 +91,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        clang-ver: [6.0, 16]
+        clang-ver: ['6.0', 16]
         configuration: [Release, Debug]
     env:
       CC: clang-${{ matrix.clang-ver }}
@@ -102,7 +102,7 @@ jobs:
           submodules: recursive
       - name: Setup
         run: |
-          if [ ${{ matrix.clang-ver }} -eq 14 ]; then
+          if [ ${{ matrix.clang-ver }} -eq 16 ]; then
             wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
             sudo add-apt-repository 'deb https://apt.llvm.org/focal/ llvm-toolchain-focal-${{ matrix.clang-ver }} main'
           fi
