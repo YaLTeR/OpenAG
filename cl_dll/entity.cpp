@@ -1,5 +1,6 @@
 // Client side entity management functions
 
+#include <algorithm>
 #include <memory.h>
 
 #include "hud.h"
@@ -19,6 +20,10 @@
 #include "discord_integration.h"
 
 #include "particleman.h"
+
+#undef min
+#undef max
+
 extern IParticleMan *g_pParticleMan;
 
 void Game_AddObjects( void );
@@ -49,6 +54,11 @@ int CL_DLLEXPORT HUD_AddEntity( int type, struct cl_entity_s *ent, const char *m
 	default:
 		break;
 	}
+
+	// show triggers that would be transferred from server-side with specific value in renderfx to differ it from other entities
+	const int kRenderFxTrigger = 241;
+	if (ent->curstate.rendermode == kRenderTransColor && ent->curstate.renderfx == kRenderFxTrigger && gHUD.m_pShowServerTriggers->value > 0)
+		ent->curstate.renderamt = std::min(255.0f, std::max(0.0f, gHUD.m_pShowServerTriggersAlpha->value));
 
 	// hide corpses option
 	if (gHUD.m_pCvarHideCorpses->value > 0 && ent->curstate.renderfx == kRenderFxDeadPlayer)
