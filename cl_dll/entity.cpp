@@ -32,6 +32,26 @@ extern vec3_t v_origin;
 
 int g_iAlive = 1;
 
+bool IsTriggerForSinglePlayer(color24 rendercolor)
+{
+	auto r = rendercolor.r;
+	auto g = rendercolor.g;
+	auto b = rendercolor.b;
+
+	if ((r == 128) && (g == 128) && (b == 128)) // trigger_autosave
+		return true;
+	else if ((r == 79) && (g == 255) && (b == 10)) // trigger_changelevel
+		return true;
+	else if ((r == 150) && (g == 75) && (b == 0)) // trigger_endsection
+		return true;
+	else if ((r == 238) && (g == 154) && (b == 77)) // trigger_monsterjump
+		return true;
+	else if ((r == 203) && (g == 103) && (b == 212)) // trigger_transition
+		return true;
+
+	return false;
+}
+
 /*
 ========================
 HUD_AddEntity
@@ -57,7 +77,7 @@ int CL_DLLEXPORT HUD_AddEntity( int type, struct cl_entity_s *ent, const char *m
 
 	// show triggers that would be transferred from server-side with specific value in renderfx to differ it from other entities
 	const int kRenderFxTrigger = 241;
-	if (ent->curstate.rendermode == kRenderTransColor && ent->curstate.renderfx == kRenderFxTrigger && gHUD.m_pShowServerTriggers->value > 0)
+	if ((ent->curstate.rendermode == kRenderTransColor) && (ent->curstate.renderfx == kRenderFxTrigger) && (gHUD.m_pShowServerTriggers->value > 0) && !IsTriggerForSinglePlayer(ent->curstate.rendercolor))
 		ent->curstate.renderamt = std::min(255.0f, std::max(0.0f, gHUD.m_pShowServerTriggersAlpha->value));
 
 	// hide corpses option
