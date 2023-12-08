@@ -206,6 +206,14 @@ typedef struct glpoly_s
         float           verts[4][VERTEXSIZE];
 } glpoly_t;
 
+typedef struct mdisplaylist_t // Half-Life 25th Anniversary Update
+{
+        unsigned gl_displaylist;
+        int rendermode;
+        float scrolloffset;
+        int renderDetailTexture;
+} mdisplaylist_t;
+
 #ifdef SOFTWARE_BUILD
 struct msurface_s
 {
@@ -270,6 +278,8 @@ struct msurface_s
 
 	color24         *samples;               // note: this is the actual lightmap data for this surface
 	decal_t         *pdecals;
+
+	//mdisplaylist_t         displaylist;   // Half-Life 25th Anniversary Update
 };
 #endif
 
