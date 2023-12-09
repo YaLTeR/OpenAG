@@ -17,11 +17,7 @@
 
 #include "archtypes.h"     // DAL
 
-#ifdef HLDEMO_BUILD
-#define INTERFACE_VERSION       001
-#else  // !HLDEMO_BUILD, i.e., regular version of HL
 #define INTERFACE_VERSION		140
-#endif // !HLDEMO_BUILD
 
 #include <stdio.h>
 #include "custom.h"
@@ -296,10 +292,11 @@ typedef struct enginefuncs_s
 	void (*pfnQueryClientCvarValue)( const edict_t *player, const char *cvarName );
 	void (*pfnQueryClientCvarValue2)( const edict_t *player, const char *cvarName, int requestID );
 	int (*pfnCheckParm)( const char *pchCmdLineToken, char **ppnext );
+	edict_t* (*pfnPEntityOfEntIndexAllEntities)( int iEntIndex );
 } enginefuncs_t;
 
 
-// ONLY ADD NEW FUNCTIONS TO THE END OF THIS STRUCT.  INTERFACE VERSION IS FROZEN AT 138
+// ONLY ADD NEW FUNCTIONS TO THE END OF THIS STRUCT.  INTERFACE VERSION IS FROZEN AT 140
 
 // Passed to pfnKeyValue
 typedef struct KeyValueData_s
