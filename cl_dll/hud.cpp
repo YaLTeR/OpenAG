@@ -378,6 +378,8 @@ int __MsgFunc_VGUIMenu(const char *pszName, int iSize, void *pbuf)
 
 int __MsgFunc_MOTD(const char *pszName, int iSize, void *pbuf)
 {
+	//return gHUD.m_MOTD.MsgFunc_MOTD(pszName, iSize, pbuf);
+
 	if (gViewPort)
 		return gViewPort->MsgFunc_MOTD( pszName, iSize, pbuf );
 	return 0;
@@ -560,6 +562,7 @@ void CHud :: Init( void )
 	m_Battery.Init();
 	m_Flash.Init();
 	m_Message.Init();
+//	m_MOTD.Init();
 	m_StatusBar.Init();
 	m_DeathNotice.Init();
 	m_AmmoSecondary.Init();
@@ -726,6 +729,7 @@ void CHud :: VidInit( void )
 	m_Battery.VidInit();
 	m_Flash.VidInit();
 	m_Message.VidInit();
+//	m_MOTD.VidInit();
 	m_StatusBar.VidInit();
 	m_DeathNotice.VidInit();
 	m_SayText.VidInit();

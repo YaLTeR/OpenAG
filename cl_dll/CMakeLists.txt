@@ -95,6 +95,7 @@ add_sources(
 	kbutton.h
 	menu.cpp
 	message.cpp
+#	MOTD.cpp
 	rainbow.cpp
 	rainbow.h
 	saytext.cpp

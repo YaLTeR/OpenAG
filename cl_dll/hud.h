@@ -223,7 +223,33 @@ private:
 	int m_iPos;
 
 };
+//
+//-----------------------------------------------------
+//
+// REMOVED: Vgui has replaced this.
+//
+//
+//-----------------------------------------------------
+/*
+class CHudMOTD : public CHudBase
+{
+public:
+	int Init( void );
+	int VidInit( void );
+	int Draw( float flTime );
+	void Reset( void );
 
+	int MsgFunc_MOTD( const char *pszName, int iSize, void *pbuf );
+
+protected:
+	static int MOTD_DISPLAY_TIME;
+	char m_szMOTD[ MAX_MOTD_LENGTH ];
+	float m_flActiveRemaining;
+	int m_iLines;
+
+	cvar_t *motd_display_time;
+};
+*/
 //
 //-----------------------------------------------------
 //
@@ -679,6 +705,7 @@ public:
 	CHudTrain		m_Train;
 	CHudFlashlight	m_Flash;
 	CHudMessage		m_Message;
+//	CHudMOTD    m_MOTD;
 	CHudStatusBar   m_StatusBar;
 	CHudDeathNotice m_DeathNotice;
 	CHudSayText		m_SayText;

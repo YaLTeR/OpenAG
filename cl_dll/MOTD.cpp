@@ -27,8 +27,6 @@
 
 //DECLARE_MESSAGE( m_MOTD, MOTD );
 
-cvar_t *motd_display_time;
-
 int CHudMOTD::MOTD_DISPLAY_TIME;
 
 int CHudMOTD :: Init( void )
@@ -97,7 +95,8 @@ int CHudMOTD :: Draw( float fTime )
 	while ( *ch )
 	{
 		int line_length = 0;  // count the length of the current line
-		for ( char *next_line = ch; *next_line != '\n' && *next_line != 0; next_line++ )
+		char *next_line;
+		for ( next_line = ch; *next_line != '\n' && *next_line != 0; next_line++ )
 			line_length += gHUD.m_scrinfo.charWidths[ *next_line ];
 		char *top = next_line;
 		if ( *top == '\n' )
