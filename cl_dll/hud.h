@@ -323,6 +323,11 @@ public:
 
 private:
 	int m_HUD_d_skull;  // sprite index of skull icon
+
+protected:
+	cvar_t *m_pCvarKillSnd;
+	cvar_t *m_pCvarKillSndPath;
+	cvar_t *hud_deathnotice_time;
 };
 
 //
@@ -455,6 +460,9 @@ public:
 	static char *BufferedLocaliseTextString( const char *msg );
 	const char *LookupString( const char *msg_name, int *msg_dest = NULL );
 	int MsgFunc_TextMsg(const char *pszName, int iSize, void *pbuf);
+
+protected:
+	cvar_t *m_pCvarHideCenterMessages;
 };
 
 //

@@ -28,8 +28,6 @@
 
 #include "vgui_TeamFortressViewport.h"
 
-cvar_t *m_pCvarHideCenterMessages;
-
 DECLARE_MESSAGE( m_TextMessage, TextMsg );
 
 int CHudTextMessage::Init(void)
