@@ -37,6 +37,7 @@
 extern IParticleMan *g_pParticleMan;
 
 #include "com_model.h"
+#include "r_studioint.h"
 
 #undef min
 #undef max
@@ -174,6 +175,8 @@ void DrawServerTriggers()
 	}
 }
 
+extern engine_studio_api_t IEngineStudio;
+
 /*
 =================
 HUD_DrawTransparentTriangles
@@ -193,26 +196,28 @@ void CL_DLLEXPORT HUD_DrawTransparentTriangles( void )
 		 g_pParticleMan->Update();
 
 	// Draw server-side triggers with TriAPI instead
-
-	glDisable(GL_TEXTURE_2D);
-
-	if ((gHUD.m_pShowServerTriggers->value > 0) && (gHUD.m_pShowServerTriggers->value != 2.0f))
+	if (IEngineStudio.IsHardware())
 	{
-		gHUD.SetMapName(map_name, ARRAYSIZE(map_name));
-		UpdateServerTriggers();
-		DrawServerTriggers();
-	}
+		glDisable(GL_TEXTURE_2D);
 
-	glEnable(GL_TEXTURE_2D);
-	gEngfuncs.pTriAPI->RenderMode(kRenderNormal);
-
-	if ((gHUD.m_pShowServerTriggers->value > 0) && (gHUD.m_pShowServerTriggers->value != 2.0f))
-	{
-		// Saved old map name in static variable to differ it with new map name
-		if (map_name[0])
+		if ((gHUD.m_pShowServerTriggers->value > 0) && (gHUD.m_pShowServerTriggers->value != 2.0f))
 		{
-			memset(map_name_old, 0, sizeof(map_name_old));
-			strncpy(map_name_old, map_name, sizeof(map_name_old) - 1);
+			gHUD.SetMapName(map_name, ARRAYSIZE(map_name));
+			UpdateServerTriggers();
+			DrawServerTriggers();
+		}
+
+		glEnable(GL_TEXTURE_2D);
+		gEngfuncs.pTriAPI->RenderMode(kRenderNormal);
+
+		if ((gHUD.m_pShowServerTriggers->value > 0) && (gHUD.m_pShowServerTriggers->value != 2.0f))
+		{
+			// Saved old map name in static variable to differ it with new map name
+			if (map_name[0])
+			{
+				memset(map_name_old, 0, sizeof(map_name_old));
+				strncpy(map_name_old, map_name, sizeof(map_name_old) - 1);
+			}
 		}
 	}
 }
