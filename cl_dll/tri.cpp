@@ -196,28 +196,34 @@ void CL_DLLEXPORT HUD_DrawTransparentTriangles( void )
 		 g_pParticleMan->Update();
 
 	// Draw server-side triggers with TriAPI instead
-	if (IEngineStudio.IsHardware())
-	{
-		glDisable(GL_TEXTURE_2D);
+	static bool init = true;
+	static HSPRITE white_sprite = 0;
 
+	if (init)
+	{
+		white_sprite = gEngfuncs.pfnSPR_Load("sprites/white.spr");
+		init = false;
+	}
+
+	if (white_sprite == 0)
+		return;
+
+	if (gEngfuncs.pTriAPI->SpriteTexture(const_cast<model_s*>(gEngfuncs.GetSpritePointer(white_sprite)), 0))
+	{
+		gHUD.SetMapName(map_name, ARRAYSIZE(map_name));
 		if ((gHUD.m_pShowServerTriggers->value > 0) && (gHUD.m_pShowServerTriggers->value != 2.0f))
 		{
-			gHUD.SetMapName(map_name, ARRAYSIZE(map_name));
 			UpdateServerTriggers();
 			DrawServerTriggers();
 		}
 
-		glEnable(GL_TEXTURE_2D);
 		gEngfuncs.pTriAPI->RenderMode(kRenderNormal);
 
-		if ((gHUD.m_pShowServerTriggers->value > 0) && (gHUD.m_pShowServerTriggers->value != 2.0f))
+		// Saved old map name in static variable to differ it with new map name
+		if (map_name[0])
 		{
-			// Saved old map name in static variable to differ it with new map name
-			if (map_name[0])
-			{
-				memset(map_name_old, 0, sizeof(map_name_old));
-				strncpy(map_name_old, map_name, sizeof(map_name_old) - 1);
-			}
+			memset(map_name_old, 0, sizeof(map_name_old));
+			strncpy(map_name_old, map_name, sizeof(map_name_old) - 1);
 		}
 	}
 }
