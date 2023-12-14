@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2002, Valve LLC, All rights reserved. ============
+//========= Copyright ï¿½ 1996-2002, Valve LLC, All rights reserved. ============
 //
 // Purpose: 
 //
@@ -6,6 +6,20 @@
 //=============================================================================
 
 // Triangle rendering, if any
+
+#include <algorithm>
+
+#ifdef _WIN32
+#include <winsani_in.h>
+#include <Windows.h>
+#include <winsani_out.h>
+#endif
+
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#else
+#include <GL/gl.h>
+#endif
 
 #include "hud.h"
 #include "cl_util.h"
@@ -21,6 +35,11 @@
 #include "particleman.h"
 #include "tri.h"
 extern IParticleMan *g_pParticleMan;
+
+#include "com_model.h"
+
+#undef min
+#undef max
 
 /*
 =================
@@ -40,6 +59,133 @@ void CL_DLLEXPORT HUD_DrawNormalTriangles( void )
 void RunEventList( void );
 #endif
 
+void DivideRGBABy255(float &r, float &g, float &b, float &a)
+{
+	r /= 255.0f;
+	g /= 255.0f;
+	b /= 255.0f;
+	a /= 255.0f;
+}
+
+void DrawAACuboid(triangleapi_s *pTriAPI, Vector corner1, Vector corner2)
+{
+	pTriAPI->Begin(TRI_QUADS);
+
+	pTriAPI->Vertex3f(corner1.x, corner1.y, corner1.z);
+	pTriAPI->Vertex3f(corner1.x, corner2.y, corner1.z);
+	pTriAPI->Vertex3f(corner2.x, corner2.y, corner1.z);
+	pTriAPI->Vertex3f(corner2.x, corner1.y, corner1.z);
+
+	pTriAPI->Vertex3f(corner1.x, corner1.y, corner1.z);
+	pTriAPI->Vertex3f(corner1.x, corner1.y, corner2.z);
+	pTriAPI->Vertex3f(corner1.x, corner2.y, corner2.z);
+	pTriAPI->Vertex3f(corner1.x, corner2.y, corner1.z);
+
+	pTriAPI->Vertex3f(corner1.x, corner1.y, corner1.z);
+	pTriAPI->Vertex3f(corner2.x, corner1.y, corner1.z);
+	pTriAPI->Vertex3f(corner2.x, corner1.y, corner2.z);
+	pTriAPI->Vertex3f(corner1.x, corner1.y, corner2.z);
+
+	pTriAPI->Vertex3f(corner2.x, corner2.y, corner2.z);
+	pTriAPI->Vertex3f(corner1.x, corner2.y, corner2.z);
+	pTriAPI->Vertex3f(corner1.x, corner1.y, corner2.z);
+	pTriAPI->Vertex3f(corner2.x, corner1.y, corner2.z);
+
+	pTriAPI->Vertex3f(corner2.x, corner2.y, corner2.z);
+	pTriAPI->Vertex3f(corner2.x, corner1.y, corner2.z);
+	pTriAPI->Vertex3f(corner2.x, corner1.y, corner1.z);
+	pTriAPI->Vertex3f(corner2.x, corner2.y, corner1.z);
+
+	pTriAPI->Vertex3f(corner2.x, corner2.y, corner2.z);
+	pTriAPI->Vertex3f(corner2.x, corner2.y, corner1.z);
+	pTriAPI->Vertex3f(corner1.x, corner2.y, corner1.z);
+	pTriAPI->Vertex3f(corner1.x, corner2.y, corner2.z);
+
+	pTriAPI->End();
+}
+
+static std::vector<Vector> trigger_mins;
+static std::vector<Vector> trigger_maxs;
+static std::vector<Vector> trigger_origin;
+static std::vector<color24> trigger_rgb;
+char map_name[64];
+static char map_name_old[64];
+
+void UpdateServerTriggers()
+{
+	if (map_name[0])
+	{
+		if ((strcmp(map_name, map_name_old)) || (gHUD.m_pShowServerTriggersForceUpdate->value > 0))
+		{
+			if ((gHUD.m_pShowServerTriggers->value == 3.0f) && (gHUD.m_pShowServerTriggersForceUpdate->value < 1.0f)) // Debug
+				gEngfuncs.Con_DPrintf("UpdateServerTriggersOnMapChange: map changed!\n");
+
+			trigger_mins.clear();
+			trigger_maxs.clear();
+			trigger_origin.clear();
+			trigger_rgb.clear();
+
+			for (int e = 0; e < MAX_EDICTS; ++e)
+			{
+				cl_entity_t* ent = gEngfuncs.GetEntityByIndex(e);
+				if (ent)
+				{
+					if (ent->model)
+					{
+						if ((ent->curstate.rendermode == kRenderTransColor) && (ent->curstate.renderfx == kRenderFxTrigger))
+						{
+							trigger_mins.emplace_back(ent->curstate.mins);
+							trigger_maxs.emplace_back(ent->curstate.maxs);
+							trigger_origin.emplace_back(ent->curstate.origin);
+							trigger_rgb.emplace_back(ent->curstate.rendercolor);
+						}
+					}
+				}
+			}
+
+			gEngfuncs.Con_DPrintf("UpdateServerTriggersOnMapChange: triggers updated!\n");
+		}
+	}
+	else
+	{
+		if (gHUD.m_pShowServerTriggers->value == 3.0f) // Debug
+			gEngfuncs.Con_DPrintf("UpdateServerTriggersOnMapChange: map not found, then we clear vectors!\n");
+
+		trigger_mins.clear();
+		trigger_maxs.clear();
+		trigger_origin.clear();
+		trigger_rgb.clear();
+	}
+}
+
+void DrawServerTriggers()
+{
+	if (!trigger_rgb.empty())
+	{
+		for (size_t i = 0; i < trigger_rgb.size(); i++)
+		{
+			color24 rendercolor = trigger_rgb[i];
+			if (!gHUD.IsTriggerForSinglePlayer(rendercolor))
+			{
+				gEngfuncs.pTriAPI->RenderMode(kRenderTransAdd);
+				gEngfuncs.pTriAPI->CullFace(TRI_NONE);
+
+				float r = rendercolor.r, g = rendercolor.g, b = rendercolor.b, a = std::min(255.0f, std::max(0.0f, gHUD.m_pShowServerTriggersAlpha->value));
+				DivideRGBABy255(r, g, b, a);
+				gEngfuncs.pTriAPI->Color4f(r, g, b, a);
+
+				Vector mins = trigger_mins[i];
+				Vector maxs = trigger_maxs[i];
+				Vector origin = trigger_origin[i];
+				Vector absmin = origin + mins;
+				Vector absmax = origin + maxs;
+
+				DrawAACuboid(gEngfuncs.pTriAPI, absmin, absmax);
+			}
+		}
+	}
+}
+
 /*
 =================
 HUD_DrawTransparentTriangles
@@ -57,4 +203,28 @@ void CL_DLLEXPORT HUD_DrawTransparentTriangles( void )
 
 	if ( g_pParticleMan )
 		 g_pParticleMan->Update();
+
+	// Draw server-side triggers with TriAPI instead
+
+	glDisable(GL_TEXTURE_2D);
+
+	if ((gHUD.m_pShowServerTriggers->value > 0) && (gHUD.m_pShowServerTriggers->value != 2.0f))
+	{
+		gHUD.SetMapName(map_name, ARRAYSIZE(map_name));
+		UpdateServerTriggers();
+		DrawServerTriggers();
+	}
+
+	glEnable(GL_TEXTURE_2D);
+	gEngfuncs.pTriAPI->RenderMode(kRenderNormal);
+
+	if ((gHUD.m_pShowServerTriggers->value > 0) && (gHUD.m_pShowServerTriggers->value != 2.0f))
+	{
+		// Saved old map name in static variable to differ it with new map name
+		if (map_name[0])
+		{
+			memset(map_name_old, 0, sizeof(map_name_old));
+			strncpy(map_name_old, map_name, sizeof(map_name_old) - 1);
+		}
+	}
 }

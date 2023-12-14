@@ -6,7 +6,9 @@
 #include <vector>
 
 #ifdef _WIN32
+#include <winsani_in.h>
 #include <Windows.h>
+#include <winsani_out.h>
 #endif
 
 #ifdef __APPLE__

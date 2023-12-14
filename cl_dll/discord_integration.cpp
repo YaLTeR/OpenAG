@@ -350,7 +350,7 @@ namespace discord_integration
 						presence.details = gViewPort->m_szServerName;
 
 					// Get the map name and icon.
-					get_map_name(map_name, ARRAYSIZE(map_name));
+					gHUD.SetMapName(map_name, ARRAYSIZE(map_name));
 					if (map_name[0])
 					{
 						// We specifically don't want to convert the map name that will be shown when hovering over the map icon (presence.largeImageText), so that why it got moved above.
