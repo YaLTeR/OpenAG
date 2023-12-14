@@ -104,10 +104,7 @@ void DrawAACuboid(triangleapi_s *pTriAPI, Vector corner1, Vector corner2)
 	pTriAPI->End();
 }
 
-static std::vector<Vector> trigger_mins;
-static std::vector<Vector> trigger_maxs;
-static std::vector<Vector> trigger_origin;
-static std::vector<color24> trigger_rgb;
+static std::vector<cl_entity_t*> trigger_entities;
 char map_name[64];
 static char map_name_old[64];
 
@@ -120,10 +117,7 @@ void UpdateServerTriggers()
 			if ((gHUD.m_pShowServerTriggers->value == 3.0f) && (gHUD.m_pShowServerTriggersForceUpdate->value < 1.0f)) // Debug
 				gEngfuncs.Con_DPrintf("UpdateServerTriggersOnMapChange: map changed!\n");
 
-			trigger_mins.clear();
-			trigger_maxs.clear();
-			trigger_origin.clear();
-			trigger_rgb.clear();
+			trigger_entities.clear();
 
 			for (int e = 0; e < MAX_EDICTS; ++e)
 			{
@@ -134,10 +128,7 @@ void UpdateServerTriggers()
 					{
 						if ((ent->curstate.rendermode == kRenderTransColor) && (ent->curstate.renderfx == kRenderFxTrigger))
 						{
-							trigger_mins.emplace_back(ent->curstate.mins);
-							trigger_maxs.emplace_back(ent->curstate.maxs);
-							trigger_origin.emplace_back(ent->curstate.origin);
-							trigger_rgb.emplace_back(ent->curstate.rendercolor);
+							trigger_entities.emplace_back(ent);
 						}
 					}
 				}
@@ -151,20 +142,17 @@ void UpdateServerTriggers()
 		if (gHUD.m_pShowServerTriggers->value == 3.0f) // Debug
 			gEngfuncs.Con_DPrintf("UpdateServerTriggersOnMapChange: map not found, then we clear vectors!\n");
 
-		trigger_mins.clear();
-		trigger_maxs.clear();
-		trigger_origin.clear();
-		trigger_rgb.clear();
+		trigger_entities.clear();
 	}
 }
 
 void DrawServerTriggers()
 {
-	if (!trigger_rgb.empty())
+	if (!trigger_entities.empty())
 	{
-		for (size_t i = 0; i < trigger_rgb.size(); i++)
+		for (size_t i = 0; i < trigger_entities.size(); i++)
 		{
-			color24 rendercolor = trigger_rgb[i];
+			color24 rendercolor = trigger_entities[i]->curstate.rendercolor;
 			if (!gHUD.IsTriggerForSinglePlayer(rendercolor))
 			{
 				gEngfuncs.pTriAPI->RenderMode(kRenderTransAdd);
@@ -174,9 +162,9 @@ void DrawServerTriggers()
 				DivideRGBABy255(r, g, b, a);
 				gEngfuncs.pTriAPI->Color4f(r, g, b, a);
 
-				Vector mins = trigger_mins[i];
-				Vector maxs = trigger_maxs[i];
-				Vector origin = trigger_origin[i];
+				Vector mins = trigger_entities[i]->curstate.mins;
+				Vector maxs = trigger_entities[i]->curstate.maxs;
+				Vector origin = trigger_entities[i]->curstate.origin;
 				Vector absmin = origin + mins;
 				Vector absmax = origin + maxs;
 
