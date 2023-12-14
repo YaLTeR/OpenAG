@@ -21,6 +21,10 @@
 
 #include "particleman.h"
 
+#include "r_studioint.h"
+
+extern engine_studio_api_t IEngineStudio;
+
 #undef min
 #undef max
 
@@ -57,8 +61,8 @@ int CL_DLLEXPORT HUD_AddEntity( int type, struct cl_entity_s *ent, const char *m
 
 	// show triggers that would be transferred from server-side with specific value in renderfx to differ it from other entities
 	// update: there is a new implementation of displaying triggers that allows you to display even when planes is stripped due to optimizations in updated map compiler
-	// so this code will only work if the value 2 is specified in the cvar, but it should not be deleted imo
-	if ((ent->curstate.rendermode == kRenderTransColor) && (ent->curstate.renderfx == kRenderFxTrigger) && (gHUD.m_pShowServerTriggers->value == 2.0f) && !gHUD.IsTriggerForSinglePlayer(ent->curstate.rendercolor))
+	// so for hardware engine this code will only work if the value 2 is specified in the cvar
+	if ((ent->curstate.rendermode == kRenderTransColor) && (ent->curstate.renderfx == kRenderFxTrigger) && (gHUD.m_pShowServerTriggers->value == 2.0f || (!IEngineStudio.IsHardware && gHUD.m_pShowServerTriggers->value > 0)) && !gHUD.IsTriggerForSinglePlayer(ent->curstate.rendercolor))
 		ent->curstate.renderamt = std::min(255.0f, std::max(0.0f, gHUD.m_pShowServerTriggersAlpha->value));
 
 	// hide corpses option
