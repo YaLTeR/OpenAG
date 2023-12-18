@@ -195,20 +195,10 @@ void CL_DLLEXPORT HUD_DrawTransparentTriangles( void )
 	if ( g_pParticleMan )
 		 g_pParticleMan->Update();
 
-	// Draw server-side triggers with TriAPI instead
-	static bool init = true;
-	static HSPRITE white_sprite = 0;
-
-	if (init)
-	{
-		white_sprite = gEngfuncs.pfnSPR_Load("sprites/white.spr");
-		init = false;
-	}
-
-	if (white_sprite == 0)
+	if (gHUD.white_sprite == 0)
 		return;
 
-	if (gEngfuncs.pTriAPI->SpriteTexture(const_cast<model_s*>(gEngfuncs.GetSpritePointer(white_sprite)), 0))
+	if (gEngfuncs.pTriAPI->SpriteTexture(const_cast<model_s*>(gEngfuncs.GetSpritePointer(gHUD.white_sprite)), 0))
 	{
 		gHUD.SetMapName(map_name, ARRAYSIZE(map_name));
 		if ((gHUD.m_pShowServerTriggers->value > 0) && (gHUD.m_pShowServerTriggers->value != 2.0f))

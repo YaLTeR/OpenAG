@@ -788,6 +788,8 @@ public:
 	bool IsTriggerForSinglePlayer(color24 rendercolor);
 
 	void SetMapName(char name[], size_t size);
+
+	HSPRITE white_sprite = 0;
 };
 
 extern CHud gHUD;

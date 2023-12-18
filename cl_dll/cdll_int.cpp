@@ -191,6 +191,8 @@ int CL_DLLEXPORT HUD_VidInit( void )
 
 	VGui_Startup();
 
+	gHUD.white_sprite = gEngfuncs.pfnSPR_Load("sprites/white.spr");
+
 	return 1;
 }
 
