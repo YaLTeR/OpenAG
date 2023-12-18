@@ -644,6 +644,8 @@ public:
 	cvar_t  *hud_classautokill;
 	cvar_t  *hud_centerid;
 
+	cvar_t	*discord_rpc_closest_map_match;
+
 	int m_iFontHeight;
 
 	cvar_t* m_pCvarColor;

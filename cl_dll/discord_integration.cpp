@@ -343,15 +343,32 @@ namespace discord_integration
 					get_map_name(map_name, ARRAYSIZE(map_name));
 					if (map_name[0])
 					{
-						// adjust to lowercase
-						unsigned char *tptr = (unsigned char *)map_name;
-						while (*tptr) {
-							*tptr = tolower(*tptr);
-							tptr++;
-						}
-
 						if (maps_with_thumbnails.find(map_name) != maps_with_thumbnails.cend())
+						{
 							presence.largeImageKey = map_name;
+						}
+						else if (gHUD.discord_rpc_closest_map_match->value > 0)
+						{
+							auto closest_match = std::find_if(maps_with_thumbnails.begin(), maps_with_thumbnails.end(), [&](const std::string& str) {
+    												return str.find(map_name) != std::string::npos; // Example: agtricks -> agtricks_telehop
+							});
+
+							if (closest_match != maps_with_thumbnails.end())
+							{
+								presence.largeImageKey = closest_match->c_str();
+							}
+							else
+							{
+								closest_match = std::find_if(maps_with_thumbnails.begin(), maps_with_thumbnails.end(), [&](const std::string& str) {
+    												return static_cast<std::string>(map_name).find(str) != std::string::npos; // Example: agtricks_telehop -> agtricks
+								});
+
+								if (closest_match != maps_with_thumbnails.end())
+								{
+									presence.largeImageKey = closest_match->c_str();
+								}
+							}
+						}
 
 						presence.largeImageText = map_name;
 					}
