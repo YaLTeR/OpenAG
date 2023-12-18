@@ -787,7 +787,7 @@ public:
 
 	bool IsTriggerForSinglePlayer(color24 rendercolor);
 
-	void SetMapName(char name[], size_t size);
+	void SetMapName(char name[], size_t size, bool lowercase);
 
 	HSPRITE white_sprite = 0;
 };

@@ -960,13 +960,12 @@ bool CHud::IsTriggerForSinglePlayer(color24 rendercolor)
 	return false;
 }
 
-void CHud::SetMapName(char name[], size_t size)
+void CHud::SetMapName(char name[], size_t size, bool lowercase)
 {
 	memset(name, 0, size);
 	get_map_name(name, size);
-	if (name[0])
+	if (lowercase && name[0])
 	{
-		// adjust to lowercase
 		unsigned char *tptr = (unsigned char *)name;
 		while (*tptr) {
 			*tptr = tolower(*tptr);

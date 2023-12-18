@@ -200,7 +200,7 @@ void CL_DLLEXPORT HUD_DrawTransparentTriangles( void )
 
 	if (gEngfuncs.pTriAPI->SpriteTexture(const_cast<model_s*>(gEngfuncs.GetSpritePointer(gHUD.white_sprite)), 0))
 	{
-		gHUD.SetMapName(map_name, ARRAYSIZE(map_name));
+		gHUD.SetMapName(map_name, ARRAYSIZE(map_name), true);
 		if ((gHUD.m_pShowServerTriggers->value > 0) && (gHUD.m_pShowServerTriggers->value != 2.0f))
 		{
 			UpdateServerTriggers();
