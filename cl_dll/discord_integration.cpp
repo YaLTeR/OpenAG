@@ -5,7 +5,6 @@
 #include <memory>
 #include <string>
 #include <unordered_set>
-#include <cctype>
 
 #include <discord_rpc.h>
 
@@ -26,26 +25,8 @@ namespace discord_integration
 		// This seems to be consistent across PCs.
 		constexpr const char STEAM_APP_ID[] = "17215498729465839686";
 
-		struct case_insensitive_hash
-		{
-			size_t operator()(const std::string& str) const
-			{
-				std::string std_lower = str;
-				std::transform(std_lower.begin(), std_lower.end(), std_lower.begin(), [](unsigned char s) { return std::tolower(s); });
-				return std::hash<std::string>()(std_lower);
-			}
-		};
-
-		struct case_insensitive_equal
-		{
-			size_t operator()(const std::string& str1, const std::string& str2) const
-			{
-				return std::equal(str1.begin(), str1.end(), str2.begin(), [](unsigned char s1, unsigned char s2) { return std::tolower(s1) == std::tolower(s2); });
-			}
-		};
-
-		// Maps for which we have thumbnails.
-		const std::unordered_set<std::string, case_insensitive_hash, case_insensitive_equal> maps_with_thumbnails {
+		// Maps in this list must be lowercase.
+		const std::unordered_set<std::string> maps_with_thumbnails {
 			"2bfree"s,
 			"8b1_hellinashop"s,
 			"ag_bhop_dungeon"s,
