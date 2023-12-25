@@ -533,7 +533,6 @@ void CHud :: Init( void )
 	m_pCvarPlayTeamSoundsVolume = CVAR_CREATE("cl_team_sounds_volume", "1.0", FCVAR_ARCHIVE);
 	m_pShowServerTriggers = CVAR_CREATE("cl_show_server_triggers", "1", FCVAR_ARCHIVE);
 	m_pShowServerTriggersAlpha = CVAR_CREATE("cl_show_server_triggers_alpha", "120", FCVAR_ARCHIVE);
-	m_pShowServerTriggersForceUpdate = CVAR_CREATE("cl_show_server_triggers_force_update", "1", FCVAR_ARCHIVE);
 	cl_lw = gEngfuncs.pfnGetCvarPointer( "cl_lw" );
 	CVAR_CREATE("showtriggers", "0", 0);
 
@@ -958,18 +957,4 @@ bool CHud::IsTriggerForSinglePlayer(color24 rendercolor)
 		return true;
 
 	return false;
-}
-
-void CHud::SetMapName(char name[], size_t size, bool lowercase)
-{
-	memset(name, 0, size);
-	get_map_name(name, size);
-	if (lowercase && name[0])
-	{
-		unsigned char *tptr = (unsigned char *)name;
-		while (*tptr) {
-			*tptr = tolower(*tptr);
-			tptr++;
-		}
-	}
 }

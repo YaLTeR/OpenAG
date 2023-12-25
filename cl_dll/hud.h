@@ -646,7 +646,6 @@ public:
 
 	cvar_t	*m_pShowServerTriggers;
 	cvar_t	*m_pShowServerTriggersAlpha;
-	cvar_t	*m_pShowServerTriggersForceUpdate;
 
 	int m_iFontHeight;
 
@@ -786,8 +785,6 @@ public:
 	float GetSensitivity();
 
 	bool IsTriggerForSinglePlayer(color24 rendercolor);
-
-	void SetMapName(char name[], size_t size, bool lowercase);
 
 	HSPRITE white_sprite = 0;
 };

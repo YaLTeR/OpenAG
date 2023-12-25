@@ -105,71 +105,39 @@ void DrawAACuboid(triangleapi_s *pTriAPI, Vector corner1, Vector corner2)
 	pTriAPI->End();
 }
 
-static std::vector<cl_entity_t*> trigger_entities;
-char map_name[64];
-static char map_name_old[64];
-
-void UpdateServerTriggers()
+void DrawServerTriggers()
 {
-	if (map_name[0])
+	if ((gHUD.m_pShowServerTriggers->value > 0) && (gHUD.m_pShowServerTriggers->value != 2.0f))
 	{
-		if ((strcmp(map_name, map_name_old)) || (gHUD.m_pShowServerTriggersForceUpdate->value > 0))
+		for (int e = 0; e < MAX_EDICTS; ++e)
 		{
-			if ((gHUD.m_pShowServerTriggers->value == 3.0f) && (gHUD.m_pShowServerTriggersForceUpdate->value < 1.0f)) // Debug
-				gEngfuncs.Con_DPrintf("UpdateServerTriggersOnMapChange: map changed!\n");
-
-			trigger_entities.clear();
-
-			for (int e = 0; e < MAX_EDICTS; ++e)
+			cl_entity_t* ent = gEngfuncs.GetEntityByIndex(e);
+			if (ent)
 			{
-				cl_entity_t* ent = gEngfuncs.GetEntityByIndex(e);
-				if (ent)
+				if (ent->model)
 				{
-					if (ent->model)
+					if ((ent->curstate.rendermode == kRenderTransColor) && (ent->curstate.renderfx == kRenderFxTrigger))
 					{
-						if ((ent->curstate.rendermode == kRenderTransColor) && (ent->curstate.renderfx == kRenderFxTrigger))
+						color24 colors = ent->curstate.rendercolor;
+						if (!gHUD.IsTriggerForSinglePlayer(colors))
 						{
-							trigger_entities.emplace_back(ent);
+							gEngfuncs.pTriAPI->RenderMode(kRenderTransAdd);
+							gEngfuncs.pTriAPI->CullFace(TRI_NONE);
+
+							float r = colors.r, g = colors.g, b = colors.b, a = std::min(255.0f, std::max(0.0f, gHUD.m_pShowServerTriggersAlpha->value));
+							DivideRGBABy255(r, g, b, a);
+							gEngfuncs.pTriAPI->Color4f(r, g, b, a);
+
+							Vector mins = ent->curstate.mins;
+							Vector maxs = ent->curstate.maxs;
+							Vector origin = ent->curstate.origin;
+							Vector absmin = origin + mins;
+							Vector absmax = origin + maxs;
+
+							DrawAACuboid(gEngfuncs.pTriAPI, absmin, absmax);
 						}
 					}
 				}
-			}
-
-			gEngfuncs.Con_DPrintf("UpdateServerTriggersOnMapChange: triggers updated!\n");
-		}
-	}
-	else
-	{
-		if (gHUD.m_pShowServerTriggers->value == 3.0f) // Debug
-			gEngfuncs.Con_DPrintf("UpdateServerTriggersOnMapChange: map not found, then we clear vectors!\n");
-
-		trigger_entities.clear();
-	}
-}
-
-void DrawServerTriggers()
-{
-	if (!trigger_entities.empty())
-	{
-		for (size_t i = 0; i < trigger_entities.size(); i++)
-		{
-			color24 rendercolor = trigger_entities[i]->curstate.rendercolor;
-			if (!gHUD.IsTriggerForSinglePlayer(rendercolor))
-			{
-				gEngfuncs.pTriAPI->RenderMode(kRenderTransAdd);
-				gEngfuncs.pTriAPI->CullFace(TRI_NONE);
-
-				float r = rendercolor.r, g = rendercolor.g, b = rendercolor.b, a = std::min(255.0f, std::max(0.0f, gHUD.m_pShowServerTriggersAlpha->value));
-				DivideRGBABy255(r, g, b, a);
-				gEngfuncs.pTriAPI->Color4f(r, g, b, a);
-
-				Vector mins = trigger_entities[i]->curstate.mins;
-				Vector maxs = trigger_entities[i]->curstate.maxs;
-				Vector origin = trigger_entities[i]->curstate.origin;
-				Vector absmin = origin + mins;
-				Vector absmax = origin + maxs;
-
-				DrawAACuboid(gEngfuncs.pTriAPI, absmin, absmax);
 			}
 		}
 	}
@@ -200,20 +168,8 @@ void CL_DLLEXPORT HUD_DrawTransparentTriangles( void )
 
 	if (gEngfuncs.pTriAPI->SpriteTexture(const_cast<model_s*>(gEngfuncs.GetSpritePointer(gHUD.white_sprite)), 0))
 	{
-		gHUD.SetMapName(map_name, ARRAYSIZE(map_name), true);
-		if ((gHUD.m_pShowServerTriggers->value > 0) && (gHUD.m_pShowServerTriggers->value != 2.0f))
-		{
-			UpdateServerTriggers();
-			DrawServerTriggers();
-		}
+		DrawServerTriggers();
 
 		gEngfuncs.pTriAPI->RenderMode(kRenderNormal);
-
-		// Saved old map name in static variable to differ it with new map name
-		if (map_name[0])
-		{
-			memset(map_name_old, 0, sizeof(map_name_old));
-			strncpy(map_name_old, map_name, sizeof(map_name_old) - 1);
-		}
 	}
 }
