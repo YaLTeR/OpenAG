@@ -531,7 +531,6 @@ void CHud :: Init( void )
 	m_pCvarHideOtherPlayers = CVAR_CREATE("cl_hide_other_players", "0", 0);
 	m_pCvarColor = CVAR_CREATE( "hud_color", "", FCVAR_ARCHIVE );
 	m_pCvarPlayTeamSoundsVolume = CVAR_CREATE("cl_team_sounds_volume", "1.0", FCVAR_ARCHIVE);
-	discord_rpc_closest_map_match = CVAR_CREATE("discord_rpc_closest_map_match", "0", FCVAR_ARCHIVE);
 	cl_lw = gEngfuncs.pfnGetCvarPointer( "cl_lw" );
 	CVAR_CREATE("showtriggers", "0", 0);
 

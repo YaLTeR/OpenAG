@@ -25,6 +25,24 @@ namespace discord_integration
 		// This seems to be consistent across PCs.
 		constexpr const char STEAM_APP_ID[] = "17215498729465839686";
 
+		// This list was specially created for a map series, let’s say that “hl1_bhop_am” series have a several versions of maps (example: `hl1_bhop_am_beta1`), but in fact those maps are almost identical
+		// If the beginning of map name matches with what presented in the list, then we set the same name for the thumbnail as in the list (e.g. map name: hl1_bhop_uc1_beta1, thumbnail name: hl1_bhop_uc1)
+		const std::unordered_set<std::string> map_series_with_thumbnails {
+			"hl1_bhop_am"s,
+			"hl1_bhop_bp1"s,
+			"hl1_bhop_bp2"s,
+			"hl1_bhop_faf"s,
+			"hl1_bhop_lc"s,
+			"hl1_bhop_oar"s,
+			"hl1_bhop_ocwgh"s,
+			"hl1_bhop_pu"s,
+			"hl1_bhop_qe"s,
+			"hl1_bhop_rp"s,
+			"hl1_bhop_st"s,
+			"hl1_bhop_uc1"s,
+			"hl1_bhop_uc2"s,
+		};
+
 		// Maps in this list must be lowercase.
 		const std::unordered_set<std::string> maps_with_thumbnails {
 			"2bfree"s,
@@ -105,19 +123,6 @@ namespace discord_integration
 			"gasworks"s,
 			"gayl0rd_bhop"s,
 			"havoc"s,
-			"hl1_bhop_am"s,
-			"hl1_bhop_bp1"s,
-			"hl1_bhop_bp2"s,
-			"hl1_bhop_faf"s,
-			"hl1_bhop_lc"s,
-			"hl1_bhop_oar"s,
-			"hl1_bhop_ocwgh"s,
-			"hl1_bhop_pu"s,
-			"hl1_bhop_qe"s,
-			"hl1_bhop_rp"s,
-			"hl1_bhop_st"s,
-			"hl1_bhop_uc1"s,
-			"hl1_bhop_uc2"s,
 			"hl_trick"s,
 			"hm_castlebhop"s,
 			"hm_speedwinterz"s,
@@ -353,26 +358,15 @@ namespace discord_integration
 						{
 							presence.largeImageKey = map_name;
 						}
-						else if (gHUD.discord_rpc_closest_map_match->value > 0)
+						else
 						{
-							auto closest_match = std::find_if(maps_with_thumbnails.begin(), maps_with_thumbnails.end(), [&](const std::string& str) {
-    												return str.find(map_name) != std::string::npos; // Example: agtricks -> agtricks_telehop
+							auto closest_match = std::find_if(map_series_with_thumbnails.begin(), map_series_with_thumbnails.end(), [&](const std::string& str) {
+    												return static_cast<std::string>(map_name).find(str) != std::string::npos; // hl1_bhop_am_beta6 -> hl1_bhop_am
 							});
 
-							if (closest_match != maps_with_thumbnails.end())
+							if (closest_match != map_series_with_thumbnails.end())
 							{
 								presence.largeImageKey = closest_match->c_str();
-							}
-							else
-							{
-								closest_match = std::find_if(maps_with_thumbnails.begin(), maps_with_thumbnails.end(), [&](const std::string& str) {
-    												return static_cast<std::string>(map_name).find(str) != std::string::npos; // Example: agtricks_telehop -> agtricks
-								});
-
-								if (closest_match != maps_with_thumbnails.end())
-								{
-									presence.largeImageKey = closest_match->c_str();
-								}
 							}
 						}
 					}
