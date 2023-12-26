@@ -352,7 +352,7 @@ namespace discord_integration
 						// We specifically don't want to convert the map name that will be shown when hovering over the map icon (presence.largeImageText), so that why it got moved above.
 						presence.largeImageText = map_name;
 
-						gHUD.ConvertToLowerCase(map_name);
+						convert_to_lower_case(map_name);
 
 						if (maps_with_thumbnails.find(map_name) != maps_with_thumbnails.cend())
 						{

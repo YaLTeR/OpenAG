@@ -936,13 +936,3 @@ float CHud::GetSensitivity( void )
 {
 	return m_flMouseSensitivity;
 }
-
-void CHud::ConvertToLowerCase(const char *str)
-{
-	unsigned char *str_lw = (unsigned char *)str;
-	while (*str_lw) {
-		*str_lw = tolower(*str_lw);
-		str_lw++;
-	}
-}
-

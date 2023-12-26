@@ -177,6 +177,15 @@ static size_t get_player_count()
 	return player_count;
 }
 
+inline void convert_to_lower_case(const char *str)
+{
+	unsigned char *str_lw = (unsigned char *)str;
+	while (*str_lw) {
+		*str_lw = tolower(*str_lw);
+		str_lw++;
+	}
+}
+
 inline 	client_textmessage_t	*TextMessageGet( const char *pName ) { return gEngfuncs.pfnTextMessageGet( pName ); }
 inline 	int						TextMessageDrawChar( int x, int y, int number, int r, int g, int b ) 
 { 

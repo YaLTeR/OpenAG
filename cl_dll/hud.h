@@ -780,8 +780,6 @@ public:
 	void AddHudElem(CHudBase *p);
 
 	float GetSensitivity();
-
-	void ConvertToLowerCase(const char *str);
 };
 
 extern CHud gHUD;
