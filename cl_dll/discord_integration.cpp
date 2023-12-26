@@ -361,7 +361,7 @@ namespace discord_integration
 						else
 						{
 							auto closest_match = std::find_if(map_series_with_thumbnails.begin(), map_series_with_thumbnails.end(), [&](const std::string& str) {
-    												return static_cast<std::string>(map_name).find(str) != std::string::npos; // hl1_bhop_am_beta6 -> hl1_bhop_am
+    												return static_cast<std::string>(map_name).compare(0, str.length(), str) == 0; // hl1_bhop_am_beta6 -> hl1_bhop_am
 							});
 
 							if (closest_match != map_series_with_thumbnails.end())
