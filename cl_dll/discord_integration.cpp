@@ -25,7 +25,7 @@ namespace discord_integration
 		// This seems to be consistent across PCs.
 		constexpr const char STEAM_APP_ID[] = "17215498729465839686";
 
-		// This list was specially created for a map series, let’s say that “hl1_bhop_am” series have a several versions of maps (example: `hl1_bhop_am_beta1`), but in fact those maps are almost identical
+		// This list was specially created for a map series, let's say that "hl1_bhop_am" series have a several versions of maps (example: hl1_bhop_am_beta1), but in fact those maps are almost identical
 		// If the beginning of map name matches with what presented in the list, then we set the same name for the thumbnail as in the list (e.g. map name: hl1_bhop_uc1_beta1, thumbnail name: hl1_bhop_uc1)
 		const std::unordered_set<std::string> map_series_with_thumbnails {
 			"hl1_bhop_am"s,
