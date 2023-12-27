@@ -25,9 +25,12 @@ namespace discord_integration
 		// This seems to be consistent across PCs.
 		constexpr const char STEAM_APP_ID[] = "17215498729465839686";
 
+		// Maps in next lists must be lowercase!
+		// Discord RPC allow to upload 300 assets per app, but we also use one thumbnail as default icon, so the lists cannot contain more than 299 maps in total!
+
 		// This list was specially created for a map series, let's say that "hl1_bhop_am" series have a several versions of maps (example: hl1_bhop_am_beta1), but in fact those maps are almost identical
 		// If the beginning of map name matches with what presented in the list, then we set the same name for the thumbnail as in the list (e.g. map name: hl1_bhop_uc1_beta1, thumbnail name: hl1_bhop_uc1)
-		const std::unordered_set<std::string> map_series_with_thumbnails {
+		const std::unordered_set<std::string> map_series {
 			"hl1_bhop_am"s,
 			"hl1_bhop_bp1"s,
 			"hl1_bhop_bp2"s,
@@ -43,8 +46,33 @@ namespace discord_integration
 			"hl1_bhop_uc2"s,
 		};
 
-		// Maps in this list must be lowercase.
-		const std::unordered_set<std::string> maps_with_thumbnails {
+		const std::unordered_set<std::string> dm_maps {
+			"boot_camp"s,
+			"bootbox"s,
+			"bounce"s,
+			"crossfire"s,
+			"datacore"s,
+			"dm_dust2"s,
+			"eden"s,
+			"elixir"s,
+			"endcamp"s,
+			"frenzy"s,
+			"gasworks"s,
+			"havoc"s,
+			"killbox"s,
+			"lost_village2"s,
+			"outcry"s,
+			"rapidcore"s,
+			"scary_1"s,
+			"snark_pit"s,
+			"stalkx"s,
+			"stalkyard"s,
+			"subtransit"s,
+			"urethane"s,
+			"vengeance"s,
+		};
+
+		const std::unordered_set<std::string> bhop_maps {
 			"2bfree"s,
 			"8b1_hellinashop"s,
 			"ag_bhop_dungeon"s,
@@ -87,9 +115,6 @@ namespace discord_integration
 			"bkz_aztecbhop"s,
 			"bkz_goldbhop"s,
 			"bkz_junglebhop"s,
-			"boot_camp"s,
-			"bootbox"s,
-			"bounce"s,
 			"bunnyrace_beta2"s,
 			"cg_cbblebhop"s,
 			"cg_coldbhop_v2"s,
@@ -99,30 +124,21 @@ namespace discord_integration
 			"cnd_speed_bhop"s,
 			"cobkz_construction"s,
 			"cosy_merrychristmas4"s,
-			"crossfire"s,
 			"d2_mario_bhop"s,
-			"datacore"s,
 			"daza_junglebhop"s,
 			"de_racetownz"s,
 			"destructo_hops"s,
 			"dev_control"s,
 			"dg_winterclimb"s,
-			"dm_dust2"s,
 			"dr0_deepbluesea"s,
 			"dyd_axn_plant"s,
 			"dyd_axn_sky"s,
 			"dyd_cosy_cupbhop_ez"s,
 			"e1m1"s,
-			"eden"s,
-			"elixir"s,
-			"endcamp"s,
 			"fof_axn_scroll_killa"s,
 			"fof_chillbhop"s,
-			"frenzy"s,
 			"fu_darkhop"s,
-			"gasworks"s,
 			"gayl0rd_bhop"s,
-			"havoc"s,
 			"hl_trick"s,
 			"hm_castlebhop"s,
 			"hm_speedwinterz"s,
@@ -134,7 +150,6 @@ namespace discord_integration
 			"j2s_4floors"s,
 			"jagkz_inferno"s,
 			"ka_kart-race"s,
-			"killbox"s,
 			"klbk_go"s,
 			"ksz_skeleton"s,
 			"kz-endo_bikinihop"s,
@@ -174,24 +189,14 @@ namespace discord_integration
 			"kzru_mam6ahop"s,
 			"kzsca_snakebhop"s,
 			"kzsca_watertemple"s,
-			"lost_village2"s,
 			"mf_doom_e1m1_e"s,
-			"outcry"s,
 			"pd_shafthop"s,
 			"prochallenge2_longjump"s,
-			"rapidcore"s,
 			"rnr_speedcrag"s,
-			"scary_1"s,
 			"smk_floppytown"s,
-			"snark_pit"s,
 			"speed_ytt_egypt"s,
-			"stalkx"s,
-			"stalkyard"s,
-			"subtransit"s,
 			"uq_axn_imoor"s,
 			"uq_skrol_bhop"s,
-			"urethane"s,
-			"vengeance"s,
 			"xjbg_bhoptemple_hard"s,
 			"zjumps"s,
 			"ztricks"s
@@ -354,17 +359,17 @@ namespace discord_integration
 
 						convert_to_lower_case(map_name);
 
-						if (maps_with_thumbnails.find(map_name) != maps_with_thumbnails.cend())
+						if ((dm_maps.find(map_name) != dm_maps.cend()) || (bhop_maps.find(map_name) != bhop_maps.cend()))
 						{
 							presence.largeImageKey = map_name;
 						}
 						else
 						{
-							auto closest_match = std::find_if(map_series_with_thumbnails.begin(), map_series_with_thumbnails.end(), [&](const std::string& str) {
+							auto closest_match = std::find_if(map_series.begin(), map_series.end(), [&](const std::string& str) {
     												return static_cast<std::string>(map_name).compare(0, str.length(), str) == 0; // hl1_bhop_am_beta6 -> hl1_bhop_am
 							});
 
-							if (closest_match != map_series_with_thumbnails.end())
+							if (closest_match != map_series.end())
 							{
 								presence.largeImageKey = closest_match->c_str();
 							}
