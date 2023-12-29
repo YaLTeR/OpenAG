@@ -46,7 +46,8 @@ namespace discord_integration
 			"hl1_bhop_uc2"s,
 		};
 
-		const std::unordered_set<std::string> dm_maps {
+		const std::unordered_set<std::string> maps_with_thumbnails {
+			// DM maps
 			"boot_camp"s,
 			"bootbox"s,
 			"bounce"s,
@@ -70,9 +71,7 @@ namespace discord_integration
 			"subtransit"s,
 			"urethane"s,
 			"vengeance"s,
-		};
-
-		const std::unordered_set<std::string> bhop_maps {
+			// Bhop maps
 			"2bfree"s,
 			"8b1_hellinashop"s,
 			"ag_bhop_dungeon"s,
@@ -359,7 +358,7 @@ namespace discord_integration
 
 						convert_to_lower_case(map_name);
 
-						if ((dm_maps.find(map_name) != dm_maps.cend()) || (bhop_maps.find(map_name) != bhop_maps.cend()))
+						if (maps_with_thumbnails.find(map_name) != maps_with_thumbnails.cend())
 						{
 							presence.largeImageKey = map_name;
 						}
