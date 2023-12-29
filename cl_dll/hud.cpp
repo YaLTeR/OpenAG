@@ -936,3 +936,4 @@ float CHud::GetSensitivity( void )
 {
 	return m_flMouseSensitivity;
 }
+

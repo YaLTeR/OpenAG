@@ -780,6 +780,7 @@ public:
 	void AddHudElem(CHudBase *p);
 
 	float GetSensitivity();
+
 };
 
 extern CHud gHUD;
