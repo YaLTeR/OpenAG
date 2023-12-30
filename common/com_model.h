@@ -206,7 +206,7 @@ typedef struct glpoly_s
         float           verts[4][VERTEXSIZE];
 } glpoly_t;
 
-typedef struct mdisplaylist_t // Half-Life 25th Anniversary Update
+typedef struct mdisplaylist_s // Half-Life 25th Anniversary Update
 {
         unsigned gl_displaylist;
         int rendermode;
