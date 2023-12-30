@@ -121,8 +121,6 @@ static size_t count_digits(int n)
 
 static size_t get_map_name(char* dest, size_t count)
 {
-	memset(dest, 0, count);
-
 	auto map_path = gEngfuncs.pfnGetLevelName();
 
 	const char* slash = strrchr(map_path, '/');
