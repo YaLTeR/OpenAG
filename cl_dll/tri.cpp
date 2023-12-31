@@ -143,8 +143,6 @@ void DrawServerTriggers()
 	}
 }
 
-extern engine_studio_api_t IEngineStudio;
-
 /*
 =================
 HUD_DrawTransparentTriangles

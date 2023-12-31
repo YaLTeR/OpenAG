@@ -23,8 +23,6 @@
 
 #include "r_studioint.h"
 
-extern engine_studio_api_t IEngineStudio;
-
 #undef min
 #undef max
 
