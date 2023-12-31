@@ -644,6 +644,9 @@ public:
 	cvar_t  *hud_classautokill;
 	cvar_t  *hud_centerid;
 
+	cvar_t	*m_pShowServerTriggers;
+	cvar_t	*m_pShowServerTriggersAlpha;
+
 	int m_iFontHeight;
 
 	cvar_t* m_pCvarColor;
@@ -781,6 +784,9 @@ public:
 
 	float GetSensitivity();
 
+	bool IsTriggerForSinglePlayer(color24 rendercolor);
+
+	HSPRITE white_sprite = 0;
 };
 
 extern CHud gHUD;
