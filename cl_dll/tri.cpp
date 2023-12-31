@@ -163,13 +163,13 @@ void CL_DLLEXPORT HUD_DrawTransparentTriangles( void )
 	if ( g_pParticleMan )
 		 g_pParticleMan->Update();
 
-	if (gHUD.white_sprite)
-	{
-		if (gEngfuncs.pTriAPI->SpriteTexture(const_cast<model_s*>(gEngfuncs.GetSpritePointer(gHUD.white_sprite)), 0))
-		{
-			DrawServerTriggers();
+	if (!gHUD.white_sprite)
+		return;
 
-			gEngfuncs.pTriAPI->RenderMode(kRenderNormal);
-		}
-	}
+	if (!gEngfuncs.pTriAPI->SpriteTexture(const_cast<model_s*>(gEngfuncs.GetSpritePointer(gHUD.white_sprite)), 0))
+		return;
+
+	DrawServerTriggers();
+
+	gEngfuncs.pTriAPI->RenderMode(kRenderNormal);
 }
