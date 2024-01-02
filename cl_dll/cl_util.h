@@ -29,6 +29,16 @@
 #include <stdarg.h>  // "
 #include <string.h> // for strncpy()
 
+#ifdef _WIN32
+#define BUILD_OFFSET_LINUX 0
+#else
+#define BUILD_OFFSET_LINUX 1
+#endif
+
+constexpr int ENGINE_BUILD_ANNIVERSARY_FIRST = 9884 + BUILD_OFFSET_LINUX;
+
+#undef BUILD_OFFSET_LINUX
+
 // Macros to hook function calls into the HUD object
 #define HOOK_MESSAGE(x) gEngfuncs.pfnHookUserMsg(#x, __MsgFunc_##x );
 
