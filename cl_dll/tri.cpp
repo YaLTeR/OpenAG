@@ -42,6 +42,8 @@ extern IParticleMan *g_pParticleMan;
 #undef min
 #undef max
 
+extern engine_studio_api_t IEngineStudio;
+
 /*
 =================
 HUD_DrawNormalTriangles
@@ -105,9 +107,47 @@ void DrawAACuboid(triangleapi_s *pTriAPI, Vector corner1, Vector corner2)
 	pTriAPI->End();
 }
 
+void DrawPolyOrCuboid(model_t *model, Vector corner1, Vector corner2)
+{
+	auto pTriAPI = gEngfuncs.pTriAPI;
+
+	if (model && !model->nummodelsurfaces)
+	{
+		DrawAACuboid(pTriAPI, corner1, corner2);
+		return;
+	}
+
+	#ifndef SOFTWARE_BUILD
+	if (IEngineStudio.IsHardware() && model && model->nummodelsurfaces)
+	{
+		#define DrawPolygons(surfs) \
+		for (int i = 0; i < model->nummodelsurfaces; ++i) \
+		{ \
+			pTriAPI->Begin(TRI_POLYGON); \
+			for (int j = 0; j < surfs[i].polys->numverts; ++j) \
+			{ \
+				pTriAPI->Vertex3fv(surfs[i].polys->verts[j]); \
+			} \
+			pTriAPI->End(); \
+		}
+
+		if (gHUD.m_iEngineBuildNumber >= ENGINE_BUILD_ANNIVERSARY_FIRST)
+		{
+			const msurface_hw_25th_anniversary_t *surfs = (msurface_hw_25th_anniversary_t*)model->surfaces + model->firstmodelsurface;
+			DrawPolygons(surfs);
+		}
+		else
+		{
+			const msurface_t *surfs = model->surfaces + model->firstmodelsurface;
+			DrawPolygons(surfs);
+		}
+	}
+	#endif
+}
+
 void DrawServerTriggers()
 {
-	if ((gHUD.m_pShowServerTriggers->value > 0) && (gHUD.m_pShowServerTriggers->value != 2.0f))
+	if (gHUD.m_pShowServerTriggers->value > 0)
 	{
 		for (int e = 0; e < MAX_EDICTS; ++e)
 		{
@@ -134,7 +174,7 @@ void DrawServerTriggers()
 							Vector absmin = origin + mins;
 							Vector absmax = origin + maxs;
 
-							DrawAACuboid(gEngfuncs.pTriAPI, absmin, absmax);
+							DrawPolyOrCuboid(ent->model, absmin, absmax);
 						}
 					}
 				}
