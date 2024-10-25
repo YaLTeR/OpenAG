@@ -155,8 +155,6 @@ int CHudBattery::Draw(float flTime)
 
 	x += width;
 	y += (int)(gHUD.m_iFontHeight * 0.2f);
-
-	x += (m_prc1->right - m_prc1->left);
 	x = gHUD.DrawHudNumber(x, y, DHN_3DIGITS | DHN_DRAWZERO, m_iBat, r, g, b);
 
 	return 1;
