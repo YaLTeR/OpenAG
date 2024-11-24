@@ -35,18 +35,23 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {runs-on: windows-2019, toolset: v141_xp}
-          - {runs-on: windows-2022, toolset: v143}
+          - { runs-on: windows-2019, toolset: v141_xp }
+          - { runs-on: windows-2022, toolset: v143 }
         configuration: [Release, Debug]
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           submodules: recursive
+
       - name: CMake generate
         run: cmake -T ${{ matrix.config.toolset }} -A Win32 -B build
+
       - name: Build
         run: cmake --build build -j $env:NUMBER_OF_PROCESSORS --config ${{ matrix.configuration }}
-      - uses: actions/upload-artifact@v3
+
+      - name: Checkout repository
+        uses: actions/upload-artifact@v4
         if: matrix.config.toolset == 'v141_xp'
         with:
           name: openag-${{ runner.os }}-${{ matrix.configuration }}
@@ -65,20 +70,26 @@ jobs:
       CC: gcc-${{ matrix.gcc-ver }}
       CXX: g++-${{ matrix.gcc-ver }}
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           submodules: recursive
+
       - name: Setup
         run: |
           sudo add-apt-repository ppa:ubuntu-toolchain-r/test
           sudo apt-get update
           sudo apt-get install -y g++-${{ matrix.gcc-ver }}-multilib libgl-dev ninja-build rapidjson-dev
+
       - name: CMake generate
         run: cmake -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -B build
+
       - name: Build
         working-directory: build
         run: ninja
-      - uses: actions/upload-artifact@v3
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
         if: matrix.gcc-ver == '11'
         with:
           name: openag-${{ runner.os }}-${{ matrix.configuration }}
@@ -97,9 +108,11 @@ jobs:
       CC: clang-${{ matrix.clang-ver }}
       CXX: clang++-${{ matrix.clang-ver }}
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           submodules: recursive
+
       - name: Setup
         run: |
           if [ ${{ matrix.clang-ver }} -eq 16 ]; then
@@ -108,8 +121,10 @@ jobs:
           fi
           sudo apt-get update
           sudo apt-get install -y clang-${{ matrix.clang-ver }} g++-multilib libgl-dev ninja-build rapidjson-dev
+
       - name: CMake generate
         run: cmake -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -B build
+
       - name: Build
         working-directory: build
         run: ninja
