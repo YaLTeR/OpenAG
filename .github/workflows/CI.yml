@@ -50,7 +50,7 @@ jobs:
       - name: Build
         run: cmake --build build -j $env:NUMBER_OF_PROCESSORS --config ${{ matrix.configuration }}
 
-      - name: Checkout repository
+      - name: Upload build artifact
         uses: actions/upload-artifact@v4
         if: matrix.config.toolset == 'v141_xp'
         with:
