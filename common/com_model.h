@@ -278,9 +278,20 @@ struct msurface_s
 
 	color24         *samples;               // note: this is the actual lightmap data for this surface
 	decal_t         *pdecals;
-
-	//mdisplaylist_t         displaylist;   // Half-Life 25th Anniversary Update
 };
+#endif
+
+#ifdef __cplusplus
+struct msurface_hw_25th_anniversary_t : public msurface_t
+{
+	mdisplaylist_t displaylist;
+};
+#else
+typedef struct
+{
+	msurface_t surface;
+	mdisplaylist_t displaylist;
+} msurface_hw_25th_anniversary_t;
 #endif
 
 typedef struct

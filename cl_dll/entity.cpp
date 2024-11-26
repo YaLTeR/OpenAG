@@ -21,10 +21,13 @@
 
 #include "particleman.h"
 
+#include "com_model.h"
 #include "r_studioint.h"
 
 #undef min
 #undef max
+
+extern engine_studio_api_t IEngineStudio;
 
 extern IParticleMan *g_pParticleMan;
 
@@ -59,8 +62,14 @@ int CL_DLLEXPORT HUD_AddEntity( int type, struct cl_entity_s *ent, const char *m
 
 	// show triggers that would be transferred from server-side with specific value in renderfx to differ it from other entities
 	// update: there is a new implementation of displaying triggers that allows you to display even when planes is stripped due to optimizations in updated map compiler
-	// so this code will only work if the value 2 is specified in the cvar, but it should not be deleted imo
-	if ((ent->curstate.rendermode == kRenderTransColor) && (ent->curstate.renderfx == kRenderFxTrigger) && (gHUD.m_pShowServerTriggers->value == 2.0f) && !gHUD.IsTriggerForSinglePlayer(ent->curstate.rendercolor))
+	// update 2: we use that code if we know that client is uses software engine and number model surfaces data is available
+	// for hardware engine there is more advanced code that can for example changing alpha per side
+	if ((gHUD.m_pShowServerTriggers->value > 0) &&
+		(!IEngineStudio.IsHardware()) &&
+		(ent->model && ent->model->nummodelsurfaces) &&
+		(ent->curstate.rendermode == kRenderTransColor) &&
+		(ent->curstate.renderfx == kRenderFxTrigger) &&
+		!gHUD.IsTriggerForSinglePlayer(ent->curstate.rendercolor))
 		ent->curstate.renderamt = std::min(255.0f, std::max(0.0f, gHUD.m_pShowServerTriggersAlpha->value));
 
 	// hide corpses option

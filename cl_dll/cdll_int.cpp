@@ -151,6 +151,25 @@ void CL_DLLEXPORT HUD_PlayerMove( struct playermove_s *ppmove, int server )
 	PM_Move( ppmove, server );
 }
 
+void SaveEngineVersion()
+{
+	cvar_t *sv_version = gEngfuncs.pfnGetCvarPointer("sv_version");
+	if (sv_version)
+	{
+		strncpy(gHUD.m_szEngineVersion, sv_version->string, sizeof(gHUD.m_szEngineVersion) - 1);
+
+		// Parse build number
+		std::string version = gHUD.m_szEngineVersion;
+		size_t lastComma = version.rfind(',');
+		
+		if (lastComma != std::string::npos)
+		{
+			const char *buildStr = gHUD.m_szEngineVersion + lastComma + 1;
+			gHUD.m_iEngineBuildNumber = atoi(buildStr);
+		}
+	}
+}
+
 int CL_DLLEXPORT Initialize( cl_enginefunc_t *pEnginefuncs, int iVersion )
 {
 	gEngfuncs = *pEnginefuncs;
@@ -161,6 +180,8 @@ int CL_DLLEXPORT Initialize( cl_enginefunc_t *pEnginefuncs, int iVersion )
 		return 0;
 
 	memcpy(&gEngfuncs, pEnginefuncs, sizeof(cl_enginefunc_t));
+
+	SaveEngineVersion();
 
 	update_checker::check_for_updates();
 	discord_integration::initialize();
