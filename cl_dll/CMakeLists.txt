@@ -36,6 +36,8 @@ add_sources(
 	health.h
 	hud.cpp
 	hud.h
+	hud_nametags.h
+	hud_nametags.cpp
 	hud_bench.cpp
 	hud_benchtrace.cpp
 	hud_countdown.cpp
