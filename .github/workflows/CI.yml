@@ -102,7 +102,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        clang-ver: [11, 20]
+        clang-ver: [11, 15]
         configuration: [Release, Debug]
     env:
       CC: clang-${{ matrix.clang-ver }}
@@ -115,10 +115,6 @@ jobs:
 
       - name: Setup
         run: |
-          if [ ${{ matrix.clang-ver }} -eq 20 ]; then
-            wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-            sudo add-apt-repository 'deb https://apt.llvm.org/jammy/ llvm-toolchain-jammy-${{ matrix.clang-ver }} main'
-          fi
           sudo apt-get update
           sudo apt-get install -y clang-${{ matrix.clang-ver }} g++-multilib libgl-dev ninja-build rapidjson-dev
 
