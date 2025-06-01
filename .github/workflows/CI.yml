@@ -60,7 +60,7 @@ jobs:
 
   build-linux-gcc:
     name: Build (Linux, gcc-${{ matrix.gcc-ver }}, ${{ matrix.configuration }})
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
@@ -98,7 +98,7 @@ jobs:
 
   build-linux-clang:
     name: Build (Linux, clang-${{ matrix.clang-ver }}, ${{ matrix.configuration }})
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
