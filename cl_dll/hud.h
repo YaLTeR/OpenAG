@@ -787,6 +787,9 @@ public:
 	bool IsTriggerForSinglePlayer(color24 rendercolor);
 
 	HSPRITE white_sprite = 0;
+
+	char m_szEngineVersion[256];
+	int m_iEngineBuildNumber = -1;
 };
 
 extern CHud gHUD;
