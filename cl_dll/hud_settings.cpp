@@ -49,36 +49,39 @@ int CHudSettings::Draw(float time)
 
 	char str[32];
 
-	sprintf(str, "AG version %s", ag_version);
-	gEngfuncs.pfnDrawString(x, (y += gHUD.m_scrinfo.iCharHeight), str, r, g, b);
-
-	gEngfuncs.pfnDrawString(x, (y += gHUD.m_scrinfo.iCharHeight), gamemode, r, g, b);
-
-	sprintf(str, "Time limit: %hhd", time_limit);
-	gEngfuncs.pfnDrawString(x, (y += gHUD.m_scrinfo.iCharHeight / 2 * 3), str, r, g, b);
-
-	sprintf(str, "Frag limit: %hhd", frag_limit);
-	gEngfuncs.pfnDrawString(x, (y += gHUD.m_scrinfo.iCharHeight), str, r, g, b);
-
-	sprintf(str, "Friendly fire: %s", friendly_fire ? "On" : "Off");
-	gEngfuncs.pfnDrawString(x, (y += gHUD.m_scrinfo.iCharHeight), str, r, g, b);
-
-	sprintf(str, "Weaponstay: %s", weapon_stay ? "On" : "Off");
-	gEngfuncs.pfnDrawString(x, (y += gHUD.m_scrinfo.iCharHeight), str, r, g, b);
-
-	if (wallgauss[0]) {
-		sprintf(str, "Wallgauss: %sx (1)", wallgauss);
+	extern cvar_t* hud_watermark;
+	if (hud_watermark->value == 1) {
+		sprintf(str, "AG version %s", ag_version);
 		gEngfuncs.pfnDrawString(x, (y += gHUD.m_scrinfo.iCharHeight), str, r, g, b);
-	}
 
-	if (headshot[0]) {
-		sprintf(str, "Headshot: %sx (3)", headshot);
-		gEngfuncs.pfnDrawString(x, (y += gHUD.m_scrinfo.iCharHeight), str, r, g, b);
-	}
+		gEngfuncs.pfnDrawString(x, (y += gHUD.m_scrinfo.iCharHeight), gamemode, r, g, b);
 
-	if (blast_radius[0]) {
-		sprintf(str, "Blast radius: %sx (1)", blast_radius);
+		sprintf(str, "Time limit: %hhd", time_limit);
+		gEngfuncs.pfnDrawString(x, (y += gHUD.m_scrinfo.iCharHeight / 2 * 3), str, r, g, b);
+
+		sprintf(str, "Frag limit: %hhd", frag_limit);
 		gEngfuncs.pfnDrawString(x, (y += gHUD.m_scrinfo.iCharHeight), str, r, g, b);
+
+		sprintf(str, "Friendly fire: %s", friendly_fire ? "On" : "Off");
+		gEngfuncs.pfnDrawString(x, (y += gHUD.m_scrinfo.iCharHeight), str, r, g, b);
+
+		sprintf(str, "Weaponstay: %s", weapon_stay ? "On" : "Off");
+		gEngfuncs.pfnDrawString(x, (y += gHUD.m_scrinfo.iCharHeight), str, r, g, b);
+
+		if (wallgauss[0]) {
+			sprintf(str, "Wallgauss: %sx (1)", wallgauss);
+			gEngfuncs.pfnDrawString(x, (y += gHUD.m_scrinfo.iCharHeight), str, r, g, b);
+		}
+
+		if (headshot[0]) {
+			sprintf(str, "Headshot: %sx (3)", headshot);
+			gEngfuncs.pfnDrawString(x, (y += gHUD.m_scrinfo.iCharHeight), str, r, g, b);
+		}
+
+		if (blast_radius[0]) {
+			sprintf(str, "Blast radius: %sx (1)", blast_radius);
+			gEngfuncs.pfnDrawString(x, (y += gHUD.m_scrinfo.iCharHeight), str, r, g, b);
+		}
 	}
 
 	if (match_is_on) {
