@@ -35,7 +35,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { runs-on: windows-latest, toolset: v143 }
+          - { runs-on: windows-2022, toolset: v143 }
         configuration: [Release, Debug]
     steps:
       - name: Checkout repository
