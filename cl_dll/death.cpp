@@ -97,7 +97,12 @@ int CHudDeathNotice :: VidInit( void )
 
 int CHudDeathNotice :: Draw( float flTime )
 {
-	int x, y, r, g, b;
+	int x, y, r, g, b, texty;
+
+	int gap = 20;
+
+	rect_s sprite = gHUD.GetSpriteRect(m_HUD_d_skull);
+	gap = sprite.bottom - sprite.top;
 
 	for ( int i = 0; i < MAX_DEATHNOTICES; i++ )
 	{
@@ -118,10 +123,11 @@ int CHudDeathNotice :: Draw( float flTime )
 		if ( gViewPort && gViewPort->AllowedToPrintText() )
 		{
 			// Draw the death notice
-			y = DEATHNOTICE_TOP + 2 + (20 * i);  //!!!
+			y = DEATHNOTICE_TOP + 2 + (gap * i);  //!!!
+			texty = y + 4;
 
 			int id = (rgDeathNoticeList[i].iId == -1) ? m_HUD_d_skull : rgDeathNoticeList[i].iId;
-			x = ScreenWidth - ConsoleStringLen(rgDeathNoticeList[i].szVictim) - (gHUD.GetSpriteRect(id).right - gHUD.GetSpriteRect(id).left);
+			x = ScreenWidth - ConsoleStringLen(rgDeathNoticeList[i].szVictim) - (gHUD.GetSpriteRect(id).right - gHUD.GetSpriteRect(id).left) - 4;
 
 			if ( !rgDeathNoticeList[i].iSuicide )
 			{
@@ -131,7 +137,7 @@ int CHudDeathNotice :: Draw( float flTime )
 				if ( rgDeathNoticeList[i].KillerColor )
 					x = 5 + gHUD.DrawConsoleStringWithColorTags(
 						x,
-						y,
+						texty,
 						rgDeathNoticeList[i].szKiller,
 						true,
 						rgDeathNoticeList[i].KillerColor[0],
@@ -168,7 +174,7 @@ int CHudDeathNotice :: Draw( float flTime )
 						rgDeathNoticeList[i].VictimColor[2]
 					);
 				else
-					x = DrawConsoleString( x, y, rgDeathNoticeList[i].szVictim );
+					x = DrawConsoleString( x, texty, rgDeathNoticeList[i].szVictim );
 			}
 		}
 	}
