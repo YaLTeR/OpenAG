@@ -35,7 +35,6 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { runs-on: windows-2019, toolset: v141_xp }
           - { runs-on: windows-2022, toolset: v143 }
         configuration: [Release, Debug]
     steps:
@@ -52,7 +51,6 @@ jobs:
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
-        if: matrix.config.toolset == 'v141_xp'
         with:
           name: openag-${{ runner.os }}-${{ matrix.configuration }}
           path: build\${{ matrix.configuration }}\client.dll
