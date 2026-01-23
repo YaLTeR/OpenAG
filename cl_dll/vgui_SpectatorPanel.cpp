@@ -100,7 +100,9 @@ void SpectatorPanel::Initialize()
 	//m_TopBorder = new CTransparentPanel(255, 0, 0, ScreenWidth, PANEL_HEIGHT);
 	//m_TopBorder->setParent(this);
 
-	m_BottomBorder = new CTransparentPanel(255, 0, ScreenHeight - PANEL_HEIGHT, ScreenWidth, PANEL_HEIGHT);
+	int offset = (ScreenHeight <= 1080) ? 0 : (int)((ScreenHeight - 1080) * 0.06f + 0.5f);
+
+	m_BottomBorder = new CTransparentPanel(255, 0, ScreenHeight - PANEL_HEIGHT - offset, ScreenWidth, PANEL_HEIGHT + offset);
 	m_BottomBorder->setParent(this);
 
 	setPaintBackgroundEnabled(false);
